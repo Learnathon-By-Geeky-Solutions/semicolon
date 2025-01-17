@@ -1,13 +1,24 @@
 import React, { useState, FormEvent } from 'react';
+import axios from "axios";
+import { SERVER_URL } from '../../constants/paths';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    alert("Logging in with Email: " + email);
-    // Add login logic here
+    try {
+      const response = await axios.post(`${SERVER_URL}/api/v1/auth/login`, {
+        email,
+        password,
+      });
+      alert(response);
+
+    } catch (error) {
+      console.error('Login failed', error);
+      alert(error);
+    }
   };
 
   return (

@@ -2,14 +2,14 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate(); 
 
   const handleLoginClick = () => {
-    navigate("/login"); // Navigate to the login page
+    navigate("/login");
   };
 
   const handleSignUpClick = () => {
-    navigate("/signup"); // Navigate to the sign-up page
+    navigate("/signup"); 
   };
 
   return (

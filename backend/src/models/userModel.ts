@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     districtId: { type: String }, 
     approved: { type: Boolean, default: false },
     permissions: { type: [String], enum: Object.values(Permission) },
-    documents: { type: String }, 
+    documents: { type: Buffer },
     isVerfied: {type: Boolean, default : false},
 
     resetPasswordToken : String,

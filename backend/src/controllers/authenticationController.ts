@@ -3,13 +3,18 @@ import { hash, compare } from 'bcrypt';
 import { User } from "../models/userModel.js";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 import { COOKIE_NAME } from "../constants/auth.js";
+import upload from "../middlewares/fileUploadMiddleware.js";
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
 
         const {email, password, name, role} = req.body;
+        const documentFile = req.file;
         try {
             if(!email || !password || !name || !role){
                 throw new Error ("All fields are required");
+            }
+            if ((role === "authority" || role === "volunteer") && !documentFile) {
+                return res.status(400).json({ success: false, message: "Document upload is required for this role." });
             }
             const userAlreadyExist = await User.findOne({email});
             if(userAlreadyExist){
@@ -23,6 +28,7 @@ export const signup = async (req:Request, res:Response, next:NextFunction) => {
                 email : email,
                 password : hashedPassword,
                 role : role,
+                documents: documentFile ? documentFile.buffer : null,
                 verificationToken : verificationCode,
                 verificationTokenExpiresAt: Date.now() + 24*60*60*1000 // 24 hours validity 
             })

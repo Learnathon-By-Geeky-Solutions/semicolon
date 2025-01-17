@@ -26,4 +26,13 @@ export const loginValidator = [
 export const signupValidator = [
     body("name").notEmpty().withMessage("Name is required"),
     ...loginValidator,
+    body("role")
+        .isIn(["user", "admin", "authority", "volunteer"])
+        .withMessage("Invalid role"),
+    body("document").custom((_, { req }) => {
+        if ((req.body.role === "authority" || req.body.role === "volunteer") && !req.file) {
+            throw new Error("Document upload is required for this role");
+        }
+        return true;
+    }),
 ];
