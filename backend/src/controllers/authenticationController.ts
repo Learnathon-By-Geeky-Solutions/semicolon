@@ -4,12 +4,9 @@ import { User } from "../models/userModel.js";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 
 
-export const signup = async (
-    req:Request,
-    res:Response, 
-    next:NextFunction) => {
+export const signup = async (req:Request, res:Response, next:NextFunction) => {
+
         const {email, password, name, role} = req.body;
-    
         try {
             if(!email || !password || !name || !role){
                 throw new Error ("All fields are required");
@@ -47,10 +44,40 @@ export const signup = async (
             return res.status(201).json({success: false, message: error.message});
         }
 }
-export const login = async (req, res) => {
-    res.send("login");
-}
+export const login = async (req : Request, res : Response, next: NextFunction) => {
 
-export const logout = async (req, res) => {
-    res.send("logout");
-}
+	const { email, password } = req.body;
+	try {
+		const user = await User.findOne({ email });
+		if (!user) {
+			return res.status(400).json({ success: false, message: "Invalid credentials" });
+		}
+		const isPasswordValid = await compare(password, user.password);
+		if (!isPasswordValid) {
+			return res.status(400).json({ success: false, message: "Invalid credentials" });
+		}
+
+		generateTokenAndSetCookie(res, user._id);
+
+		await user.save();
+
+		res.status(200).json({
+			success: true,
+			message: "Logged in successfully",
+			user: {
+				...user.toObject(),
+				password: undefined,
+			},
+		});
+	} catch (error) {
+		console.log("Error in login ", error);
+		res.status(400).json({ success: false, message: error.message });
+	}
+};
+
+export const logout = async (req : Request, res : Response, next: NextFunction) => {
+	res.clearCookie("token");
+	res.status(200).json({ success: true, message: "Logged out successfully" });
+};
+
+
