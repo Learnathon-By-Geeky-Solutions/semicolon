@@ -21,19 +21,13 @@ const SignUpPage: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('email', email);
-    formData.append('password', password);
-    formData.append('role', role);
-
-    if ((role === 'authority' || role === 'volunteer') && document) {
-        formData.append('document', document);
-    }
-
     try {
-			await signup(email, password, name, role);
+      if ((role === 'authority' || role === 'volunteer') && document) {
+          console.log("here");
+         await signup(email, password, name, role, document);
+      } else {
+			  await signup(email, password, name, role);
+      }
 			navigate("/");
 		} catch (error) {
 			console.log(error);

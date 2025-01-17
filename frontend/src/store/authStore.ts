@@ -25,7 +25,7 @@ interface AuthState {
   isLoading: boolean;
   isCheckingAuth: boolean;
   message: string | null;
-  signup: (email: string, password: string, name: string, role: "admin" | "authority" | "volunteer" | "user") => Promise<void>;
+  signup: (email: string, password: string, name: string, role: "admin" | "authority" | "volunteer" | "user", document?: File | string ) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -40,10 +40,27 @@ export const useAuthStore = create<AuthState>((set) => ({
   isCheckingAuth: true,
   message: null,
 
-  signup: async (email, password, name, role) => {
+  signup: async (email, password, name, role, document) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/signup`, { email, password, name, role });
+        const formData = new FormData();
+        
+        formData.append("email", email);
+        formData.append("password", password);
+        formData.append("name", name);
+        formData.append("role", role);
+    
+        if ((role === 'authority' || role === 'volunteer') && document) {
+          formData.append("document", document); 
+        }
+    
+        console.log("final formData", formData);
+            const response = await axios.post(`${API_URL}/signup`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+    
       set({ user: response.data.user, isAuthenticated: true, isLoading: false });
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
