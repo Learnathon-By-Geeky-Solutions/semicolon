@@ -4,7 +4,6 @@ import { User } from "../models/userModel.js";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 import { COOKIE_NAME } from "../constants/auth.js";
 
-
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
 
         const {email, password, name, role} = req.body;
@@ -45,6 +44,7 @@ export const signup = async (req:Request, res:Response, next:NextFunction) => {
             return res.status(201).json({success: false, message: error.message});
         }
 }
+
 export const login = async (req : Request, res : Response, next: NextFunction) => {
 
 	const { email, password } = req.body;
