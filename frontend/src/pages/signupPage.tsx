@@ -1,6 +1,7 @@
 import React, { useState, FormEvent, ChangeEvent } from "react";
-import axios from "axios";
-import { SERVER_URL } from '../../constants/paths';
+import { useAuthStore } from "../store/authStore";
+import { useNavigate } from "react-router-dom";
+
 
 const SignUpPage: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -8,6 +9,9 @@ const SignUpPage: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [role, setRole] = useState<"user" | "admin" | "authority" | "volunteer">("user");
   const [document, setDocument] = useState<File | null>(null);
+
+  const navigate = useNavigate();
+  const { signup } = useAuthStore();
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -29,17 +33,11 @@ const SignUpPage: React.FC = () => {
     }
 
     try {
-        const response = await axios.post(`${SERVER_URL}/api/v1/auth/signup`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-
-        alert(response.data.message);  
-    } catch (error) {
-        console.error('Error during signup', error);
-        alert('An error occurred during signup.');
-    }
+			await signup(email, password, name, role);
+			navigate("/");
+		} catch (error) {
+			console.log(error);
+		}
 };
 
   return (

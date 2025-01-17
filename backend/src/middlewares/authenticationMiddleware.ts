@@ -30,3 +30,24 @@ export const verifyToken = (req: AuthenticatedRequest, res: Response, next: Next
         return res.status(400).json({ success: false, message: "No token is provided. Authorization denied." });
     }
 }
+
+
+
+export const verifyTokenForCheckAuth = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    console.log(req.cookies);
+	const token = req.cookies.token;
+    // console.log(token);
+	if (!token) return res.status(401).json({ success: false, message: "Unauthorized - no token provided" });
+	try {
+		const decoded = jwt.verify(token, process.env.JWT_SECRET) as DecodedToken;
+
+		if (!decoded) return res.status(401).json({ success: false, message: "Unauthorized - invalid token" });
+        // console.log(decoded)
+        req.user = decoded;
+		// req.userId = decoded.userId;
+		next();
+	} catch (error) {
+		console.log("Error in verifyToken ", error);
+		return res.status(500).json({ success: false, message: "Server error" });
+	}
+};

@@ -1,8 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate(); 
+    const { logout } = useAuthStore();
+  
 
   const handleLoginClick = () => {
     navigate("/login");
@@ -10,6 +13,10 @@ const HomePage: React.FC = () => {
 
   const handleSignUpClick = () => {
     navigate("/signup"); 
+  };
+  const handleLogoutClick = async () => {
+    await logout();
+    navigate("/logout"); 
   };
 
   return (
@@ -34,6 +41,13 @@ const HomePage: React.FC = () => {
             onClick={handleSignUpClick}
           >
             Sign Up
+          </button>
+
+          <button
+            className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300"
+            onClick={handleLogoutClick}
+          >
+              Log Out
           </button>
         </div>
       </div>

@@ -1,4 +1,7 @@
 import { Route, Routes } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { useAuthStore } from "./store/authStore";
+import { useEffect } from "react";
 import HomePage  from "./pages/homePage";
 import LoginPage from "./pages/loginPage";
 import SignUpPage from "./pages/signupPage";
@@ -8,7 +11,16 @@ import VolunteerDashboard from "./pages/volunteerDashboard";
 import UserDashboard from "./pages/userDashboard";
 
 function App() {
- 
+
+  const { user, isAuthenticated, checkAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    console.log("Auth State:", { isAuthenticated, user });
+  }, [isAuthenticated, user]); 
 
   return (
     <>
@@ -25,6 +37,7 @@ function App() {
 
           <Route path="/logout" element={"LOGOUT"} />
         </Routes>
+        <Toaster />
       </div>
     </>
   )

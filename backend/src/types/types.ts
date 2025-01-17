@@ -1,14 +1,19 @@
 import { Request} from "express";
 
 export interface DecodedToken {
-    id: string;
+    userId: string;
     email: string,
     role: string;
 }
 export interface AuthenticatedRequest extends Request {
     user?: {
-        id: string;
+        userId: string;
         email: string,
         role: string;
     };
+}
+export interface CustomRequest extends Request {
+    userId: string; 
+    email: string;
+    role: string;
 }

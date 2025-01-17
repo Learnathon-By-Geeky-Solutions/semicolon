@@ -1,23 +1,22 @@
 import React, { useState, FormEvent } from 'react';
-import axios from "axios";
-import { SERVER_URL } from '../../constants/paths';
+import { useAuthStore } from '../store/authStore';
+import { useNavigate } from "react-router-dom";
+
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-
+  const { login , user} = useAuthStore();
+  const navigate = useNavigate();
+  
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${SERVER_URL}/api/v1/auth/login`, {
-        email,
-        password,
-      });
-      alert(response);
-
+      await login(email, password);
+      console.log(user);
+      navigate("/");
     } catch (error) {
       console.error('Login failed', error);
-      alert(error);
     }
   };
 
