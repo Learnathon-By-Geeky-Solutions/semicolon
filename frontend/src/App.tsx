@@ -1,10 +1,21 @@
+import { Route, Routes } from "react-router-dom";
+import HomePage  from "./pages/homePage";
+import LoginPage from "./pages/loginPage";
+import SignUpPage from "./pages/signupPage";
 
 function App() {
  
 
   return (
     <>
-      <h1 className="text-green-950">CrisisCompass</h1>
+      <div> 
+        <Routes>
+          <Route path="/" element={<HomePage/>} />
+          <Route path="/signup" element={<SignUpPage/>} />
+          <Route path="/login" element={<LoginPage/>} />
+          <Route path="/logout" element={"LOGOUT"} />
+        </Routes>
+      </div>
     </>
   )
 }
