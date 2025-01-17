@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { NextFunction, Request, Response } from "express";
+import { Response } from "express";
 import { COOKIE_NAME } from "../constants/auth.js";
 
 export const generateTokenAndSetCookie = (res:Response, userId, email, role) => {
