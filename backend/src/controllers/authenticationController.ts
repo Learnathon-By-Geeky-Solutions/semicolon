@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { hash, compare } from 'bcrypt';
 import { User } from "../models/userModel.js";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
+import { COOKIE_NAME } from "../constants/auth.js";
 
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
@@ -28,7 +29,7 @@ export const signup = async (req:Request, res:Response, next:NextFunction) => {
             })
             await user.save();
 
-            generateTokenAndSetCookie(res, user._id);
+            generateTokenAndSetCookie(res, user._id, user.email, user.role);
             res.status(201).json({
                 success: true,
                 message : "user created successfully",
@@ -57,9 +58,7 @@ export const login = async (req : Request, res : Response, next: NextFunction) =
 			return res.status(400).json({ success: false, message: "Invalid credentials" });
 		}
 
-		generateTokenAndSetCookie(res, user._id);
-
-		await user.save();
+		generateTokenAndSetCookie(res, user._id, user.email, user.role);
 
 		res.status(200).json({
 			success: true,
@@ -76,8 +75,14 @@ export const login = async (req : Request, res : Response, next: NextFunction) =
 };
 
 export const logout = async (req : Request, res : Response, next: NextFunction) => {
-	res.clearCookie("token");
-	res.status(200).json({ success: true, message: "Logged out successfully" });
+    try {
+        res.clearCookie(COOKIE_NAME);
+	    res.status(200).json({ success: true, message: "Logged out successfully" });
+    } catch (error) {
+        console.log("Error logging out ", error);
+		res.status(400).json({ success: false, message: error.message });
+    }
+	
 };
 
 

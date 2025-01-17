@@ -1,12 +1,13 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
+import { COOKIE_NAME } from "../constants/auth.js";
 
-export const generateTokenAndSetCookie = (res:Response, userId) => {
-	const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+export const generateTokenAndSetCookie = (res:Response, userId, email, role) => {
+	const token = jwt.sign({ userId, email, role }, process.env.JWT_SECRET, {
 		expiresIn: "7d",
 	});
 
-	res.cookie("token", token, {
+	res.cookie(COOKIE_NAME, token, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: "strict",
