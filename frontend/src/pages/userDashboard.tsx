@@ -11,7 +11,7 @@ const UserDashboard: React.FC = () => {
         <h2 className="text-2xl font-bold mb-6">CrisisCompass</h2>
         <ul className="flex flex-col flex-grow">
           <li>
-            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300">
+            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300" onClick={() => navigate("/")}>
               Home
             </button>
           </li>
@@ -28,14 +28,6 @@ const UserDashboard: React.FC = () => {
           <li>
             <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300">
               Contact Authorities
-            </button>
-          </li>
-          <li>
-            <button
-              className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300"
-              onClick={() => navigate("/login")}
-            >
-              Logout
             </button>
           </li>
         </ul>

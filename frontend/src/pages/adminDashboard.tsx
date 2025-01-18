@@ -11,6 +11,11 @@ const AdminDashboard: React.FC = () => {
         <h2 className="text-2xl font-bold mb-6">CrisisCompass</h2>
         <ul className="flex flex-col flex-grow">
           <li>
+            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300" onClick={() => navigate("/")}>
+              Home
+            </button>
+          </li>
+          <li>
             <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300">
               Dashboard
             </button>
@@ -30,14 +35,7 @@ const AdminDashboard: React.FC = () => {
               View Resources
             </button>
           </li>
-          <li>
-            <button
-              className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300"
-              onClick={() => navigate("/login")}
-            >
-              Logout
-            </button>
-          </li>
+          
         </ul>
       </div>
 

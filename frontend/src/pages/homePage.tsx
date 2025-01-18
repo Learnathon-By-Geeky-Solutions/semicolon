@@ -4,7 +4,7 @@ import { useAuthStore } from "../store/authStore";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate(); 
-    const { logout } = useAuthStore();
+    const { logout, isAuthenticated, user } = useAuthStore();
   
 
   const handleLoginClick = () => {
@@ -16,7 +16,19 @@ const HomePage: React.FC = () => {
   };
   const handleLogoutClick = async () => {
     await logout();
-    navigate("/logout"); 
+    navigate("/"); 
+  };
+
+  const handleDashboardClick = () => {
+    const roleBasedRedirect: Record<string, string> = {
+      admin: "/admin",
+      authority: "/authority",
+      volunteer: "/volunteer",
+      user: "/user",
+    };
+    if (user && user.role in roleBasedRedirect) {
+      navigate(roleBasedRedirect[user.role]);
+    }
   };
 
   return (
@@ -30,26 +42,41 @@ const HomePage: React.FC = () => {
         </p>
         <div className="flex space-x-4">
           {/* Login and Sign-up Buttons */}
-          <button
-            className="px-6 py-3 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-800 transition duration-300"
-            onClick={handleLoginClick}
-          >
-            Login
-          </button>
-          <button
-            className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300"
-            onClick={handleSignUpClick}
-          >
-            Sign Up
-          </button>
+          {!isAuthenticated ? (
+            <>
+              <button
+                className="px-6 py-3 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-800 transition duration-300"
+                onClick={handleLoginClick}
+              >
+                Login
+              </button>
+              <button
+                className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300"
+                onClick={handleSignUpClick}
+              >
+                Sign Up
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Dashboard Button */}
+              <button
+                className="px-6 py-3 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-800 transition duration-300"
+                onClick={handleDashboardClick}
+              >
+                Dashboard
+              </button>
 
-          <button
-            className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300"
-            onClick={handleLogoutClick}
-          >
-              Log Out
-          </button>
+              <button
+                className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-700 transition duration-300"
+                onClick={handleLogoutClick}
+              >
+                Log Out
+              </button>
+            </>
+          )}
         </div>
+
       </div>
 
       {/* Footer Section */}
