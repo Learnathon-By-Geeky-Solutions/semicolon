@@ -27,26 +27,24 @@ function App() {
   }, [isAuthenticated, user]); 
 
   return (
-    <>
-      <div> 
-        <Routes>
-          
-          <Route path="/" element={<HomePage/>} />
-          
-          <Route path="/signup" element={<RedirectAuthenticatedUser> <SignUpPage/> </RedirectAuthenticatedUser>} />
-          <Route path="/login" element={ <RedirectAuthenticatedUser> <LoginPage/></RedirectAuthenticatedUser> } />
+    <div> 
+      <Routes>
+        
+        <Route path="/" element={<HomePage/>} />
+        
+        <Route path="/signup" element={<RedirectAuthenticatedUser> <SignUpPage/> </RedirectAuthenticatedUser>} />
+        <Route path="/login" element={ <RedirectAuthenticatedUser> <LoginPage/></RedirectAuthenticatedUser> } />
 
-          <Route path="/admin" element={<ProtectedRoute><AdminDashboard/></ProtectedRoute>} />
-          <Route path="/authority" element={ <ProtectedRoute>  <AuthorityDashboard/> </ProtectedRoute>} />
-          <Route path="/volunteer" element={<ProtectedRoute> <VolunteerDashboard/> </ProtectedRoute>} />
-          <Route path="/user" element={<ProtectedRoute><UserDashboard/></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><AdminDashboard/></ProtectedRoute>} />
+        <Route path="/authority" element={ <ProtectedRoute>  <AuthorityDashboard/> </ProtectedRoute>} />
+        <Route path="/volunteer" element={<ProtectedRoute> <VolunteerDashboard/> </ProtectedRoute>} />
+        <Route path="/user" element={<ProtectedRoute><UserDashboard/></ProtectedRoute>} />
 
 
-          <Route path="/logout" element={"LOGOUT"} />
-        </Routes>
-        <Toaster />
-      </div>
-    </>
+        <Route path="/logout" element={"LOGOUT"} />
+      </Routes>
+      <Toaster />
+    </div>
   )
 }
 

@@ -1,6 +1,5 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
-import { COOKIE_NAME } from "../constants/auth.js";
 import { AuthenticatedRequest, DecodedToken } from "../types/types.js";
 
 export const verifyToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -36,15 +35,11 @@ export const verifyToken = (req: AuthenticatedRequest, res: Response, next: Next
 export const verifyTokenForCheckAuth = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     console.log(req.cookies);
 	const token = req.cookies.token;
-    // console.log(token);
 	if (!token) return res.status(401).json({ success: false, message: "Unauthorized - no token provided" });
 	try {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET) as DecodedToken;
-
 		if (!decoded) return res.status(401).json({ success: false, message: "Unauthorized - invalid token" });
-        // console.log(decoded)
         req.user = decoded;
-		// req.userId = decoded.userId;
 		next();
 	} catch (error) {
 		console.log("Error in verifyToken ", error);

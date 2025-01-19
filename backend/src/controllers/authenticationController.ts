@@ -2,9 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { hash, compare } from 'bcrypt';
 import { User } from "../models/userModel.js";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
-import { COOKIE_NAME } from "../constants/auth.js";
-import upload from "../middlewares/fileUploadMiddleware.js";
-import { CustomRequest, AuthenticatedRequest } from "../types/types.js";
+import {  AuthenticatedRequest } from "../types/types.js";
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
 
@@ -94,9 +92,7 @@ export const logout = async (req : Request, res : Response, next: NextFunction) 
 
 export const checkAuth = async  (req : AuthenticatedRequest, res : Response, next: NextFunction) => {
 	try {
-        // console.log(req.user.userId)
         const user = await User.findOne({ _id: req.user.userId });
-        // console.log(user);
 		if (!user) {
 			return res.status(400).json({ success: false, message: "User not found" });
 		}
