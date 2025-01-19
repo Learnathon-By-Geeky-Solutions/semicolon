@@ -16,6 +16,7 @@ const HomePage: React.FC = () => {
   };
   const handleLogoutClick = async () => {
     await logout();
+    window.location.reload();
     navigate("/"); 
   };
 
