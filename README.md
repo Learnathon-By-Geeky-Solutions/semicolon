@@ -9,7 +9,7 @@
 - musaberul-bs23
 
 ## Project Description
-Add your project description here.
+CrisisCompass is a disaster management app with real-time alerts, AI-driven disaster prediction, and resource request features
 
 ## Getting Started
 1. Clone the repository
