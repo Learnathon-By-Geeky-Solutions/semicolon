@@ -38,7 +38,7 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard/></ProtectedRoute>} />
         <Route path="/authority" element={ <ProtectedRoute>  <AuthorityDashboard/> </ProtectedRoute>} />
         <Route path="/volunteer" element={<ProtectedRoute> <VolunteerDashboard/> </ProtectedRoute>} />
-        <Route path="/user" element={<ProtectedRoute><UserDashboard/></ProtectedRoute>} />
+        <Route path="/user/:email" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} /> {/* Dynamic user route */}
 
 
         <Route path="/logout" element={"LOGOUT"} />

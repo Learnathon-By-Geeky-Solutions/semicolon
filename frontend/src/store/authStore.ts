@@ -15,6 +15,7 @@ interface User {
     name: string;
     email: string;
     role: "admin" | "authority" | "volunteer" | "user"; 
+    family: string[];
     documents?: Document[]; 
 }
 
@@ -24,11 +25,14 @@ interface AuthState {
   error: string | null;
   isLoading: boolean;
   isCheckingAuth: boolean;
+  users:string[];
   message: string | null;
+  
   signup: (email: string, password: string, name: string, role: "admin" | "authority" | "volunteer" | "user", document?: File | string ) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+
 }
 axios.defaults.withCredentials = true;
 
@@ -36,6 +40,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   error: null,
+  users: [],
   isLoading: false,
   isCheckingAuth: true,
   message: null,
@@ -80,12 +85,19 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(`${API_URL}/login`, { email, password });
+
+      console.log("2");
+      const usersResponse = await axios.get("http://localhost:5000/api/v1/user/all"); // Assuming this is the endpoint to fetch all users
+      const allUsers = usersResponse.data.data; // Store users in an array
+     console.log(allUsers);
       set({
         isAuthenticated: true,
         user: response.data.user,
+        users:allUsers,
         error: null,
         isLoading: false,
       });
+      
     }catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           set({

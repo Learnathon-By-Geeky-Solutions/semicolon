@@ -3,9 +3,8 @@ import { ReactNode, useEffect, useState } from "react";
 import { useAuthStore } from "../store/authStore"; // Adjust the path as needed
 
 interface User {
-  _id: string;
+  email: string; // Email is now used for the unique path
   name: string;
-  email: string;
   role: string;
   approved: boolean;
   permissions: string[];
@@ -14,6 +13,8 @@ interface User {
   verificationTokenExpiresAt?: string;
   createdAt: string;
   updatedAt: string;
+  family: string[]; 
+  users: string[];
 }
 
 interface RedirectAuthenticatedUserProps {
@@ -30,16 +31,16 @@ export const RedirectAuthenticatedUser = ({ children }: RedirectAuthenticatedUse
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      const roleBasedRedirect: Record<string, string> = {
-        admin: "/admin",
-        authority: "/authority",
-        volunteer: "/volunteer",
-        user: "/user",
+      const roleBasedRedirect: Record<string, (identifier: string) => string> = {
+        admin: () => "/admin",
+        authority: () => "/authority",
+        volunteer: () => "/volunteer",
+        user: (email) => `/user/${encodeURIComponent(email)}`, // Dynamic path for users based on email
       };
 
-      const path = roleBasedRedirect[user.role] || "/";
+      const path = roleBasedRedirect[user.role]?.(user.email) || "/";
       console.log(`Redirecting to: ${path}`);
-      setRedirectPath(path); 
+      setRedirectPath(path);
     }
   }, [isAuthenticated, user]);
 
@@ -49,4 +50,3 @@ export const RedirectAuthenticatedUser = ({ children }: RedirectAuthenticatedUse
 
   return children;
 };
-

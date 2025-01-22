@@ -1,8 +1,10 @@
 import express  from "express";
-import { test } from "../controllers/userController.js";
+import { getAllUsers } from "../controllers/userController.js";
+import { verifyToken } from "../middlewares/authenticationMiddleware.js"; // Assuming the middleware is correctly set up
+import { authorizeRole } from "../middlewares/roleMiddleware.js";
 
 const userRouter = express.Router();
 
-userRouter.get("/", test);
+userRouter.get("/all", getAllUsers);
 
 export default userRouter;

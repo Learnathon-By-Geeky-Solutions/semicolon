@@ -1,11 +1,20 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import {User} from "../models/userModel.js"; // Import the User model
 
-export const test = async (req : Request, res : Response, next: NextFunction) => {
+// Controller function to get all users
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        res.status(200).json({ success: true, message: "inside user" });
+      // Fetch all users from the database
+      const users = await User.find(); // Mongoose method to get all users
+  
+      // Extract the names from the users array
+      const userNames = users.map((user: any) => user.name);
+  
+      // Send the user names in the response
+      res.status(200).json({ success: true, data: userNames });
     } catch (error) {
-        console.log("Error inside user ", error);
-        res.status(400).json({ success: false, message: error.message });
+      // Handle any errors
+      console.error("Error fetching users:", error);
+      res.status(400).json({ success: false, message: error.message });
     }
-    
-};
+  };
