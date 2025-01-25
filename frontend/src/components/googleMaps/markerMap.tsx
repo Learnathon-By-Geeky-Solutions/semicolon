@@ -77,8 +77,8 @@ const MapWithClickableCustomMarkers: React.FC = () => {
   ) => {
     const geocoder = new window.google.maps.Geocoder();
     const latlng = { lat, lng };
-    geocoder.geocode({ location: latlng }, (results, status) => {
-      if (status === "OK" && results[0]) {
+    geocoder.geocode({ location: latlng }, (results: google.maps.GeocoderResult[] | null, status: string) => {
+      if (status === "OK" && results && results[0]) {
         callback(results[0].formatted_address);
       } else {
         callback("Unknown Location");
@@ -243,11 +243,11 @@ const MapWithClickableCustomMarkers: React.FC = () => {
         destination: { lat: destination.lat, lng: destination.lng },
         travelMode: window.google.maps.TravelMode.DRIVING,
       },
-      (response, status) => {
+      (response: google.maps.DirectionsResult    | null, status: string) => {
         if (status === "OK") {
-          const leg = response.routes[0].legs[0];
-          setDistance(leg.distance?.text || null);
-          setDuration(leg.duration?.text || null);
+          const leg = response?.routes[0]?.legs[0];
+          setDistance(leg?.distance?.text || null);
+          setDuration(leg?.duration?.text || null);
           setNearestCalc(true);
           directionsRenderer?.setDirections(response);
         } else {
@@ -275,29 +275,47 @@ const MapWithClickableCustomMarkers: React.FC = () => {
   }, []);
 
   return (
-    <div>
-      <div id="map" style={mapContainerStyle}></div>
-      {nearestCalc && (
-        <h3>
-          Distance: {distance} Duration: {duration}
-        </h3>
-      )}
-      <button type="button" onClick={findNearestLocation}>
-        Get Nearest Route
-      </button>
-      <button type="button" onClick={handleGet}>
-        Get all locations
-      </button>
-      {role === "authority" && (
-        <button type="button" onClick={handleSave}>
-          Save all shelters
-        </button>
-      )}
-      <button type="button" onClick={getDisasterPredictions}>
-        Get earthquake predictions
-      </button>
-    </div>
-  );
-};
+      <div>
+        
+        { nearestCalc?( <>
+          <div id="map" style={mapContainerStyle}></div>
+          <h3> Distance: {distance}     Duration: {duration} </h3>
+          <button type="button" onClick={findNearestLocation}>
+            Get Nearest Route
+          </button>
+          <button type="button" onClick={handleGet}>
+            Get all locations
+          </button>
+          {role === 'authority' && (  <> <button type="button" onClick={handleSave}>
+            Save all shelters
+          </button>  </>)}
+          <button type="button" onClick={getDisasterPredictions}>
+            Get earthquake predictions
+          </button>
+          </>
+        ) : 
+        (
+          <>
+          <div id="map" style={mapContainerStyle}></div>
+          <button type="button" onClick={findNearestLocation}>
+            Get Nearest Route
+          </button>
+          <button type="button" onClick={handleGet}>
+            Get all locations
+          </button>
+          {role === 'authority' && (  <> <button type="button" onClick={handleSave}>
+            Save all shelters
+          </button>  </>)}
+          <button type="button" onClick={getDisasterPredictions}>
+            Get earthquake predictions
+          </button>
+       
+          </>
+        )}
+
+      </div>
+    );
+  };
+
 
 export default MapWithClickableCustomMarkers;
