@@ -26,7 +26,7 @@ const AdminDashboard: React.FC = () => {
             </button>
           </li>
           <li>
-            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300">
+            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300" onClick={() => navigate("/shelters")}>
               View Shelter Zones
             </button>
           </li>
