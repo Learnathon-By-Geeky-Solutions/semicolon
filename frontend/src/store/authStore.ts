@@ -53,7 +53,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         if ((role === 'authority' || role === 'volunteer') && document) {
           formData.append("document", document); 
         }
-    
+
         console.log("final formData", formData);
             const response = await axios.post(`${API_URL}/signup`, formData, {
           headers: {
@@ -79,6 +79,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
+      console.log(API_URL);
       const response = await axios.post(`${API_URL}/login`, { email, password });
       set({
         isAuthenticated: true,
