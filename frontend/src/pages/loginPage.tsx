@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const { login , user} = useAuthStore();
+  const { login , googleAuth, user} = useAuthStore();
   const navigate = useNavigate();
   
   const handleSubmit = async (e: FormEvent) => {
@@ -17,6 +17,16 @@ const LoginPage: React.FC = () => {
       navigate("/");
     } catch (error) {
       console.error('Login failed', error);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await googleAuth();
+      console.log(user);
+      navigate("/");
+    } catch (error) {
+      console.error('Google login failed', error);
     }
   };
 
@@ -54,6 +64,9 @@ const LoginPage: React.FC = () => {
             Login
           </button>
         </form>
+        <button onClick={handleGoogleLogin} className="w-full py-2 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none transition duration-300 mt-4">
+            Login with Google
+        </button>
         <div className="mt-4 text-center text-gray-600">
           <p>
             Don't have an account?{' '}

@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser';
 import cors from "cors";
 import passport from "passport";
 import session from "express-session";
+import passportConfig from "./config/passportConfig.js";
+import GoogleStrategy from "passport-google-oauth20";
 
 config()
 
@@ -25,8 +27,26 @@ app.use(session({
     saveUninitialized: true
 }));
 
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "https://3861-103-203-92-101.ngrok-free.app/api/v1/auth/google/callback"
+    }, (accessToken, refreshToken, profile, done) => {
+        console.log(profile);
+        done(null, profile);
+}));
+
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+    done(null, user);
+});
 
 app.use("/api/v1", appRouter);
 

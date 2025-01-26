@@ -27,6 +27,7 @@ interface AuthState {
   message: string | null;
   signup: (email: string, password: string, name: string, role: "admin" | "authority" | "volunteer" | "user", document?: File | string ) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  googleAuth: () => void;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -134,4 +135,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw error;
       }
     },
+
+    googleAuth: () => {
+      window.location.href = `${API_URL}/google`;
+    }
   }));

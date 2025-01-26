@@ -3,6 +3,9 @@ import { hash, compare } from 'bcrypt';
 import { User } from "../models/userModel.js";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 import {  AuthenticatedRequest } from "../types/types.js";
+import passport from "passport";
+import { Role } from "../constants/roles.js";
+
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
 
@@ -109,4 +112,40 @@ export const checkAuth = async  (req : AuthenticatedRequest, res : Response, nex
 		console.log("Error in checkAuth ", error);
 		res.status(400).json({ success: false, message: error.message });
 	}
+};
+
+export const googleRedirect = passport.authenticate("google", { scope: ["profile", "email"] });
+
+export const googleCallback = passport.authenticate("google", { failureRedirect: "/login" });
+
+export const googleCallbackHandler = (req: Request, res: Response) => {
+    console.log("googleCallbackHandler done");
+    // Redirect to frontend dashboard or desired page
+    console.log(req);
+    res.redirect("https://5cf2-103-203-92-101.ngrok-free.app"); // e.g., https://your-frontend.com/
+};
+
+
+export const googleSignup = async ({accessToken, refreshToken, profile, done}) => {
+    // At this point, user is authenticated
+    console.log(profile);
+    /*
+    const user = await User.findOne({email: profile.emails[0].value});
+    if(!user){
+
+        const hashedPassword = await hash(profile.id, 10);
+
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const newUser = await User.create({
+            email: profile.emails[0].value,
+            name: profile.displayName,
+            password: hashedPassword,
+            role: Role.User,
+            documents: null,
+            verificationToken: verificationCode,
+            verificationTokenExpiresAt: Date.now() + 24*60*60*1000,
+        });
+        done(null, newUser);
+    }*/
+    return done(null, profile);
 };
