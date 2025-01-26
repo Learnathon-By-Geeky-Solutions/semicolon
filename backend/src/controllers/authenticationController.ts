@@ -126,26 +126,38 @@ export const googleCallbackHandler = (req: Request, res: Response) => {
 };
 
 
-export const googleSignup = async ({accessToken, refreshToken, profile, done}) => {
+export const googleSignup = async (accessToken, refreshToken, profile, done) => {
     // At this point, user is authenticated
-    console.log(profile);
-    /*
-    const user = await User.findOne({email: profile.emails[0].value});
-    if(!user){
+    
+    if(profile.emails[0].value){
+        const user = await User.findOne({email: profile.emails[0].value});
+        if(!user){
 
-        const hashedPassword = await hash(profile.id, 10);
+            const hashedPassword = await hash(profile.id, 10);
 
-        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        const newUser = await User.create({
-            email: profile.emails[0].value,
-            name: profile.displayName,
-            password: hashedPassword,
-            role: Role.User,
-            documents: null,
-            verificationToken: verificationCode,
-            verificationTokenExpiresAt: Date.now() + 24*60*60*1000,
-        });
-        done(null, newUser);
-    }*/
-    return done(null, profile);
+            const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            const newUser = await User.create({
+                email: profile.emails[0].value,
+                name: profile.displayName,
+                password: hashedPassword,
+                role: Role.User,
+                documents: null,
+                verificationToken: verificationCode,
+                verificationTokenExpiresAt: Date.now() + 24*60*60*1000,
+            });
+
+            console.log(newUser);
+            console.log('newUser created');
+            done(null, newUser);
+        }
+        else{
+            console.log(user);
+            console.log('user found');
+            done(null, user);
+        }
+    }
+    else{
+        console.log('profile found');
+        done(null, profile);
+    }
 };
