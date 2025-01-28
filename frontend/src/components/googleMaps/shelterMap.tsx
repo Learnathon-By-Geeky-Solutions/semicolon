@@ -195,38 +195,10 @@ const MapWithShelters: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
-      <div className="bg-green-900 text-white w-64 p-6 flex flex-col h-screen">
-        <h2 className="text-2xl font-bold mb-6">CrisisCompass</h2>
-        <ul className="flex flex-col flex-grow">
-          <li>
-            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300">
-              Home
-            </button>
-          </li>
-          <li>
-            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300">
-              Shelter Zones
-            </button>
-          </li>
-          <li>
-            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300">
-              Resources
-            </button>
-          </li>
-          <li>
-            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300">
-              Contact Authorities
-            </button>
-          </li>
-        </ul>
-      </div>
-  
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
       {/* Main Content */}
-      <div className="flex-1 p-10">
-        <div id="map" className="w-[170vh] h-[70vh] mx-auto rounded-lg shadow-lg mb-6"></div>
-        <div className="text-center space-x-4">
+      <div id="map" className="w-full h-[70vh] rounded-lg shadow-lg mb-6"></div>
+      <div className="text-center space-x-4">
           <button
             className={`px-6 py-3 ${
               mode === "placing" ? "bg-green-800" : "bg-gray-400"
@@ -255,8 +227,8 @@ const MapWithShelters: React.FC = () => {
           >
             Get Nearest Shelter (Walking)
           </button>
-        </div>
       </div>
+      
   
       {/* Resource Popup */}
       {isPopupOpen && selectedShelter && (
