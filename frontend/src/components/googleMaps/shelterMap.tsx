@@ -207,6 +207,10 @@ const MapWithShelters: React.FC = () => {
       },
       (response, status) => {
         if (status === "OK" && directionsRenderer) {
+          directionsRenderer.setOptions({
+            
+            suppressMarkers: true
+          });
           directionsRenderer.setDirections(response);
         } else {
           toast.error("Directions request failed.");
