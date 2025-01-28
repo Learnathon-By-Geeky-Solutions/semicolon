@@ -2,61 +2,35 @@
 import { Request,Response,NextFunction } from "express";
 import { ShelterList } from "../models/shelterModel.js";
 
-export const saveShelters = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    const { locationArray } = req.body;
-    try {
-  
-      console.log("reached save shelter in backend")
-      console.log(locationArray)
-      const shelterId = "one"; 
-      
-      const prevShelterList = await ShelterList.findOne({ id: shelterId });
-      if (!prevShelterList){
-        const newShelterList = new ShelterList({id:"one", shelters:locationArray });
-        await newShelterList.save();
-
-        return res.status(200).json({ message: "Shelters saved successfully! "});
-      }
-      else{
-        prevShelterList.shelters = locationArray;
-        await prevShelterList.save();
-  
-        //return res.status(200).json({ chats: user.chats });
-        return res.status(200).json({ message: "Shelters saved successfully! "});
-      }
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: "Something went wrong " });
+export const getShelters = async (req: Request, res: Response) => {
+  try {
+    const shelterList = await ShelterList.findOne();
+    if (shelterList) {
+      res.json(shelterList.shelters);
+    } else {
+      res.json([]);
     }
-  };
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 
-  export const getShelters = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-  
-      console.log("reached get shelter in backend")
-      const shelterId = "one"; 
-      
-      const prevShelterList = await ShelterList.findOne({ id: shelterId });
-      if (!prevShelterList){
-        return res.status(401).send("No schema registered OR Token malfunctioned");
-      }
-
-      console.log( prevShelterList.shelters );
-      
-      return res
-      .status(200)
-      .json({ message: "OK", shelters:prevShelterList.shelters });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: "Couldn't fetch data " });
+export const saveShelters = async (req: Request, res: Response) => {
+  try {
+    const { shelters } = req.body;
+    if (!Array.isArray(shelters)) {
+      return res.status(400).json({ message: "Shelters must be an array" });
     }
-  };
+
+    const shelterList = await ShelterList.findOneAndUpdate(
+      {}, 
+      { shelters },
+      { upsert: true, new: true }
+    );
+
+    res.status(201).json({ message: "Shelters saved successfully", data: shelterList.shelters });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

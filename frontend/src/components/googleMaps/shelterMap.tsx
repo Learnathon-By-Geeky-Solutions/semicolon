@@ -3,23 +3,14 @@ import { toast } from "react-hot-toast";
 import { GOOGLE_MAPS_API_KEY } from "../../constants/paths";
 import { Loader } from "@googlemaps/js-api-loader";
 import { ResourcePopup } from "./resourcePopup";
+import { Location, Resource, Shelter } from "../../types/shelterMapTypes";
+import { getShelters, saveShelters } from "../../helpers/shelter";
 
 const loader = new Loader({
   apiKey: GOOGLE_MAPS_API_KEY,
   libraries: ["places", "marker"],
 });
 
-interface Location {
-  name: string;
-  lat: number;
-  lng: number;
-}
-
-interface Resource {
-  food: number;
-  water: number;
-  medicine: number;
-}
 
 const center = {
   lat: -34.397,
@@ -28,10 +19,15 @@ const center = {
 
 const MapWithShelters: React.FC = () => {
   const mapRef = useRef<google.maps.Map | null>(null);
-  const [shelters, setShelters] = useState<Location[]>([]);
+  const [shelters, setShelters] = useState<Shelter[]>([]);
   const [currentLocation, setCurrentLocation] = useState<google.maps.LatLng | null>(null);
   const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer | null>(null);
   const [resources, setResources] = useState<Resource>({ food: 0, water: 0, medicine: 0 });
+
+  const [food, setFood] = useState<number>(0);
+  const [water, setWater] = useState<number>(0);
+  const [medicine, setMedicine] = useState<number>(0);
+
   const [isEditing, setIsEditing] = useState<{ [key: string]: boolean }>({ food: false, water: false, medicine: false });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedShelter, setSelectedShelter] = useState<Location | null>(null);
@@ -67,10 +63,15 @@ const MapWithShelters: React.FC = () => {
         const clickedLocation = event.latLng;
         if (!clickedLocation) return;
 
-        const newShelter: Location = {
+        const newShelter: Shelter = {
           name: `Shelter ${shelters.length + 1}`,
           lat: clickedLocation.lat(),
           lng: clickedLocation.lng(),
+          district_id: "1",
+          district_name: "tangail",
+          food: food,
+          water: water,
+          medicine: medicine,
         };
 
         const houseImage = document.createElement('img');
@@ -196,7 +197,12 @@ const MapWithShelters: React.FC = () => {
 
   useEffect(() => {
     initializeMap();
+    getShelters().then((shelters) => setShelters(shelters));
   }, []);
+
+  const handleSaveShelters = () => {
+    saveShelters(shelters);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
@@ -216,6 +222,12 @@ const MapWithShelters: React.FC = () => {
             Get Nearest Shelter (Walking)
           </button>
       </div>
+      <button
+          className="px-6 py-3 bg-blue-800 text-white rounded-lg hover:bg-blue-600 focus:outline-none transition duration-300"
+          onClick={handleSaveShelters}
+        >
+          Save Shelters
+      </button>
       
   
       {/* Resource Popup */}

@@ -1,31 +1,26 @@
-import axios from "axios"
+import axios from 'axios';
+import { SERVER_URL } from '../constants/paths';
+import { toast } from 'react-hot-toast';
+import { Shelter } from '../types/shelterMapTypes';
 
-export const storeShelterLocations = async ( locationArray ) => {
-    console.log("api comm reached")
-    const res = await axios.post("http://localhost:5000/api/authority_user/shelters/save", {locationArray});
-    if(res.status !== 200)
-    {
-        throw new Error("Unable to save shelter locations");
-    }
-    const data = await res.data;
-    return data;
+const API_URL = `${SERVER_URL}/api/v1/shelters/all`;
+
+export const getShelters = async (): Promise<Shelter[]> => {
+  try {
+    const response = await axios.get(API_URL);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching shelters:', error);
+    return [];
+  }
 };
 
-export const getShelterLocations = async () => {
-    const res = await axios.get("http://localhost:5000/api/authority_user/shelters/get");
-     //const res = "hi";
-     if (res.status === 200) {
-        const data = await res.data;
-        console.log(data)
-        //return "hiii , how can";
-        return data;
-     }
-     else if(res.status === 401){
-        console.log("no schema found")
-        return ([]);
-     }
-     else{
-        throw new Error("Unable to send chat");
-     }
-     
+export const saveShelters = async (shelters: Shelter[]): Promise<void> => {
+  try {
+    await axios.post(API_URL, shelters);
+    toast.success('Shelters saved successfully!');
+  } catch (error) {
+    console.error('Error saving shelters:', error);
+    toast.error('Failed to save shelters.');
+  }
 };
