@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { GOOGLE_MAPS_API_KEY } from "../../constants/paths";
 import { Loader } from "@googlemaps/js-api-loader";
 import { ResourcePopup } from "./resourcePopup";
-import { Location, Resource, Shelter, NewShelter } from "../../types/shelterMapTypes";
+import { Location, Shelter, NewShelter } from "../../types/shelterMapTypes";
 import { getShelters, saveShelters } from "../../helpers/shelter";
 
 const loader = new Loader({
@@ -22,31 +22,41 @@ const MapWithShelters: React.FC = () => {
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [currentLocation, setCurrentLocation] = useState<google.maps.LatLng | null>(null);
   const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer | null>(null);
-  const [resources, setResources] = useState<Resource>({ food: 0, water: 0, medicine: 0 });
 
   const [isEditing, setIsEditing] = useState<{ [key: string]: boolean }>({ food: false, water: false, medicine: false });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedShelter, setSelectedShelter] = useState<Shelter | null>(null);
   const houseIcon = "./house.png";
 
-  // Add a ref to store markers
   const markersRef = useRef<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
-
-  // Add state to track if route is displayed
   const [isRouteDisplayed, setIsRouteDisplayed] = useState(false);
+  const shelterCountRef = useRef(0);
 
-  const handleEdit = (field: string) => {
-    setIsEditing((prev) => ({ ...prev, [field]: !prev[field] }));
+  const initializeShelterCount = () => {
+    shelterCountRef.current = shelters.length;
   };
 
-  const handleSave = (field: string, value: number) => {
+  useEffect(() => {
+    if (shelters.length > 0) {
+      initializeShelterCount();
+    }
+  }, [shelters]);
+
+  const handleEdit = (field: string) => {
+    setIsEditing(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  const handleResourceChange = (field: string, value: number) => {
     if (selectedShelter) {
-      setShelters(prevShelters => prevShelters.map(shelter => 
-        shelter === selectedShelter 
+      setShelters(prevShelters => prevShelters.map(shelter =>
+        shelter._id === selectedShelter._id
           ? { ...shelter, [field]: value }
           : shelter
       ));
-      setResources(prev => ({ ...prev, [field]: value }));
+      setSelectedShelter(prev => prev ? { ...prev, [field]: value } : prev);
     }
   };
 
@@ -83,9 +93,11 @@ const MapWithShelters: React.FC = () => {
         const clickedLocation = event.latLng;
         if (!clickedLocation) return;
 
+        shelterCountRef.current += 1;
+
         const newShelter: NewShelter & { _id: string } = {
-          _id: `temp-${Date.now()}`, // Temporary ID for new shelters
-          name: `Shelter ${shelters.length + 1}`,
+          _id: `temp-${Date.now()}`,
+          name: `Shelter ${shelterCountRef.current}`,
           lat: clickedLocation.lat(),
           lng: clickedLocation.lng(),
           district_id: "1",
@@ -110,18 +122,12 @@ const MapWithShelters: React.FC = () => {
         marker.addListener('click', () => {
           setSelectedShelter(newShelter);
           setIsPopupOpen(true);
-          setResources({ 
-            food: newShelter.food, 
-            water: newShelter.water, 
-            medicine: newShelter.medicine 
-          });
         });
 
         setShelters((prev) => [...prev, newShelter]);
         toast.success("Shelter marker placed!");
       });
 
-      // Create new directions renderer
       const directionsRendererInstance = new google.maps.DirectionsRenderer({
         suppressMarkers: true
       });
@@ -266,11 +272,6 @@ const MapWithShelters: React.FC = () => {
         marker.addListener('click', () => {
           setSelectedShelter(shelter);
           setIsPopupOpen(true);
-          setResources({ 
-            food: shelter.food, 
-            water: shelter.water, 
-            medicine: shelter.medicine 
-          });
         });
 
         markersRef.current.set(shelter._id, marker);
@@ -279,13 +280,56 @@ const MapWithShelters: React.FC = () => {
   }, [shelters, houseIcon]);
 
   const handleSaveShelters = async () => {
-    const sheltersToSave = shelters.map(({ _id, ...shelter }) => {      
+    const sheltersToSave = shelters.map(shelter => {      
+      const { _id, ...restOfShelter } = shelter;
       if (_id.startsWith('temp-')) {
-        return shelter;
+        return {
+          ...restOfShelter,
+          food: shelter.food,
+          water: shelter.water,
+          medicine: shelter.medicine
+        };
       }
-      return { _id, ...shelter };
+      return {
+        _id,
+        ...restOfShelter,
+        food: shelter.food,
+        water: shelter.water,
+        medicine: shelter.medicine
+      };
     });
-    await saveShelters(sheltersToSave as Shelter[]);
+    
+    try {
+      await saveShelters(sheltersToSave as Shelter[]);
+      toast.success("Shelters saved successfully");
+    } catch (error) {
+      toast.error("Failed to save shelters");
+      console.error("Error saving shelters:", error);
+    }
+  };
+
+  const handleSaveResources = async () => {
+    if (selectedShelter) {
+      try {
+        const sheltersToSave = shelters.map(({ _id, ...shelter }) => {
+          if (_id.startsWith('temp-')) {
+            return shelter;
+          }
+          return { _id, ...shelter };
+        });
+
+        await saveShelters(sheltersToSave as Shelter[]);
+        toast.success("Resources updated successfully");
+
+        setIsEditing(Object.keys(isEditing).reduce((acc, key) => ({
+          ...acc,
+          [key]: false
+        }), {}));
+      } catch (error) {
+        toast.error("Failed to update resources");
+        console.error("Error updating resources:", error);
+      }
+    }
   };
 
   return (
@@ -327,12 +371,12 @@ const MapWithShelters: React.FC = () => {
       {isPopupOpen && selectedShelter && (
         <ResourcePopup
           shelter={selectedShelter}
-          resources={resources}
           isEditing={isEditing}
           onEdit={handleEdit}
-          onSave={handleSave}
+          onSave={handleSaveResources}
           onClose={() => setIsPopupOpen(false)}
           onDelete={handleDelete}
+          onResourceChange={handleResourceChange}
         />
       )}
     </div>
