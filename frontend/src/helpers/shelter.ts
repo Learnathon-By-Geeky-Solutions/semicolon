@@ -17,7 +17,10 @@ export const getShelters = async (): Promise<Shelter[]> => {
 
 export const saveShelters = async (shelters: Shelter[]): Promise<void> => {
   try {
-    await axios.post(API_URL, shelters);
+   const payload = {
+    shelters: shelters
+   }
+    await axios.post(API_URL, payload);
     toast.success('Shelters saved successfully!');
   } catch (error) {
     console.error('Error saving shelters:', error);

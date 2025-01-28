@@ -11,6 +11,7 @@ export interface Resource {
 }
 
 export interface Shelter {
+  
   name: string;
   lat: number;
   lng: number;

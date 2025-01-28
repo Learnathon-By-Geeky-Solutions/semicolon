@@ -24,10 +24,6 @@ const MapWithShelters: React.FC = () => {
   const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer | null>(null);
   const [resources, setResources] = useState<Resource>({ food: 0, water: 0, medicine: 0 });
 
-  const [food, setFood] = useState<number>(0);
-  const [water, setWater] = useState<number>(0);
-  const [medicine, setMedicine] = useState<number>(0);
-
   const [isEditing, setIsEditing] = useState<{ [key: string]: boolean }>({ food: false, water: false, medicine: false });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedShelter, setSelectedShelter] = useState<Location | null>(null);
@@ -38,7 +34,14 @@ const MapWithShelters: React.FC = () => {
   };
 
   const handleSave = (field: string, value: number) => {
-    setResources((prev) => ({ ...prev, [field]: value }));
+    if (selectedShelter) {
+      setShelters(prevShelters => prevShelters.map(shelter => 
+        shelter === selectedShelter 
+          ? { ...shelter, [field]: value }
+          : shelter
+      ));
+      setResources(prev => ({ ...prev, [field]: value }));
+    }
   };
 
   const handleDelete = () => {
@@ -69,9 +72,9 @@ const MapWithShelters: React.FC = () => {
           lng: clickedLocation.lng(),
           district_id: "1",
           district_name: "tangail",
-          food: food,
-          water: water,
-          medicine: medicine,
+          food: 0,
+          water: 0,
+          medicine: 0,
         };
 
         const houseImage = document.createElement('img');
@@ -85,14 +88,15 @@ const MapWithShelters: React.FC = () => {
         });
 
         marker.addListener('click', () => {
-         
-            setSelectedShelter(newShelter);
-            setIsPopupOpen(true);
-            // Fetch or initialize resources for the selected shelter
-            setResources({ food: 100, water: 50, medicine: 20 }); 
-          
+          setSelectedShelter(newShelter);
+          setIsPopupOpen(true);
+          // Use the shelter's own resources
+          setResources({ 
+            food: newShelter.food, 
+            water: newShelter.water, 
+            medicine: newShelter.medicine 
+          });
         });
-
 
         setShelters((prev) => [...prev, newShelter]);
         toast.success("Shelter marker placed!");
