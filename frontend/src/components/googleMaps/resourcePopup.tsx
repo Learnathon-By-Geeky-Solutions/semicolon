@@ -8,26 +8,50 @@ export const ResourcePopup: React.FC<{
     onSave: () => void;
     onClose: () => void;
     onDelete: () => void;
-    onResourceChange: (field: string, value: number) => void;
+    onResourceChange: (field: string, value: number | string) => void;
   }> = ({ shelter, isEditing, onEdit, onSave, onClose, onDelete, onResourceChange }) => {
     
     const resources = {
+      name: shelter.name,
       food: shelter.food,
       water: shelter.water,
       medicine: shelter.medicine
     };
 
     const handleInputChange = (field: string, value: string) => {
-      const numValue = value === '' ? 0 : parseInt(value, 10);
-      onResourceChange(field, numValue);
+      if (field === 'name') {
+        onResourceChange(field, value);
+      } else {
+        const numValue = value === '' ? 0 : parseInt(value, 10);
+        onResourceChange(field, numValue);
+      }
     };
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-          <h2 className="text-xl font-bold mb-4">{shelter.name}</h2>
+          <div className="flex items-center justify-between mb-4">
+            {isEditing['name'] ? (
+              <input
+                type="text"
+                value={shelter.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                className="border p-1 w-48 text-xl font-bold"
+              />
+            ) : (
+              <h2 className="text-xl font-bold">{shelter.name}</h2>
+            )}
+            <button
+              onClick={() => onEdit('name')}
+              className="ml-2 text-gray-500 hover:text-gray-700"
+            >
+              ✏️
+            </button>
+          </div>
           <div className="space-y-4">
-            {Object.entries(resources).map(([key, value]) => (
+            {Object.entries(resources)
+              .filter(([key]) => key !== 'name')
+              .map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
                 <span className="font-medium">{key}:</span>
                 {isEditing[key] ? (

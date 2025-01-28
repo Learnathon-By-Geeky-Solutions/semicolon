@@ -52,7 +52,7 @@ const MapWithShelters: React.FC = () => {
     }));
   };
 
-  const handleResourceChange = (field: string, value: number) => {
+  const handleResourceChange = (field: string, value: number | string) => {
     if (selectedShelter) {
       setShelters(prevShelters => prevShelters.map(shelter =>
         shelter._id === selectedShelter._id
