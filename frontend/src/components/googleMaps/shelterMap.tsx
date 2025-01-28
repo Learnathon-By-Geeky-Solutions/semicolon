@@ -26,11 +26,14 @@ const MapWithShelters: React.FC = () => {
   const [isEditing, setIsEditing] = useState<{ [key: string]: boolean }>({ food: false, water: false, medicine: false });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedShelter, setSelectedShelter] = useState<Shelter | null>(null);
-  const houseIcon = "./house.png";
+  
 
   const markersRef = useRef<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
   const [isRouteDisplayed, setIsRouteDisplayed] = useState(false);
   const shelterCountRef = useRef(0);
+
+  const savedShelterIcon = "./saved_shelter_flag.png";
+  const newlyPlacedShelterIcon = "./new_shelter_flag.png";
 
   const initializeShelterCount = () => {
     shelterCountRef.current = shelters.length;
@@ -107,14 +110,11 @@ const MapWithShelters: React.FC = () => {
           medicine: 0,
         };
 
-        const houseImage = document.createElement('img');
-        houseImage.src = houseIcon;
-
         const marker = new google.maps.marker.AdvancedMarkerElement({
           position: clickedLocation,
           map,
           title: newShelter.name,
-          content: houseImage,
+          content: createMarkerImage(newlyPlacedShelterIcon),
         });
 
         markersRef.current.set(newShelter._id, marker);
@@ -253,20 +253,18 @@ const MapWithShelters: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (mapRef.current && shelters.length > 0) {
-      // Clear existing markers
+    if (mapRef.current && shelters.length >= 0) {
       markersRef.current.forEach(marker => marker.map = null);
       markersRef.current.clear();
 
       shelters.forEach(shelter => {
-        const houseImage = document.createElement('img');
-        houseImage.src = houseIcon;
-
+        const iconPath = shelter._id.startsWith('temp-') ? newlyPlacedShelterIcon : savedShelterIcon;
+        
         const marker = new google.maps.marker.AdvancedMarkerElement({
           position: { lat: shelter.lat, lng: shelter.lng },
           map: mapRef.current,
           title: shelter.name,
-          content: houseImage,
+          content: createMarkerImage(iconPath),
         });
 
         marker.addListener('click', () => {
@@ -277,7 +275,7 @@ const MapWithShelters: React.FC = () => {
         markersRef.current.set(shelter._id, marker);
       });
     }
-  }, [shelters, houseIcon]);
+  }, [shelters, newlyPlacedShelterIcon, savedShelterIcon]);
 
   const handleSaveShelters = async () => {
     const sheltersToSave = shelters.map(shelter => {      
@@ -301,6 +299,8 @@ const MapWithShelters: React.FC = () => {
     
     try {
       await saveShelters(sheltersToSave as Shelter[]);
+      const savedShelters = await getShelters();
+      setShelters(savedShelters);
       toast.success("Shelters saved successfully");
     } catch (error) {
       toast.error("Failed to save shelters");
@@ -330,6 +330,16 @@ const MapWithShelters: React.FC = () => {
         console.error("Error updating resources:", error);
       }
     }
+    const savedShelters = await getShelters();
+    setShelters(savedShelters)
+  };
+
+  const createMarkerImage = (iconPath: string) => {
+    const img = document.createElement('img');
+    img.src = iconPath;
+    img.style.width = '32px';  
+    img.style.height = '32px';
+    return img;
   };
 
   return (
