@@ -32,6 +32,9 @@ const MapWithShelters: React.FC = () => {
   // Add a ref to store markers
   const markersRef = useRef<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
 
+  // Add state to track if route is displayed
+  const [isRouteDisplayed, setIsRouteDisplayed] = useState(false);
+
   const handleEdit = (field: string) => {
     setIsEditing((prev) => ({ ...prev, [field]: !prev[field] }));
   };
@@ -118,7 +121,10 @@ const MapWithShelters: React.FC = () => {
         toast.success("Shelter marker placed!");
       });
 
-      const directionsRendererInstance = new google.maps.DirectionsRenderer();
+      // Create new directions renderer
+      const directionsRendererInstance = new google.maps.DirectionsRenderer({
+        suppressMarkers: true
+      });
       directionsRendererInstance.setMap(map);
       setDirectionsRenderer(directionsRendererInstance);
 
@@ -199,6 +205,15 @@ const MapWithShelters: React.FC = () => {
   const displayDirections = (destination: Location, travelMode: google.maps.TravelMode) => {
     const directionsService = new google.maps.DirectionsService();
 
+    // Create new DirectionsRenderer if none exists
+    if (!directionsRenderer && mapRef.current) {
+      const newDirectionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: true
+      });
+      newDirectionsRenderer.setMap(mapRef.current);
+      setDirectionsRenderer(newDirectionsRenderer);
+    }
+
     directionsService.route(
       {
         origin: currentLocation!,
@@ -208,15 +223,22 @@ const MapWithShelters: React.FC = () => {
       (response, status) => {
         if (status === "OK" && directionsRenderer) {
           directionsRenderer.setOptions({
-            
             suppressMarkers: true
           });
           directionsRenderer.setDirections(response);
+          setIsRouteDisplayed(true);
         } else {
           toast.error("Directions request failed.");
         }
       }
     );
+  };
+
+  
+  const clearRoute = () => {
+    initializeMap();
+    getShelters().then((shelters) => setShelters(shelters));
+    setIsRouteDisplayed(false);
   };
 
   useEffect(() => {
@@ -272,6 +294,12 @@ const MapWithShelters: React.FC = () => {
       <div id="map" className="w-full h-[70vh] rounded-lg shadow-lg mb-6"></div>
       <div className="text-center space-x-4">
           <button
+              className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300"
+              onClick={handleSaveShelters}
+            >
+              Save Shelters
+          </button>
+          <button
             className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300"
             onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
           >
@@ -283,13 +311,16 @@ const MapWithShelters: React.FC = () => {
           >
             Get Nearest Shelter (Walking)
           </button>
+          {isRouteDisplayed && (
+            <button
+              className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300"
+              onClick={clearRoute}
+            >
+              Clear Route
+            </button>
+          )}
       </div>
-      <button
-          className="px-6 py-3 bg-blue-800 text-white rounded-lg hover:bg-blue-600 focus:outline-none transition duration-300"
-          onClick={handleSaveShelters}
-        >
-          Save Shelters
-      </button>
+      
       
   
       {/* Resource Popup */}
