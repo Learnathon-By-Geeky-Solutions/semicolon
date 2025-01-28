@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { GOOGLE_MAPS_API_KEY } from "../../constants/paths";
 import { Loader } from "@googlemaps/js-api-loader";
 import { ResourcePopup } from "./resourcePopup";
-import { Location, Resource, Shelter } from "../../types/shelterMapTypes";
+import { Location, Resource, Shelter, NewShelter } from "../../types/shelterMapTypes";
 import { getShelters, saveShelters } from "../../helpers/shelter";
 
 const loader = new Loader({
@@ -26,8 +26,11 @@ const MapWithShelters: React.FC = () => {
 
   const [isEditing, setIsEditing] = useState<{ [key: string]: boolean }>({ food: false, water: false, medicine: false });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selectedShelter, setSelectedShelter] = useState<Location | null>(null);
+  const [selectedShelter, setSelectedShelter] = useState<Shelter | null>(null);
   const houseIcon = "./house.png";
+
+  // Add a ref to store markers
+  const markersRef = useRef<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
 
   const handleEdit = (field: string) => {
     setIsEditing((prev) => ({ ...prev, [field]: !prev[field] }));
@@ -44,11 +47,22 @@ const MapWithShelters: React.FC = () => {
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedShelter) {
-      setShelters((prev) => prev.filter((shelter) => shelter !== selectedShelter));
+      const marker = markersRef.current.get(selectedShelter._id);
+      if (marker) {
+        marker.map = null; 
+        markersRef.current.delete(selectedShelter._id);
+      }
+
+      setShelters((prev) => prev.filter((shelter) => shelter._id !== selectedShelter._id));
+      
+      await saveShelters(shelters.filter(shelter => shelter._id !== selectedShelter._id));
+      
       setSelectedShelter(null);
       setIsPopupOpen(false);
+      
+      toast.success("Shelter deleted successfully");
     }
   };
 
@@ -66,7 +80,7 @@ const MapWithShelters: React.FC = () => {
         const clickedLocation = event.latLng;
         if (!clickedLocation) return;
 
-        const newShelter: Shelter = {
+        const newShelter: NewShelter = {
           name: `Shelter ${shelters.length + 1}`,
           lat: clickedLocation.lat(),
           lng: clickedLocation.lng(),
@@ -88,9 +102,8 @@ const MapWithShelters: React.FC = () => {
         });
 
         marker.addListener('click', () => {
-          setSelectedShelter(newShelter);
+          setSelectedShelter(newShelter as Shelter);
           setIsPopupOpen(true);
-          // Use the shelter's own resources
           setResources({ 
             food: newShelter.food, 
             water: newShelter.water, 
@@ -98,7 +111,7 @@ const MapWithShelters: React.FC = () => {
           });
         });
 
-        setShelters((prev) => [...prev, newShelter]);
+        setShelters((prev) => [...prev, newShelter as Shelter]);
         toast.success("Shelter marker placed!");
       });
 
@@ -206,6 +219,10 @@ const MapWithShelters: React.FC = () => {
 
   useEffect(() => {
     if (mapRef.current && shelters.length > 0) {
+      // Clear existing markers
+      markersRef.current.forEach(marker => marker.map = null);
+      markersRef.current.clear();
+
       shelters.forEach(shelter => {
         const houseImage = document.createElement('img');
         houseImage.src = houseIcon;
@@ -226,6 +243,9 @@ const MapWithShelters: React.FC = () => {
             medicine: shelter.medicine 
           });
         });
+
+        // Store marker reference
+        markersRef.current.set(shelter._id, marker);
       });
     }
   }, [shelters, houseIcon]);

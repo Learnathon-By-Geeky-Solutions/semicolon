@@ -2,7 +2,7 @@ export interface Location {
     name: string;
     lat: number;
     lng: number;
-  }
+}
   
 export interface Resource {
   food: number;
@@ -10,8 +10,8 @@ export interface Resource {
   medicine: number;
 }
 
-export interface Shelter {
-  
+// For creating new shelters (POST requests)
+export interface NewShelter {
   name: string;
   lat: number;
   lng: number;
@@ -20,4 +20,9 @@ export interface Shelter {
   food: number;
   water: number;
   medicine: number;
+}
+
+// For existing shelters (GET responses)
+export interface Shelter extends NewShelter {
+  _id: string;
 }
