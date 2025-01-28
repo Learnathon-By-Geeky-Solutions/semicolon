@@ -80,7 +80,8 @@ const MapWithShelters: React.FC = () => {
         const clickedLocation = event.latLng;
         if (!clickedLocation) return;
 
-        const newShelter: NewShelter = {
+        const newShelter: NewShelter & { _id: string } = {
+          _id: `temp-${Date.now()}`, // Temporary ID for new shelters
           name: `Shelter ${shelters.length + 1}`,
           lat: clickedLocation.lat(),
           lng: clickedLocation.lng(),
@@ -101,8 +102,10 @@ const MapWithShelters: React.FC = () => {
           content: houseImage,
         });
 
+        markersRef.current.set(newShelter._id, marker);
+
         marker.addListener('click', () => {
-          setSelectedShelter(newShelter as Shelter);
+          setSelectedShelter(newShelter);
           setIsPopupOpen(true);
           setResources({ 
             food: newShelter.food, 
@@ -111,7 +114,7 @@ const MapWithShelters: React.FC = () => {
           });
         });
 
-        setShelters((prev) => [...prev, newShelter as Shelter]);
+        setShelters((prev) => [...prev, newShelter]);
         toast.success("Shelter marker placed!");
       });
 
@@ -244,14 +247,19 @@ const MapWithShelters: React.FC = () => {
           });
         });
 
-        // Store marker reference
         markersRef.current.set(shelter._id, marker);
       });
     }
   }, [shelters, houseIcon]);
 
-  const handleSaveShelters = () => {
-    saveShelters(shelters);
+  const handleSaveShelters = async () => {
+    const sheltersToSave = shelters.map(({ _id, ...shelter }) => {      
+      if (_id.startsWith('temp-')) {
+        return shelter;
+      }
+      return { _id, ...shelter };
+    });
+    await saveShelters(sheltersToSave as Shelter[]);
   };
 
   return (

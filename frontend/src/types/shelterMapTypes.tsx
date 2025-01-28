@@ -12,6 +12,7 @@ export interface Resource {
 
 // For creating new shelters (POST requests)
 export interface NewShelter {
+
   name: string;
   lat: number;
   lng: number;
