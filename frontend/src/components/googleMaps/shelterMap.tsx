@@ -204,6 +204,32 @@ const MapWithShelters: React.FC = () => {
     getShelters().then((shelters) => setShelters(shelters));
   }, []);
 
+  useEffect(() => {
+    if (mapRef.current && shelters.length > 0) {
+      shelters.forEach(shelter => {
+        const houseImage = document.createElement('img');
+        houseImage.src = houseIcon;
+
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          position: { lat: shelter.lat, lng: shelter.lng },
+          map: mapRef.current,
+          title: shelter.name,
+          content: houseImage,
+        });
+
+        marker.addListener('click', () => {
+          setSelectedShelter(shelter);
+          setIsPopupOpen(true);
+          setResources({ 
+            food: shelter.food, 
+            water: shelter.water, 
+            medicine: shelter.medicine 
+          });
+        });
+      });
+    }
+  }, [shelters, houseIcon]);
+
   const handleSaveShelters = () => {
     saveShelters(shelters);
   };
