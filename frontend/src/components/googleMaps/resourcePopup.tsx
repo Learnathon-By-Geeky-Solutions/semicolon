@@ -21,7 +21,8 @@ export const ResourcePopup: React.FC<{
     onEdit: (field: string) => void;
     onSave: (field: string, value: number) => void;
     onClose: () => void;
-  }> = ({ shelter, resources, isEditing, onEdit, onSave, onClose }) => {
+    onDelete: () => void;
+  }> = ({ shelter, resources, isEditing, onEdit, onSave, onClose, onDelete }) => {
     const [localResources, setLocalResources] = useState(resources);
   
     const handleSave = (field: string) => {
@@ -66,6 +67,12 @@ export const ResourcePopup: React.FC<{
             className="mt-6 w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600"
           >
             Close
+          </button>
+          <button
+            onClick={onDelete}
+            className="mt-6 w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600"
+          >
+            Delete
           </button>
         </div>
       </div>

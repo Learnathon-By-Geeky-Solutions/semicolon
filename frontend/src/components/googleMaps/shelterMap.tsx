@@ -9,9 +9,6 @@ const loader = new Loader({
   libraries: ["places", "marker"],
 });
 
-type Mode = "placing" | "viewing";
-
-
 interface Location {
   name: string;
   lat: number;
@@ -38,7 +35,6 @@ const MapWithShelters: React.FC = () => {
   const [isEditing, setIsEditing] = useState<{ [key: string]: boolean }>({ food: false, water: false, medicine: false });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedShelter, setSelectedShelter] = useState<Location | null>(null);
-  const [mode, setMode] = useState<Mode>("viewing");
   const houseIcon = "./house.png";
 
   const handleEdit = (field: string) => {
@@ -47,6 +43,14 @@ const MapWithShelters: React.FC = () => {
 
   const handleSave = (field: string, value: number) => {
     setResources((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleDelete = () => {
+    if (selectedShelter) {
+      setShelters((prev) => prev.filter((shelter) => shelter !== selectedShelter));
+      setSelectedShelter(null);
+      setIsPopupOpen(false);
+    }
   };
 
 
@@ -80,12 +84,12 @@ const MapWithShelters: React.FC = () => {
         });
 
         marker.addListener('click', () => {
-          if (mode === "viewing") {
+         
             setSelectedShelter(newShelter);
             setIsPopupOpen(true);
             // Fetch or initialize resources for the selected shelter
-            setResources({ food: 100, water: 50, medicine: 20 }); // Example data
-          }
+            setResources({ food: 100, water: 50, medicine: 20 }); 
+          
         });
 
 
@@ -200,22 +204,6 @@ const MapWithShelters: React.FC = () => {
       <div id="map" className="w-full h-[70vh] rounded-lg shadow-lg mb-6"></div>
       <div className="text-center space-x-4">
           <button
-            className={`px-6 py-3 ${
-              mode === "placing" ? "bg-green-800" : "bg-gray-400"
-            } text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300`}
-            onClick={() => setMode("placing")}
-          >
-            Place Shelters
-          </button>
-          <button
-            className={`px-6 py-3 ${
-              mode === "viewing" ? "bg-green-800" : "bg-gray-400"
-            } text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300`}
-            onClick={() => setMode("viewing")}
-          >
-            View/Edit Shelters
-          </button>
-          <button
             className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300"
             onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
           >
@@ -239,6 +227,7 @@ const MapWithShelters: React.FC = () => {
           onEdit={handleEdit}
           onSave={handleSave}
           onClose={() => setIsPopupOpen(false)}
+          onDelete={handleDelete}
         />
       )}
     </div>
