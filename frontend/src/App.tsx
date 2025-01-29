@@ -9,10 +9,10 @@ import AdminDashboard from "./pages/adminDashboard";
 import AuthorityDashboard from "./pages/authorityDashboard";
 import VolunteerDashboard from "./pages/volunteerDashboard";
 import UserDashboard from "./pages/userDashboard";
-import Shelters from "./pages/shelters";
+import SheltersPage from "./pages/sheltersPage";
 import DistrictPage from "./pages/districtPage";
 import ManageSheltersPage from "./pages/manageSheltersPage";
-import ResourceAnalyticts from "./pages/resourceAnalyticts";
+import ResourceAnalytictsPage from "./pages/resourceAnalytictsPage";
 import { ProtectedRoute } from "./components/protectedRoute";
 import { RedirectAuthenticatedUser } from "./components/redirectAuthenticatedUser";
 
@@ -62,10 +62,10 @@ function App() {
         <Route path="/volunteer" element={<ProtectedRoute> <VolunteerDashboard/> </ProtectedRoute>} />
         <Route path="/user" element={<ProtectedRoute><UserDashboard/></ProtectedRoute>} />
 
-        <Route path="/shelters" element={<Shelters/>} />
+        <Route path="/shelters" element={<SheltersPage/>} />
         <Route path="/manage-shelters" element={<ManageSheltersPage/>} />
         <Route path="/districts" element={<DistrictPage />} />
-        <Route path="/resource-analyticts" element={<ResourceAnalyticts/>} />
+        <Route path="/resource-analyticts" element={<ResourceAnalytictsPage/>} />
         <Route path="/logout" element={"LOGOUT"} />
       </Routes>
       <Toaster />

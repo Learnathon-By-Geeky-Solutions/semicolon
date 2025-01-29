@@ -1,99 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts';
+
 import { getDistricts } from '../helpers/district';
 import { getShelters } from '../helpers/shelter';
 import { District } from '../types/districtTypes';
 import { Shelter } from '../types/shelterMapTypes';
 import LoadingSpinner from '../components/loadingSpinner';
+import { ResourceType, ResourceData, ResourceColors, ResourceLabels, AreaChartData } from '../types/resourceAnalyticsTypes';
+import CustomPieChart from '../components/resourceAnalytics/customPieChart';
+import CustomAreaChart from '../components/resourceAnalytics/customAreaChart';
 
-const CustomPieChart = ({ data, dataKey, nameKey, colors }: { 
-  data: any[], 
-  dataKey: string, 
-  nameKey: string, 
-  colors: string[] 
-}) => (
-  <div className="h-64 w-full">
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          innerRadius={60}
-          outerRadius={80}
-          fill="#8884d8"
-          paddingAngle={5}
-          dataKey={dataKey}
-          nameKey={nameKey}
-          label
-        >
-          {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-          ))}
-        </Pie>
-        <Tooltip />
-        <Legend />
-      </PieChart>
-    </ResponsiveContainer>
-  </div>
-);
-
-const CustomAreaChart = ({ data, dataKey, color, name }: {
-  data: any[],
-  dataKey: string,
-  color: string,
-  name: string
-}) => (
-  <div className="h-64 w-full">
-    <ResponsiveContainer width="100%" height="100%">
-      <AreaChart
-        data={data}
-        margin={{ top: 20, right: 30, left: 40, bottom: 30 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Area 
-          name={name}
-          type="monotone" 
-          dataKey={dataKey} 
-          stroke={color} 
-          fill={color} 
-          fillOpacity={0.3} 
-        />
-      </AreaChart>
-    </ResponsiveContainer>
-  </div>
-);
-
-const ResourceAnalyticts = () => {
+const ResourceAnalytictsPage = () => {
   const [districts, setDistricts] = useState<District[]>([]);
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [selectedDistrictId, setSelectedDistrictId] = useState<string>("");
-  const [selectedResource, setSelectedResource] = useState<string>("food");
+  const [selectedResource, setSelectedResource] = useState<ResourceType>("food");
   const [loading, setLoading] = useState(true);
 
-  const resourceColors = {
+  const resourceColors: ResourceColors = {
     food: "#22C55E", // green-600
     water: "#0EA5E9", // sky-500
     medicine: "#EC4899", // pink-500
   };
 
-  const resourceLabels = {
+  const resourceLabels: ResourceLabels = {
     food: "Food Supplies",
     water: "Water Supplies",
     medicine: "Medical Supplies"
@@ -129,21 +58,21 @@ const ResourceAnalyticts = () => {
   );
 
   const totals = selectedDistrictShelters.reduce((acc, shelter) => {
-    Object.keys(resourceColors).forEach(resource => {
-      acc[resource] = (acc[resource] || 0) + (shelter[resource as keyof Shelter] || 0);
+    (Object.keys(resourceColors) as ResourceType[]).forEach(resource => {
+      acc[resource] = (acc[resource] || 0) + (shelter[resource] || 0);
     });
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<ResourceType, number>);
 
   // Prepare data for pie chart
-  const pieData = Object.entries(totals).map(([name, value]) => ({ name, value }));
+  const pieData: ResourceData[] = Object.entries(totals).map(([name, value]) => ({ name, value }));
 
   // Prepare data for area charts
-  const areaData = selectedDistrictShelters.map(shelter => ({
+  const areaData: AreaChartData[] = selectedDistrictShelters.map(shelter => ({
     name: shelter.name,
-    ...Object.keys(resourceColors).reduce((acc, resource) => ({
+    ...(Object.keys(resourceColors) as ResourceType[]).reduce((acc, resource) => ({
       ...acc,
-      [resource]: shelter[resource as keyof Shelter]
+      [resource]: shelter[resource]
     }), {})
   }));
 
@@ -214,11 +143,11 @@ const ResourceAnalyticts = () => {
                 className={`bg-white p-4 rounded-lg shadow cursor-pointer transition-all duration-200 ${
                   selectedResource === resource ? 'ring-2 ring-green-500' : ''
                 }`}
-                style={{ borderLeft: `4px solid ${resourceColors[resource]}` }}
-                onClick={() => setSelectedResource(resource)}
+                style={{ borderLeft: `4px solid ${resourceColors[resource as ResourceType]}` }}
+                onClick={() => setSelectedResource(resource as ResourceType)}
               >
                 <div className="text-sm font-medium text-gray-600 capitalize">
-                  {resourceLabels[resource as keyof typeof resourceLabels]}
+                  {resourceLabels[resource as ResourceType]}
                 </div>
                 <div className="text-2xl font-bold text-gray-800">
                   {total.toLocaleString()}
@@ -254,7 +183,7 @@ const ResourceAnalyticts = () => {
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-700">
-                  {resourceLabels[selectedResource as keyof typeof resourceLabels]} by Shelter
+                  {resourceLabels[selectedResource]} by Shelter
                 </h3>
                 <div className="text-sm text-gray-500">
                   Average: {Math.round(totals[selectedResource] / selectedDistrictShelters.length).toLocaleString()}
@@ -264,7 +193,7 @@ const ResourceAnalyticts = () => {
                 data={areaData}
                 dataKey={selectedResource}
                 color={resourceColors[selectedResource]}
-                name={resourceLabels[selectedResource as keyof typeof resourceLabels]}
+                name={resourceLabels[selectedResource]}
               />
             </div>
 
@@ -303,7 +232,7 @@ const ResourceAnalyticts = () => {
                               selectedResource === resource ? 'font-bold' : ''
                             }`}
                           >
-                            {shelter[resource as keyof Shelter]?.toLocaleString()}
+                            {shelter[resource as ResourceType]?.toLocaleString()}
                           </td>
                         ))}
                       </tr>
@@ -319,4 +248,4 @@ const ResourceAnalyticts = () => {
   );
 };
 
-export default ResourceAnalyticts;
+export default ResourceAnalytictsPage;

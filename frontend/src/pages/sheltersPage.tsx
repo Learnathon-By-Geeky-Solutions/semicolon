@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ShelterMap from "../components/googleMaps/shelterMap";
 import { MdMenu, MdClose } from "react-icons/md";
 
-const Shelters: React.FC = () => {
+const SheltersPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -101,4 +101,4 @@ const Shelters: React.FC = () => {
   );
 };
 
-export default Shelters;
+export default SheltersPage;
