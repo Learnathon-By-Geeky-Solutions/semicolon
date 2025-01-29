@@ -27,3 +27,7 @@ export interface NewShelter {
 export interface Shelter extends NewShelter {
   _id: string;
 }
+
+export interface MapWithSheltersProps {
+  permission: 'view' | 'edit';
+}

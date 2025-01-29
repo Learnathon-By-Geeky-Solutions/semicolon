@@ -4,23 +4,19 @@ import { toast } from "react-hot-toast";
 import { GOOGLE_MAPS_API_KEY } from "../../constants/paths";
 import { Loader } from "@googlemaps/js-api-loader";
 import { ResourcePopup } from "./resourcePopup";
-import { Location, Shelter, NewShelter } from "../../types/shelterMapTypes";
+import { Location, Shelter, NewShelter, MapWithSheltersProps } from "../../types/shelterMapTypes";
 import { getShelters, saveShelters } from "../../helpers/shelter";
+import LoadingSpinner from "../loadingSpinner";
 
 const loader = new Loader({
   apiKey: GOOGLE_MAPS_API_KEY,
   libraries: ["places", "marker"],
 });
 
-
 const center = {
   lat: -34.397,
   lng: 150.644,
 };
-
-interface MapWithSheltersProps {
-  permission: 'view' | 'edit';
-}
 
 const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   const location = useLocation();
@@ -370,8 +366,14 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      {/* Main Content */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <LoadingSpinner />
+        </div>
+      )}
+      
       <div id="map" className="w-full h-[70vh] rounded-lg shadow-lg mb-6"></div>
+      
       <div className="text-center space-x-4">
         {permission === 'edit' && (
           <button
