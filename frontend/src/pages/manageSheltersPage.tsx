@@ -8,6 +8,8 @@ import {  getDistricts } from "../helpers/district";
 import LoadingSpinner from "../components/loadingSpinner";
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { District } from "../types/districtTypes";
+import PageLayout from "../components/layout/pageLayout";
+import { mainNavItems } from "../config/navigation";
 
 const API_URL = `${SERVER_URL}/api/v1/shelters`;
 
@@ -130,112 +132,89 @@ const ShelterManagement = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-green-900 text-white">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold">CrisisCompass</h1>
-        </div>
-        <nav className="mt-6">
-          <a
-            href="/shelters"
-            className="flex items-center px-6 py-3 bg-green-700 text-white"
-          >
-            <span className="mx-3">Shelters</span>
-          </a>
-          <a
-            href="/districts"
-            className="flex items-center px-6 py-3 text-gray-100 hover:bg-green-700"
-          >
-            <span className="mx-3">Districts</span>
-          </a>
-          <a
-            href="/map"
-            className="flex items-center px-6 py-3 text-gray-100 hover:bg-green-700"
-          >
-            <span className="mx-3">Map</span>
-          </a>
-        </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white shadow">
-          <div className="px-6 py-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">Shelter Management</h2>
-              <div className="flex items-center gap-4">
-                <select
-                  value={selectedDistrict?._id || ""}
-                  onChange={handleDistrictChange}
-                  className="border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Select District</option>
-                  {districts.map(district => (
-                    <option key={district._id} value={district._id}>
-                      {district.district_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-6">
-          {/* Shelters Table */}
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+    <PageLayout
+      title="Shelter Management"
+      navItems={mainNavItems}
+      headerRightContent={
+        <select
+          value={selectedDistrict?._id || ""}
+          onChange={handleDistrictChange}
+          className="border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option value="">Select District</option>
+          {districts.map(district => (
+            <option key={district._id} value={district._id}>
+              {district.district_name}
+            </option>
+          ))}
+        </select>
+      }
+    >
+      <div className="max-w-[1400px] mx-auto p-4 md:p-8">
+        {/* Shelters Table */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Food</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Water</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Medicine</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Location
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Food
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Water
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Medicine
+                  </th>
                   {canEditShelters && (
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-200">
                 {filteredShelters.map((shelter) => (
-                  <tr key={shelter._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-900">{shelter.name}</div>
+                  <tr key={shelter._id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {shelter.name}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-gray-900">{shelter.lat}, {shelter.lng}</div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {shelter.lat}, {shelter.lng}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-gray-900">{shelter.food}</div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {shelter.food}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-gray-900">{shelter.water}</div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {shelter.water}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-gray-900">{shelter.medicine}</div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {shelter.medicine}
                     </td>
                     {canEditShelters && (
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div className="flex gap-3">
                           <button
                             onClick={() => {
                               setEditingShelter(shelter);
                               setFormData(shelter);
                               setIsEditModalOpen(true);
                             }}
-                            className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-full transition-colors"
+                            className="text-blue-600 hover:text-blue-800"
                           >
-                            <FiEdit2 className="w-5 h-5" />
+                            <FiEdit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => deleteShelter(shelter._id)}
-                            className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full transition-colors"
+                            className="text-red-600 hover:text-red-800"
                           >
-                            <FiTrash2 className="w-5 h-5" />
+                            <FiTrash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -245,130 +224,129 @@ const ShelterManagement = () => {
               </tbody>
             </table>
           </div>
-        </main>
-      </div>
+        </div>
 
-      {/* Edit Shelter Modal */}
-      {isEditModalOpen && editingShelter && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl overflow-hidden">
-      <div className="bg-green-700 px-6 py-4 text-white flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Edit Shelter</h2>
-        <button
-          onClick={() => {
-            setIsEditModalOpen(false);
-            setEditingShelter(null);
-          }}
-          className="text-white hover:text-gray-200"
-          aria-label="Close modal"
-        >
-          &times;
-        </button>
-      </div>
-      <form onSubmit={updateShelter} className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Shelter Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Location
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="number"
-                name="lat"
-                value={formData.lat}
-                onChange={handleInputChange}
-                className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
-                placeholder="Latitude"
-                disabled
-              />
-              <input
-                type="number"
-                name="lng"
-                value={formData.lng}
-                onChange={handleInputChange}
-                className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
-                placeholder="Longitude"
-                disabled
-              />
+        {/* Edit Shelter Modal */}
+        {isEditModalOpen && editingShelter && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl overflow-hidden">
+              <div className="bg-green-700 px-6 py-4 text-white flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Edit Shelter</h2>
+                <button
+                  onClick={() => {
+                    setIsEditModalOpen(false);
+                    setEditingShelter(null);
+                  }}
+                  className="text-white hover:text-gray-200"
+                  aria-label="Close modal"
+                >
+                  &times;
+                </button>
+              </div>
+              <form onSubmit={updateShelter} className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Shelter Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Location
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        name="lat"
+                        value={formData.lat}
+                        onChange={handleInputChange}
+                        className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+                        placeholder="Latitude"
+                        disabled
+                      />
+                      <input
+                        type="number"
+                        name="lng"
+                        value={formData.lng}
+                        onChange={handleInputChange}
+                        className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+                        placeholder="Longitude"
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Food
+                    </label>
+                    <input
+                      type="number"
+                      name="food"
+                      value={formData.food}
+                      onChange={handleInputChange}
+                      className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Water
+                    </label>
+                    <input
+                      type="number"
+                      name="water"
+                      value={formData.water}
+                      onChange={handleInputChange}
+                      className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Medicine
+                    </label>
+                    <input
+                      type="number"
+                      name="medicine"
+                      value={formData.medicine}
+                      onChange={handleInputChange}
+                      className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditModalOpen(false);
+                      setEditingShelter(null);
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-gray-300 focus:outline-none"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-600 focus:outline-none"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Food
-            </label>
-            <input
-              type="number"
-              name="food"
-              value={formData.food}
-              onChange={handleInputChange}
-              className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Water
-            </label>
-            <input
-              type="number"
-              name="water"
-              value={formData.water}
-              onChange={handleInputChange}
-              className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Medicine
-            </label>
-            <input
-              type="number"
-              name="medicine"
-              value={formData.medicine}
-              onChange={handleInputChange}
-              className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
-              required
-            />
-          </div>
-        </div>
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setIsEditModalOpen(false);
-              setEditingShelter(null);
-            }}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-gray-300 focus:outline-none"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-600 focus:outline-none"
-          >
-            Save Changes
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)
-}
-    </div>
+        )}
+      </div>
+    </PageLayout>
   );
 };
 

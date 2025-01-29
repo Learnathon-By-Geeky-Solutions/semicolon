@@ -446,7 +446,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex-1 flex flex-col bg-gray-50">
       {/* Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
@@ -454,33 +454,14 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
         </div>
       )}
       
-      <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Emergency Shelters</h1>
-          {permission === 'edit' && (
-            <button
-              className="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg
-              hover:bg-green-800 shadow-sm transition-all duration-200"
-              onClick={handleSaveShelters}
-            >
-              <MdSave className="w-5 h-5" />
-              <span>Save Changes</span>
-            </button>
-          )}
-        </div>
-
+      <div className="flex-1 p-4 space-y-4">
         {/* Map Container */}
-        <div className="relative rounded-2xl overflow-hidden shadow-xl bg-white p-1">
-          <div id="map" className="w-full h-[75vh] rounded-xl" />
+        <div className="relative rounded-2xl overflow-hidden shadow-xl bg-white p-1 h-[calc(100vh-12rem)]">
+          <div id="map" className="w-full h-full rounded-xl" />
         </div>
         
         {/* Controls Container */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-          <div className="p-4 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800">Navigation Controls</h2>
-          </div>
-          
           <div className="p-4 flex flex-wrap gap-3 justify-start">
             <button
               className="inline-flex items-center px-4 py-2.5 bg-green-600 text-white rounded-lg
@@ -533,112 +514,123 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
                 <span>Clear Route</span>
               </button>
             )}
+
+            {permission === 'edit' && (
+              <button
+                className="inline-flex items-center px-4 py-2.5 ml-auto bg-green-700 text-white rounded-lg
+                hover:bg-green-800 shadow-sm transition-all duration-200"
+                onClick={handleSaveShelters}
+              >
+                <MdSave className="w-5 h-5" />
+                <span>Save Changes</span>
+              </button>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Shelter Selection Modal */}
-      {isSelectingShelter && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50
-          animate-[fadeIn_0.2s_ease-out]">
-          <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-md w-full mx-4
-            animate-[slideIn_0.3s_ease-out]">
-            <h3 className="text-xl font-semibold text-gray-800 mb-6">Plan Your Route</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Destination
-                </label>
-                <select
-                  className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50
-                  focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  value={selectedDestination?._id || ""}
-                  onChange={(e) => {
-                    const shelter = shelters.find(s => s._id === e.target.value);
-                    setSelectedDestination(shelter || null);
-                  }}
-                >
-                  <option value="">Choose a shelter...</option>
-                  {shelters.map((shelter) => (
-                    <option key={shelter._id} value={shelter._id}>
-                      {shelter.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        {/* Shelter Selection Modal */}
+        {isSelectingShelter && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50
+            animate-[fadeIn_0.2s_ease-out]">
+            <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-md w-full mx-4
+              animate-[slideIn_0.3s_ease-out]">
+              <h3 className="text-xl font-semibold text-gray-800 mb-6">Plan Your Route</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Destination
+                  </label>
+                  <select
+                    className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50
+                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    value={selectedDestination?._id || ""}
+                    onChange={(e) => {
+                      const shelter = shelters.find(s => s._id === e.target.value);
+                      setSelectedDestination(shelter || null);
+                    }}
+                  >
+                    <option value="">Choose a shelter...</option>
+                    {shelters.map((shelter) => (
+                      <option key={shelter._id} value={shelter._id}>
+                        {shelter.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Travel Mode
-                </label>
-                <div className="flex gap-3">
-                  <button
-                    className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2
-                      transition-all duration-200 ${
-                        selectedTravelMode === 'DRIVING'
-                          ? 'bg-green-600 text-white shadow-md'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    onClick={() => setSelectedTravelMode('DRIVING')}
-                  >
-                    <MdDirectionsCar className="w-5 h-5" />
-                    Drive
-                  </button>
-                  <button
-                    className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2
-                      transition-all duration-200 ${
-                        selectedTravelMode === 'WALKING'
-                          ? 'bg-green-600 text-white shadow-md'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    onClick={() => setSelectedTravelMode('WALKING')}
-                  >
-                    <MdDirectionsWalk className="w-5 h-5" />
-                    Walk
-                  </button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Travel Mode
+                  </label>
+                  <div className="flex gap-3">
+                    <button
+                      className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2
+                        transition-all duration-200 ${
+                          selectedTravelMode === 'DRIVING'
+                            ? 'bg-green-600 text-white shadow-md'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      onClick={() => setSelectedTravelMode('DRIVING')}
+                    >
+                      <MdDirectionsCar className="w-5 h-5" />
+                      Drive
+                    </button>
+                    <button
+                      className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2
+                        transition-all duration-200 ${
+                          selectedTravelMode === 'WALKING'
+                            ? 'bg-green-600 text-white shadow-md'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      onClick={() => setSelectedTravelMode('WALKING')}
+                    >
+                      <MdDirectionsWalk className="w-5 h-5" />
+                      Walk
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex justify-end gap-3 mt-8">
-              <button
-                className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium transition-colors"
-                onClick={() => {
-                  setIsSelectingShelter(false);
-                  setSelectedDestination(null);
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 
-                disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200
-                shadow-sm hover:shadow font-medium"
-                disabled={!selectedDestination}
-                onClick={() => selectedDestination && handleShowRoute(selectedDestination)}
-              >
-                Show Route
-              </button>
+              <div className="flex justify-end gap-3 mt-8">
+                <button
+                  className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                  onClick={() => {
+                    setIsSelectingShelter(false);
+                    setSelectedDestination(null);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 
+                  disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200
+                  shadow-sm hover:shadow font-medium"
+                  disabled={!selectedDestination}
+                  onClick={() => selectedDestination && handleShowRoute(selectedDestination)}
+                >
+                  Show Route
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Resource Popup */}
-      {isPopupOpen && selectedShelter && (
-        <ResourcePopup
-          shelter={selectedShelter}
-          isEditing={isEditing}
-          onEdit={handleEdit}
-          onSave={handleSaveResources}
-          onClose={() => setIsPopupOpen(false)}
-          onDelete={handleDelete}
-          onResourceChange={handleResourceChange}
-          permission={permission}
-          onShowRoute={handleShowRouteFromPopup}
-        />
-      )}
+        {/* Resource Popup */}
+        {isPopupOpen && selectedShelter && (
+          <ResourcePopup
+            shelter={selectedShelter}
+            isEditing={isEditing}
+            onEdit={handleEdit}
+            onSave={handleSaveResources}
+            onClose={() => setIsPopupOpen(false)}
+            onDelete={handleDelete}
+            onResourceChange={handleResourceChange}
+            permission={permission}
+            onShowRoute={handleShowRouteFromPopup}
+          />
+        )}
+      </div>
     </div>
   );
 };
