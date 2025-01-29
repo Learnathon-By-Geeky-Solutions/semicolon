@@ -4,8 +4,8 @@ const ShelterSchema = new Schema({
   name: { type: String, required: true },
   lat: { type: Number, required: true, unique:true },
   lng: { type: Number, required: true, unique: true },
-  district_id: { type: String, required: true },
-  district_name: { type: String, required: false },
+  
+  district_id: { type: String, required: true, ref: 'District' },
 
   // resources
   food: { type: Number, required: true },
