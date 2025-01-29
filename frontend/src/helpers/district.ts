@@ -42,3 +42,9 @@ export const deleteDistrict = async (district: District): Promise<void> => {
       console.error('Error deleting district:', error);
     }
 };
+
+export const getDistrictById = async (id: string): Promise<District> => {
+  const url = `${API_URL}/getDistrictById`
+  const response = await axios.post(url, { _id: id });
+  return response.data;
+};

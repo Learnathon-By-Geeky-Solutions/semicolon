@@ -12,6 +12,12 @@ export const getDistricts = async (req: Request, res: Response) => {
   }
 };
 
+export const getDistrictById = async (req: Request, res: Response) => {
+  const { _id } = req.body;
+  const district = await District.findById(_id);
+  res.json(district);
+};
+
 // Create a new district
 export const createDistrict = async (req: Request, res: Response) => {
   try {

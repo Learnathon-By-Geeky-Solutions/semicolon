@@ -8,6 +8,9 @@ import { Location, Shelter, NewShelter, MapWithSheltersProps, TravelMode } from 
 import { getShelters, saveShelters } from "../../helpers/shelter";
 import LoadingSpinner from "../loadingSpinner";
 import { MdMyLocation, MdSave, MdDirectionsCar, MdDirectionsWalk, MdClose, MdRoute } from "react-icons/md";
+import { useAuthStore } from "../../store/authStore";
+import { getDistrictById } from "../../helpers/district";
+import { District } from "../../types/districtTypes";
 
 const loader = new Loader({
   apiKey: GOOGLE_MAPS_API_KEY,
@@ -20,6 +23,8 @@ const center = {
 };
 
 const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
+  const { user } = useAuthStore();
+
   const location = useLocation();
   const mapRef = useRef<google.maps.Map | null>(null);
   const [shelters, setShelters] = useState<Shelter[]>([]);
@@ -42,10 +47,19 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   const [isSelectingShelter, setIsSelectingShelter] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState<Shelter | null>(null);
   const [selectedTravelMode, setSelectedTravelMode] = useState<TravelMode>('DRIVING');
+  const [district, setDistrict] = useState<District | null>(null);
 
   const initializeShelterCount = () => {
     shelterCountRef.current = shelters.length;
   };
+
+  useEffect(() => {
+    const fetchDistrict = async () => {
+      const district = await getDistrictById(user?.district_id || "");
+      setDistrict(district);
+    };
+    fetchDistrict();
+  }, [user?.district_id]);
 
   useEffect(() => {
     if (shelters.length > 0) {
@@ -107,14 +121,15 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
           if (!clickedLocation) return;
 
           shelterCountRef.current += 1;
+          
 
           const newShelter: NewShelter & { _id: string } = {
             _id: `temp-${Date.now()}`,
             name: `Shelter ${shelterCountRef.current}`,
             lat: clickedLocation.lat(),
             lng: clickedLocation.lng(),
-            district_id: "1",
-            district_name: "tangail",
+            district_id: user?.district_id || "",
+            district_name: district?.district_name || "",
             food: 0,
             water: 0,
             medicine: 0,
