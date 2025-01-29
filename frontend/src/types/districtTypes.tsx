@@ -15,3 +15,4 @@ export interface NewDistrict {
     total_medicine: number;
 }
 
+
