@@ -31,3 +31,17 @@ export interface Shelter extends NewShelter {
 export interface MapWithSheltersProps {
   permission: 'view' | 'edit';
 }
+// Add this type definition
+export type TravelMode = 'DRIVING' | 'WALKING';
+
+export interface ResourcePopupProps {
+  shelter: Shelter;
+  isEditing: { [key: string]: boolean };
+  onEdit: (field: string) => void;
+  onSave: () => void;
+  onClose: () => void;
+  onDelete: () => void;
+  onResourceChange: (field: string, value: number | string) => void;
+  permission: string;
+  onShowRoute: (shelter: Shelter, mode: TravelMode) => void;
+} 

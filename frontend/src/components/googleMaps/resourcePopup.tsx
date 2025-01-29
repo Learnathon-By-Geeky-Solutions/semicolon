@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
-import { Shelter } from '../../types/shelterMapTypes';
-import { MdDelete, MdSave, MdClose, MdEdit } from 'react-icons/md';
+import { MdDelete, MdSave, MdClose, MdEdit, MdDirectionsCar, MdDirectionsWalk } from 'react-icons/md';
+import { ResourcePopupProps } from "../../types/shelterMapTypes";
 
-export const ResourcePopup: React.FC<{
-    shelter: Shelter;
-    isEditing: { [key: string]: boolean };
-    onEdit: (field: string) => void;
-    onSave: () => void;
-    onClose: () => void;
-    onDelete: () => void;
-    onResourceChange: (field: string, value: number | string) => void;
-    permission: 'view' | 'edit';
-  }> = ({ shelter, isEditing, onEdit, onSave, onClose, onDelete, onResourceChange, permission }) => {
+
+export const ResourcePopup: React.FC<ResourcePopupProps> = ({
+  shelter,
+  isEditing,
+  onEdit,
+  onSave,
+  onClose,
+  onDelete,
+  onResourceChange,
+  permission,
+  onShowRoute
+}) => {
     
     const resources = {
       name: shelter.name,
@@ -32,15 +34,17 @@ export const ResourcePopup: React.FC<{
       console.log(shelter);
     }, [shelter]);
     return (
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-        <div className="bg-white p-8 rounded-xl shadow-2xl w-[28rem] max-w-[90vw] relative">
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200"
-            title="Close"
-          >
-            <MdClose size={20} />
-          </button>
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">{shelter.name}</h3>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <MdClose className="w-6 h-6" />
+            </button>
+          </div>
 
           <div className="flex items-center justify-between mb-8 pb-3 border-b border-gray-100 pr-12">
             <div className="flex-grow mr-2">
@@ -100,26 +104,48 @@ export const ResourcePopup: React.FC<{
               ))}
           </div>
 
-          <div className="flex space-x-3 justify-between">
+          {/* Route Options */}
+          <div className="mb-6">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Get Directions</h4>
+            <div className="flex gap-3">
+              <button
+                className="flex-1 py-2 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 
+                transition-colors flex items-center justify-center gap-2"
+                onClick={() => onShowRoute(shelter, "DRIVING")}
+              >
+                <MdDirectionsCar className="w-5 h-5" />
+                Drive
+              </button>
+              <button
+                className="flex-1 py-2 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 
+                transition-colors flex items-center justify-center gap-2"
+                onClick={() => onShowRoute(shelter, 'WALKING')}
+              >
+                <MdDirectionsWalk className="w-5 h-5" />
+                Walk
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
             {permission === 'edit' && (
               <>
-                {Object.values(isEditing).some(Boolean) && (
-                  <button
-                    onClick={onSave}
-                    className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm hover:shadow"
-                    title="Save Changes"
-                  >
-                    <MdSave size={20} />
-                    <span className="font-medium">Save</span>
-                  </button>
-                )}
                 <button
-                  onClick={onDelete}
-                  className="flex-1 px-4 py-2.5 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200 flex items-center justify-center space-x-2"
-                  title="Delete Shelter"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 
+                  transition-colors flex items-center gap-2"
+                  onClick={onSave}
                 >
-                  <MdDelete size={20} />
-                  <span className="font-medium">Delete</span>
+                  <MdSave className="w-5 h-5" />
+                  Save
+                </button>
+                
+                <button
+                  className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 
+                  transition-colors flex items-center gap-2"
+                  onClick={onDelete}
+                >
+                  <MdDelete className="w-5 h-5" />
+                  Delete
                 </button>
               </>
             )}

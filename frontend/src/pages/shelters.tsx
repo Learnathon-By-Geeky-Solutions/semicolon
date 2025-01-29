@@ -32,7 +32,7 @@ const Shelters: React.FC = () => {
       </div>
       
       <div className="flex-1 p-4">
-        <ShelterMap permission="view" />
+        <ShelterMap permission="edit" />
       </div>
     </div>
 

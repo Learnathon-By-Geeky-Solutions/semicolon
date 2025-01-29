@@ -4,20 +4,23 @@ import { toast } from "react-hot-toast";
 import { GOOGLE_MAPS_API_KEY } from "../../constants/paths";
 import { Loader } from "@googlemaps/js-api-loader";
 import { ResourcePopup } from "./resourcePopup";
-import { Location, Shelter, NewShelter, MapWithSheltersProps } from "../../types/shelterMapTypes";
+import { Location, Shelter, NewShelter, MapWithSheltersProps, TravelMode } from "../../types/shelterMapTypes";
 import { getShelters, saveShelters } from "../../helpers/shelter";
 import LoadingSpinner from "../loadingSpinner";
-import { MdMyLocation, MdSave, MdDirectionsCar, MdDirectionsWalk, MdClose } from "react-icons/md";
+import { MdMyLocation, MdSave, MdDirectionsCar, MdDirectionsWalk, MdClose, MdRoute } from "react-icons/md";
 
 const loader = new Loader({
   apiKey: GOOGLE_MAPS_API_KEY,
   libraries: ["places", "marker"],
 });
 
+
 const center = {
   lat: -34.397,
   lng: 150.644,
 };
+
+
 
 const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   const location = useLocation();
@@ -38,6 +41,10 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
   const savedShelterIcon = "./saved_shelter_flag.png";
   const newlyPlacedShelterIcon = "./new_shelter_flag.png";
+
+  const [isSelectingShelter, setIsSelectingShelter] = useState(false);
+  const [selectedDestination, setSelectedDestination] = useState<Shelter | null>(null);
+  const [selectedTravelMode, setSelectedTravelMode] = useState<TravelMode>('DRIVING');
 
   const initializeShelterCount = () => {
     shelterCountRef.current = shelters.length;
@@ -372,6 +379,29 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
     }
   };
 
+  const handleShowRoute = (shelter: Shelter) => {
+    if (shelter && currentLocation) {
+      const travelMode = google.maps.TravelMode[selectedTravelMode];
+      displayDirections(shelter, travelMode);
+      setIsSelectingShelter(false);
+      setSelectedDestination(null);
+      setIsRouteDisplayed(true);
+    } else {
+      toast.error("Please select a shelter and ensure your location is available");
+    }
+  };
+
+  const handleShowRouteFromPopup = (shelter: Shelter, mode: TravelMode) => {
+    if (currentLocation) {
+      const travelMode = google.maps.TravelMode[mode];
+      displayDirections(shelter, travelMode);
+      setIsPopupOpen(false);
+      setIsRouteDisplayed(true);
+    } else {
+      toast.error("Please ensure your location is available");
+    }
+  };
+
   return (
     <div className="min-h-screen p-4 md:p-6">
       {isLoading && (
@@ -439,6 +469,92 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
               </div>
             </button>
             
+            <button
+              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 
+              focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
+              transition duration-300 shadow-md hover:shadow-lg"
+              onClick={() => setIsSelectingShelter(true)}
+            >
+              <div className="flex items-center gap-2">
+                <MdRoute className="w-5 h-5" />
+                Show Route
+              </div>
+            </button>
+
+            {isSelectingShelter && (
+              <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
+                  <h3 className="text-lg font-semibold mb-4">Select a Shelter</h3>
+                  
+                  <select
+                    className="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    value={selectedDestination?._id || ""}
+                    onChange={(e) => {
+                      const shelter = shelters.find(s => s._id === e.target.value);
+                      setSelectedDestination(shelter || null);
+                    }}
+                  >
+                    <option value="">Select a shelter...</option>
+                    {shelters.map((shelter) => (
+                      <option key={shelter._id} value={shelter._id}>
+                        {shelter.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="mb-4">
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Travel Mode
+                    </label>
+                    <div className="flex gap-3">
+                      <button
+                        className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
+                          ${selectedTravelMode === 'DRIVING'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          } transition-colors duration-200`}
+                        onClick={() => setSelectedTravelMode('DRIVING')}
+                      >
+                        <MdDirectionsCar className="w-5 h-5" />
+                        Drive
+                      </button>
+                      <button
+                        className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
+                          ${selectedTravelMode === 'WALKING'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          } transition-colors duration-200`}
+                        onClick={() => setSelectedTravelMode('WALKING')}
+                      >
+                        <MdDirectionsWalk className="w-5 h-5" />
+                        Walk
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3">
+                    <button
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                      onClick={() => {
+                        setIsSelectingShelter(false);
+                        setSelectedDestination(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 
+                      disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      disabled={!selectedDestination}
+                      onClick={() => selectedDestination && handleShowRoute(selectedDestination)}
+                    >
+                      Show Route
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {isRouteDisplayed && (
               <button
                 className="px-6 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 
@@ -467,6 +583,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
           onDelete={handleDelete}
           onResourceChange={handleResourceChange}
           permission={permission}
+          onShowRoute={handleShowRouteFromPopup}
         />
       )}
     </div>
