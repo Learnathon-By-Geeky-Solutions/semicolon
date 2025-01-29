@@ -81,7 +81,6 @@ const SheltersPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
       {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div 

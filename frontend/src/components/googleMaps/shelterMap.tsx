@@ -446,151 +446,164 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   };
 
   return (
-    <div className="min-h-screen p-2 md:p-6">
+    <div className="min-h-screen bg-gray-50">
+      {/* Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <LoadingSpinner />
         </div>
       )}
       
-      <div className="max-w-[1400px] mx-auto space-y-4 md:space-y-6">
+      <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Emergency Shelters</h1>
+          {permission === 'edit' && (
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg
+              hover:bg-green-800 shadow-sm transition-all duration-200"
+              onClick={handleSaveShelters}
+            >
+              <MdSave className="w-5 h-5" />
+              <span>Save Changes</span>
+            </button>
+          )}
+        </div>
+
         {/* Map Container */}
-        <div className="relative rounded-xl overflow-hidden shadow-lg">
-          <div id="map" className="w-full h-[80vh] md:h-[75vh]"></div>
+        <div className="relative rounded-2xl overflow-hidden shadow-xl bg-white p-1">
+          <div id="map" className="w-full h-[75vh] rounded-xl" />
         </div>
         
         {/* Controls Container */}
-        <div className="bg-white rounded-xl p-3 md:p-6 shadow-lg border border-gray-200">
-          <div className="flex flex-wrap gap-2 md:gap-3 justify-center">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
+          <div className="p-4 border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-800">Navigation Controls</h2>
+          </div>
+          
+          <div className="p-4 flex flex-wrap gap-3 justify-start">
             <button
-              className="h-10 md:h-11 px-3 md:px-6 bg-green-700 text-white rounded-lg
-              transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
-              hover:bg-green-800 font-medium text-[13px] md:text-sm tracking-wide
-              touch-manipulation active:bg-green-900"
+              className="inline-flex items-center px-4 py-2.5 bg-green-600 text-white rounded-lg
+              hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
+              font-medium text-sm gap-2"
               onClick={refreshLocation}
             >
-              <MdMyLocation className="w-4 h-4" />
-              <span className="hidden md:inline">Location</span>
+              <MdMyLocation className="w-5 h-5" />
+              <span>My Location</span>
             </button>
             
-            {permission === 'edit' && (
-              <button
-                className="h-10 md:h-11 px-3 md:px-6 bg-green-700 text-white rounded-lg
-                transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
-                hover:bg-green-800 font-medium text-[13px] md:text-sm tracking-wide
-                touch-manipulation active:bg-green-900"
-                onClick={handleSaveShelters}
-              >
-                <MdSave className="w-4 h-4" />
-                <span className="hidden md:inline">Save</span>
-              </button>
-            )}
-            
             <button
-              className="h-10 md:h-11 px-3 md:px-6 bg-green-700 text-white rounded-lg
-              transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
-              hover:bg-green-800 font-medium text-[13px] md:text-sm tracking-wide
-              touch-manipulation active:bg-green-900"
+              className="inline-flex items-center px-4 py-2.5 bg-green-600 text-white rounded-lg
+              hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
+              font-medium text-sm gap-2"
               onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
             >
-              <MdDirectionsCar className="w-4 h-4" />
-              <span className="hidden md:inline">Drive</span>
+              <MdDirectionsCar className="w-5 h-5" />
+              <span>Find Nearest (Drive)</span>
             </button>
             
             <button
-              className="h-10 md:h-11 px-3 md:px-6 bg-green-700 text-white rounded-lg
-              transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
-              hover:bg-green-800 font-medium text-[13px] md:text-sm tracking-wide
-              touch-manipulation active:bg-green-900"
+              className="inline-flex items-center px-4 py-2.5 bg-green-600 text-white rounded-lg
+              hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
+              font-medium text-sm gap-2"
               onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
             >
-              <MdDirectionsWalk className="w-4 h-4" />
-              <span className="hidden md:inline">Walk</span>
+              <MdDirectionsWalk className="w-5 h-5" />
+              <span>Find Nearest (Walk)</span>
             </button>
             
             <button
-              className="h-10 md:h-11 px-3 md:px-6 bg-green-700 text-white rounded-lg
-              transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
-              hover:bg-green-800 font-medium text-[13px] md:text-sm tracking-wide
-              touch-manipulation active:bg-green-900"
+              className="inline-flex items-center px-4 py-2.5 bg-green-600 text-white rounded-lg
+              hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
+              font-medium text-sm gap-2"
               onClick={() => setIsSelectingShelter(true)}
             >
-              <MdRoute className="w-4 h-4" />
-              <span className="hidden md:inline">Show Route</span>
+              <MdRoute className="w-5 h-5" />
+              <span>Plan Route</span>
             </button>
             
             {isRouteDisplayed && (
               <button
-                className="h-10 md:h-11 px-3 md:px-6 bg-rose-500 text-white rounded-lg
-                transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
-                hover:bg-rose-600 font-medium text-[13px] md:text-sm tracking-wide
-                touch-manipulation active:bg-rose-700"
+                className="inline-flex items-center px-4 py-2.5 bg-rose-500 text-white rounded-lg
+                hover:bg-rose-600 transition-all duration-200 shadow-sm hover:shadow
+                font-medium text-sm gap-2"
                 onClick={clearRoute}
               >
-                <MdClose className="w-4 h-4" />
-                <span className="hidden md:inline">Clear</span>
+                <MdClose className="w-5 h-5" />
+                <span>Clear Route</span>
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Add animation to the shelter selection modal */}
+      {/* Shelter Selection Modal */}
       {isSelectingShelter && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50
           animate-[fadeIn_0.2s_ease-out]">
-          <div className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4
+          <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-md w-full mx-4
             animate-[slideIn_0.3s_ease-out]">
-            <h3 className="text-lg font-semibold mb-4">Select a Shelter</h3>
-            <select
-              className="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
-              value={selectedDestination?._id || ""}
-              onChange={(e) => {
-                const shelter = shelters.find(s => s._id === e.target.value);
-                setSelectedDestination(shelter || null);
-              }}
-            >
-              <option value="">Select a shelter...</option>
-              {shelters.map((shelter) => (
-                <option key={shelter._id} value={shelter._id}>
-                  {shelter.name}
-                </option>
-              ))}
-            </select>
+            <h3 className="text-xl font-semibold text-gray-800 mb-6">Plan Your Route</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Destination
+                </label>
+                <select
+                  className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50
+                  focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  value={selectedDestination?._id || ""}
+                  onChange={(e) => {
+                    const shelter = shelters.find(s => s._id === e.target.value);
+                    setSelectedDestination(shelter || null);
+                  }}
+                >
+                  <option value="">Choose a shelter...</option>
+                  {shelters.map((shelter) => (
+                    <option key={shelter._id} value={shelter._id}>
+                      {shelter.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Travel Mode
-              </label>
-              <div className="flex gap-3">
-                <button
-                  className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
-                    ${selectedTravelMode === 'DRIVING'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    } transition-colors duration-200`}
-                  onClick={() => setSelectedTravelMode('DRIVING')}
-                >
-                  <MdDirectionsCar className="w-5 h-5" />
-                  Drive
-                </button>
-                <button
-                  className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
-                    ${selectedTravelMode === 'WALKING'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    } transition-colors duration-200`}
-                  onClick={() => setSelectedTravelMode('WALKING')}
-                >
-                  <MdDirectionsWalk className="w-5 h-5" />
-                  Walk
-                </button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Travel Mode
+                </label>
+                <div className="flex gap-3">
+                  <button
+                    className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2
+                      transition-all duration-200 ${
+                        selectedTravelMode === 'DRIVING'
+                          ? 'bg-green-600 text-white shadow-md'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    onClick={() => setSelectedTravelMode('DRIVING')}
+                  >
+                    <MdDirectionsCar className="w-5 h-5" />
+                    Drive
+                  </button>
+                  <button
+                    className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2
+                      transition-all duration-200 ${
+                        selectedTravelMode === 'WALKING'
+                          ? 'bg-green-600 text-white shadow-md'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    onClick={() => setSelectedTravelMode('WALKING')}
+                  >
+                    <MdDirectionsWalk className="w-5 h-5" />
+                    Walk
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-3 mt-8">
               <button
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium transition-colors"
                 onClick={() => {
                   setIsSelectingShelter(false);
                   setSelectedDestination(null);
@@ -599,8 +612,9 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 
-                disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 
+                disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200
+                shadow-sm hover:shadow font-medium"
                 disabled={!selectedDestination}
                 onClick={() => selectedDestination && handleShowRoute(selectedDestination)}
               >
