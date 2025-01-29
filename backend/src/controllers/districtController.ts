@@ -48,8 +48,8 @@ export const createDistrict = async (req: Request, res: Response) => {
 // Update a district
 export const updateDistrict = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const { district_name, total_food, total_water, total_medicine } = req.body;
+    
+    const { _id ,district_name, total_food, total_water, total_medicine } = req.body;
 
     if (!district_name && total_food === undefined && 
         total_water === undefined && total_medicine === undefined) {
@@ -65,8 +65,8 @@ export const updateDistrict = async (req: Request, res: Response) => {
       ...(total_medicine !== undefined && { total_medicine })
     };
 
-    const district = await District.findOneAndUpdate(
-      { district_id: id },
+    const district = await District.findByIdAndUpdate(
+      _id,
       updateData,
       { new: true }
     );
@@ -87,11 +87,11 @@ export const updateDistrict = async (req: Request, res: Response) => {
 // Delete a district
 export const deleteDistrict = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { _id } = req.body;
 
     // Check if district has any shelters
     const shelterList = await ShelterList.findOne({
-      "shelters.district_id": id
+      "shelters.district_id": _id
     });
 
     if (shelterList && shelterList.shelters.length > 0) {
@@ -100,7 +100,7 @@ export const deleteDistrict = async (req: Request, res: Response) => {
       });
     }
 
-    const district = await District.findOneAndDelete({ district_id: id });
+    const district = await District.findByIdAndDelete(_id);
 
     if (!district) {
       return res.status(404).json({ message: "District not found" });

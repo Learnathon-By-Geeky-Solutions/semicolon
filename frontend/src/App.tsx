@@ -10,6 +10,7 @@ import AuthorityDashboard from "./pages/authorityDashboard";
 import VolunteerDashboard from "./pages/volunteerDashboard";
 import UserDashboard from "./pages/userDashboard";
 import Shelters from "./pages/shelters";
+import DistrictPage from "./pages/districtPage";
 
 import { ProtectedRoute } from "./components/protectedRoute";
 import { RedirectAuthenticatedUser } from "./components/redirectAuthenticatedUser";
@@ -61,6 +62,7 @@ function App() {
         <Route path="/user" element={<ProtectedRoute><UserDashboard/></ProtectedRoute>} />
 
         <Route path="/shelters" element={<Shelters/>} />
+        <Route path="/districts" element={<DistrictPage />} />
         
         <Route path="/logout" element={"LOGOUT"} />
       </Routes>
