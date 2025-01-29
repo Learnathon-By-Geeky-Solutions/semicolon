@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Shelter } from '../../types/shelterMapTypes';
-import { MdDelete, MdSave, MdClose } from 'react-icons/md';
+import { MdDelete, MdSave, MdClose, MdEdit } from 'react-icons/md';
 
 export const ResourcePopup: React.FC<{
     shelter: Shelter;
@@ -19,19 +19,6 @@ export const ResourcePopup: React.FC<{
       medicine: shelter.medicine
     };
 
-    const getResourceIcon = (resourceType: string) => {
-      switch(resourceType) {
-        case 'food':
-          return '🍽️';
-        case 'water':
-          return '💧';
-        case 'medicine':
-          return '💊';
-        default:
-          return '📝';
-      }
-    };
-
     const handleInputChange = (field: string, value: string) => {
       if (field === 'name') {
         onResourceChange(field, value);
@@ -44,84 +31,88 @@ export const ResourcePopup: React.FC<{
       console.log(shelter);
     }, [shelter]);
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-          <div className="flex items-center justify-between mb-6 pb-2 border-b">
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+        <div className="bg-white p-8 rounded-xl shadow-2xl w-[28rem] max-w-[90vw] relative">
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200"
+            title="Close"
+          >
+            <MdClose size={20} />
+          </button>
+
+          <div className="flex items-center justify-between mb-8 pb-3 border-b border-gray-100 pr-12">
             <div className="flex-grow mr-2">
               {isEditing['name'] ? (
                 <input
                   type="text"
                   value={shelter.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg text-xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
                 />
               ) : (
-                <h2 className="text-xl font-bold">{shelter.name}</h2>
+                <h2 className="text-2xl font-semibold text-gray-800">{shelter.name}</h2>
               )}
             </div>
             <button
               onClick={() => onEdit('name')}
-              className="ml-4 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 text-sm"
+              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-all duration-200"
             >
-              ✏️
+              <MdEdit size={20} />
             </button>
           </div>
 
-          <div className="space-y-4 mb-6">
+          <div className="space-y-5 mb-8">
             {Object.entries(resources)
               .filter(([key]) => key !== 'name')
               .map(([key, value]) => (
-                <div key={key} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
-                 
-                  <div className="flex-grow">
-                    <span className="font-medium capitalize">{key}</span>
-                    <div className="flex items-center mt-1">
-                      {isEditing[key] ? (
-                        <input
-                          type="number"
-                          min="0"
-                          value={value || ''}
-                          onChange={(e) => handleInputChange(key, e.target.value)}
-                          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      ) : (
-                        <span className="text-lg">{value}</span>
-                      )}
+                <div key={key} className="group">
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all duration-200">
+                    <div className="flex-grow">
+                      <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">{key}</span>
+                      <div className="mt-1">
+                        {isEditing[key] ? (
+                          <input
+                            type="number"
+                            min="0"
+                            value={value || ''}
+                            onChange={(e) => handleInputChange(key, e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
+                          />
+                        ) : (
+                          <span className="text-lg font-medium text-gray-700">{value}</span>
+                        )}
+                      </div>
                     </div>
+                    <button
+                      onClick={() => onEdit(key)}
+                      className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200"
+                    >
+                      <MdEdit size={18} />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => onEdit(key)}
-                    className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 text-sm"
-                  >
-                    ✏️
-                  </button>
                 </div>
               ))}
           </div>
 
-          <div className="flex space-x-2 justify-between">
+          <div className="flex space-x-3 justify-between">
             {Object.values(isEditing).some(Boolean) && (
               <button
                 onClick={onSave}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+                className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm hover:shadow"
                 title="Save Changes"
               >
-                <span className="text-xl">Save</span>
+                <MdSave size={20} />
+                <span className="font-medium">Save</span>
               </button>
             )}
             <button
-              onClick={onClose}
-              className="flex-1 px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center"
-              title="Close"
-            >
-              <span className="text-xl">Close</span>
-            </button>
-            <button
               onClick={onDelete}
-              className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+              className="flex-1 px-4 py-2.5 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200 flex items-center justify-center space-x-2"
               title="Delete Shelter"
             >
-              <span>Delete</span>
+              <MdDelete size={20} />
+              <span className="font-medium">Delete</span>
             </button>
           </div>
         </div>
