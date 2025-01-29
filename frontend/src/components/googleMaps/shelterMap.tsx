@@ -486,10 +486,12 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
         </div>
       </div>
 
-      {/* Add the shelter selection modal */}
+      {/* Add animation to the shelter selection modal */}
       {isSelectingShelter && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50
+          animate-[fadeIn_0.2s_ease-out]">
+          <div className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4
+            animate-[slideIn_0.3s_ease-out]">
             <h3 className="text-lg font-semibold mb-4">Select a Shelter</h3>
             <select
               className="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"

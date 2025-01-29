@@ -25,8 +25,10 @@ export const ResourcePopup: React.FC<ResourcePopupProps> = ({
       console.log(shelter);
     }, [shelter]);
     return (
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50
+        animate-[fadeIn_0.2s_ease-out]">
+        <div className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4
+          animate-[slideIn_0.3s_ease-out]">
           <div className="flex justify-between items-center mb-8 pb-3 border-b border-gray-100">
             <div className="flex-grow mr-2">
               {isEditing['name'] && permission === 'edit' ? (
