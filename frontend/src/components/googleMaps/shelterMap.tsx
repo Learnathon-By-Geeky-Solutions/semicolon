@@ -25,7 +25,6 @@ const center = {
 const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   const { user } = useAuthStore();
 
-  const location = useLocation();
   const mapRef = useRef<google.maps.Map | null>(null);
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [currentLocation, setCurrentLocation] = useState<google.maps.LatLng | null>(null);
@@ -54,15 +53,26 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   };
 
   useEffect(() => {
+    console.log("Current district state:", district);
+  }, [district]);
+
+  useEffect(() => {
     const fetchDistrict = async () => {
       try {
         if (user && user.district_id) {
-          const district = await getDistrictById(user.district_id);
-          setDistrict(district);
-          console.log("District fetched:", district);
+          console.log("Fetching district for user:", user.district_id);
+          const fetchedDistrict = await getDistrictById(user.district_id);
+          console.log("Fetched district:", fetchedDistrict);
+          if (fetchedDistrict && fetchedDistrict._id) {
+            setDistrict(fetchedDistrict);
+          } else {
+            console.error("Invalid district data received");
+            toast.error("Error loading district information");
+          }
         }
       } catch (error) {
         console.error("Error fetching district:", error);
+        toast.error("Error loading district information");
       }
     };
 
@@ -125,10 +135,18 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
       });
 
       // Only add click listener for shelter placement if user has edit permission
-      if (permission === 'edit') {
-        map.addListener("click", (event: google.maps.MapMouseEvent) => {
+      if (permission === 'edit' && district) {
+        map.addListener("click", async (event: google.maps.MapMouseEvent) => {
           const clickedLocation = event.latLng;
           if (!clickedLocation) return;
+          
+          console.log("Current district when creating shelter:", district);
+
+          // Strict check for district
+          if (!district || !district._id) {
+            toast.error("No district assigned. Please contact an administrator.");
+            return;
+          }
 
           shelterCountRef.current += 1;
           
@@ -138,12 +156,14 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
             name: `Shelter ${shelterCountRef.current}`,
             lat: clickedLocation.lat(),
             lng: clickedLocation.lng(),
-            district_id: user?.district_id || "",
-            district_name: district?.district_name || "",
+            district_id: district._id,
+            district_name: district.district_name,
             food: 0,
             water: 0,
             medicine: 0,
           };
+
+          console.log("New shelter being created:", newShelter);
 
           const marker = new google.maps.marker.AdvancedMarkerElement({
             position: clickedLocation,
@@ -292,14 +312,16 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
       setIsLoading(false);
     };
 
-    loadMapAndShelters();
+    if (district) {
+      loadMapAndShelters();
+    }
 
     return () => {
       // Cleanup markers
       markersRef.current.forEach(marker => marker.map = null);
       markersRef.current.clear();
     };
-  }, [location.key]); // Re-run when location changes
+  }, [district]);
 
   // Update markers whenever shelters change
   useEffect(() => {
