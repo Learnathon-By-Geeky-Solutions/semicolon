@@ -17,7 +17,11 @@ const center = {
   lng: 150.644,
 };
 
-const MapWithShelters: React.FC = () => {
+interface MapWithSheltersProps {
+  permission: 'view' | 'edit';
+}
+
+const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   const mapRef = useRef<google.maps.Map | null>(null);
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [currentLocation, setCurrentLocation] = useState<google.maps.LatLng | null>(null);
@@ -92,41 +96,44 @@ const MapWithShelters: React.FC = () => {
         mapId: "shelter-map",
       });
 
-      map.addListener("click", (event: google.maps.MapMouseEvent) => {
-        const clickedLocation = event.latLng;
-        if (!clickedLocation) return;
+      // Only add click listener for shelter placement if user has edit permission
+      if (permission === 'edit') {
+        map.addListener("click", (event: google.maps.MapMouseEvent) => {
+          const clickedLocation = event.latLng;
+          if (!clickedLocation) return;
 
-        shelterCountRef.current += 1;
+          shelterCountRef.current += 1;
 
-        const newShelter: NewShelter & { _id: string } = {
-          _id: `temp-${Date.now()}`,
-          name: `Shelter ${shelterCountRef.current}`,
-          lat: clickedLocation.lat(),
-          lng: clickedLocation.lng(),
-          district_id: "1",
-          district_name: "tangail",
-          food: 0,
-          water: 0,
-          medicine: 0,
-        };
+          const newShelter: NewShelter & { _id: string } = {
+            _id: `temp-${Date.now()}`,
+            name: `Shelter ${shelterCountRef.current}`,
+            lat: clickedLocation.lat(),
+            lng: clickedLocation.lng(),
+            district_id: "1",
+            district_name: "tangail",
+            food: 0,
+            water: 0,
+            medicine: 0,
+          };
 
-        const marker = new google.maps.marker.AdvancedMarkerElement({
-          position: clickedLocation,
-          map,
-          title: newShelter.name,
-          content: createMarkerImage(newlyPlacedShelterIcon),
+          const marker = new google.maps.marker.AdvancedMarkerElement({
+            position: clickedLocation,
+            map,
+            title: newShelter.name,
+            content: createMarkerImage(newlyPlacedShelterIcon),
+          });
+
+          markersRef.current.set(newShelter._id, marker);
+
+          marker.addListener('click', () => {
+            setSelectedShelter(newShelter);
+            setIsPopupOpen(true);
+          });
+
+          setShelters((prev) => [...prev, newShelter]);
+          toast.success("Shelter marker placed!");
         });
-
-        markersRef.current.set(newShelter._id, marker);
-
-        marker.addListener('click', () => {
-          setSelectedShelter(newShelter);
-          setIsPopupOpen(true);
-        });
-
-        setShelters((prev) => [...prev, newShelter]);
-        toast.success("Shelter marker placed!");
-      });
+      }
 
       const directionsRendererInstance = new google.maps.DirectionsRenderer({
         suppressMarkers: true
@@ -347,32 +354,34 @@ const MapWithShelters: React.FC = () => {
       {/* Main Content */}
       <div id="map" className="w-full h-[70vh] rounded-lg shadow-lg mb-6"></div>
       <div className="text-center space-x-4">
+        {permission === 'edit' && (
           <button
-              className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300"
-              onClick={handleSaveShelters}
-            >
-              Save Shelters
-          </button>
-          <button
-            className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300"
-            onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
+            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none transition duration-300"
+            onClick={handleSaveShelters}
           >
-            Get Nearest Shelter (Driving)
+            Save Shelters
           </button>
+        )}
+        <button
+          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none transition duration-300"
+          onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
+        >
+          Get Nearest Shelter (Driving)
+        </button>
+        <button
+          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none transition duration-300"
+          onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
+        >
+          Get Nearest Shelter (Walking)
+        </button>
+        {isRouteDisplayed && (
           <button
-            className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300"
-            onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
+            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none transition duration-300"
+            onClick={clearRoute}
           >
-            Get Nearest Shelter (Walking)
+            Clear Route
           </button>
-          {isRouteDisplayed && (
-            <button
-              className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300"
-              onClick={clearRoute}
-            >
-              Clear Route
-            </button>
-          )}
+        )}
       </div>
       
       
@@ -387,6 +396,7 @@ const MapWithShelters: React.FC = () => {
           onClose={() => setIsPopupOpen(false)}
           onDelete={handleDelete}
           onResourceChange={handleResourceChange}
+          permission={permission}
         />
       )}
     </div>

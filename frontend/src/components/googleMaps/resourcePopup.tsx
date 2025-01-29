@@ -10,7 +10,8 @@ export const ResourcePopup: React.FC<{
     onClose: () => void;
     onDelete: () => void;
     onResourceChange: (field: string, value: number | string) => void;
-  }> = ({ shelter, isEditing, onEdit, onSave, onClose, onDelete, onResourceChange }) => {
+    permission: 'view' | 'edit';
+  }> = ({ shelter, isEditing, onEdit, onSave, onClose, onDelete, onResourceChange, permission }) => {
     
     const resources = {
       name: shelter.name,
@@ -43,7 +44,7 @@ export const ResourcePopup: React.FC<{
 
           <div className="flex items-center justify-between mb-8 pb-3 border-b border-gray-100 pr-12">
             <div className="flex-grow mr-2">
-              {isEditing['name'] ? (
+              {isEditing['name'] && permission === 'edit' ? (
                 <input
                   type="text"
                   value={shelter.name}
@@ -54,12 +55,14 @@ export const ResourcePopup: React.FC<{
                 <h2 className="text-2xl font-semibold text-gray-800">{shelter.name}</h2>
               )}
             </div>
-            <button
-              onClick={() => onEdit('name')}
-              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-all duration-200"
-            >
-              <MdEdit size={20} />
-            </button>
+            {permission === 'edit' && (
+              <button
+                onClick={() => onEdit('name')}
+                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-all duration-200"
+              >
+                <MdEdit size={20} />
+              </button>
+            )}
           </div>
 
           <div className="space-y-5 mb-8">
@@ -71,7 +74,7 @@ export const ResourcePopup: React.FC<{
                     <div className="flex-grow">
                       <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">{key}</span>
                       <div className="mt-1">
-                        {isEditing[key] ? (
+                        {isEditing[key] && permission === 'edit' ? (
                           <input
                             type="number"
                             min="0"
@@ -84,36 +87,42 @@ export const ResourcePopup: React.FC<{
                         )}
                       </div>
                     </div>
-                    <button
-                      onClick={() => onEdit(key)}
-                      className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200"
-                    >
-                      <MdEdit size={18} />
-                    </button>
+                    {permission === 'edit' && (
+                      <button
+                        onClick={() => onEdit(key)}
+                        className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200"
+                      >
+                        <MdEdit size={18} />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
           </div>
 
           <div className="flex space-x-3 justify-between">
-            {Object.values(isEditing).some(Boolean) && (
-              <button
-                onClick={onSave}
-                className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm hover:shadow"
-                title="Save Changes"
-              >
-                <MdSave size={20} />
-                <span className="font-medium">Save</span>
-              </button>
+            {permission === 'edit' && (
+              <>
+                {Object.values(isEditing).some(Boolean) && (
+                  <button
+                    onClick={onSave}
+                    className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm hover:shadow"
+                    title="Save Changes"
+                  >
+                    <MdSave size={20} />
+                    <span className="font-medium">Save</span>
+                  </button>
+                )}
+                <button
+                  onClick={onDelete}
+                  className="flex-1 px-4 py-2.5 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200 flex items-center justify-center space-x-2"
+                  title="Delete Shelter"
+                >
+                  <MdDelete size={20} />
+                  <span className="font-medium">Delete</span>
+                </button>
+              </>
             )}
-            <button
-              onClick={onDelete}
-              className="flex-1 px-4 py-2.5 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200 flex items-center justify-center space-x-2"
-              title="Delete Shelter"
-            >
-              <MdDelete size={20} />
-              <span className="font-medium">Delete</span>
-            </button>
           </div>
         </div>
       </div>
