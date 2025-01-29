@@ -14,13 +14,10 @@ const loader = new Loader({
   libraries: ["places", "marker"],
 });
 
-
 const center = {
   lat: -34.397,
   lng: 150.644,
 };
-
-
 
 const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   const location = useLocation();
@@ -420,66 +417,66 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
         <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
           <div className="flex flex-wrap gap-3 justify-center">
             <button
-              className="h-11 px-6 bg-green-700 text-white rounded-lg
+              className="h-11 md:px-6 px-3 bg-green-700 text-white rounded-lg
               transition-colors duration-200 flex items-center justify-center gap-2
               hover:bg-green-800 font-medium text-sm tracking-wide"
               onClick={refreshLocation}
             >
               <MdMyLocation className="w-4 h-4" />
-              Location
+              <span className="hidden md:inline">Location</span>
             </button>
             
             {permission === 'edit' && (
               <button
-                className="h-11 px-6 bg-green-700 text-white rounded-lg
+                className="h-11 md:px-6 px-3 bg-green-700 text-white rounded-lg
                 transition-colors duration-200 flex items-center justify-center gap-2
                 hover:bg-green-800 font-medium text-sm tracking-wide"
                 onClick={handleSaveShelters}
               >
                 <MdSave className="w-4 h-4" />
-                Save
+                <span className="hidden md:inline">Save</span>
               </button>
             )}
             
             <button
-              className="h-11 px-6 bg-green-700 text-white rounded-lg
+              className="h-11 md:px-6 px-3 bg-green-700 text-white rounded-lg
               transition-colors duration-200 flex items-center justify-center gap-2
               hover:bg-green-800 font-medium text-sm tracking-wide"
               onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
             >
               <MdDirectionsCar className="w-4 h-4" />
-              Drive
+              <span className="hidden md:inline">Drive</span>
             </button>
             
             <button
-              className="h-11 px-6 bg-green-700 text-white rounded-lg
+              className="h-11 md:px-6 px-3 bg-green-700 text-white rounded-lg
               transition-colors duration-200 flex items-center justify-center gap-2
               hover:bg-green-800 font-medium text-sm tracking-wide"
               onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
             >
               <MdDirectionsWalk className="w-4 h-4" />
-              Walk
+              <span className="hidden md:inline">Walk</span>
             </button>
             
             <button
-              className="h-11 px-6 bg-green-700 text-white rounded-lg
+              className="h-11 md:px-6 px-3 bg-green-700 text-white rounded-lg
               transition-colors duration-200 flex items-center justify-center gap-2
               hover:bg-green-800 font-medium text-sm tracking-wide"
               onClick={() => setIsSelectingShelter(true)}
             >
               <MdRoute className="w-4 h-4" />
-              Show Route
+              <span className="hidden md:inline">Show Route</span>
             </button>
             
             {isRouteDisplayed && (
               <button
-                className="h-11 px-6 bg-rose-500 text-white rounded-lg
+                className="h-11 md:px-6 px-3 bg-rose-500 text-white rounded-lg
                 transition-colors duration-200 flex items-center justify-center gap-2
                 hover:bg-rose-600 font-medium text-sm tracking-wide"
                 onClick={clearRoute}
               >
                 <MdClose className="w-4 h-4" />
-                Clear
+                <span className="hidden md:inline">Clear</span>
               </button>
             )}
           </div>
