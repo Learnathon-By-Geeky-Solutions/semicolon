@@ -7,6 +7,7 @@ import { ResourcePopup } from "./resourcePopup";
 import { Location, Shelter, NewShelter, MapWithSheltersProps } from "../../types/shelterMapTypes";
 import { getShelters, saveShelters } from "../../helpers/shelter";
 import LoadingSpinner from "../loadingSpinner";
+import { MdMyLocation, MdSave, MdDirectionsCar, MdDirectionsWalk, MdClose } from "react-icons/md";
 
 const loader = new Loader({
   apiKey: GOOGLE_MAPS_API_KEY,
@@ -364,49 +365,97 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
     return img;
   };
 
+  const refreshLocation = () => {
+    if (mapRef.current) {
+      getCurrentLocation(mapRef.current);
+      toast.success("Refreshing your location...");
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <div className="min-h-screen p-4 md:p-6">
       {isLoading && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <LoadingSpinner />
         </div>
       )}
       
-      <div id="map" className="w-full h-[70vh] rounded-lg shadow-lg mb-6"></div>
-      
-      <div className="text-center space-x-4">
-        {permission === 'edit' && (
-          <button
-            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none transition duration-300"
-            onClick={handleSaveShelters}
-          >
-            Save Shelters
-          </button>
-        )}
-        <button
-          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none transition duration-300"
-          onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
-        >
-          Get Nearest Shelter (Driving)
-        </button>
-        <button
-          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none transition duration-300"
-          onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
-        >
-          Get Nearest Shelter (Walking)
-        </button>
-        {isRouteDisplayed && (
-          <button
-            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none transition duration-300"
-            onClick={clearRoute}
-          >
-            Clear Route
-          </button>
-        )}
+      <div className="max-w-[1400px] mx-auto space-y-6">
+        {/* Map Container */}
+        <div className="relative rounded-xl overflow-hidden shadow-lg">
+          <div id="map" className="w-full h-[75vh]"></div>
+        </div>
+        
+        {/* Controls Container */}
+        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
+          <div className="flex flex-wrap gap-4 justify-center">
+            <button
+              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 
+              focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
+              transition duration-300 shadow-md hover:shadow-lg"
+              onClick={refreshLocation}
+            >
+              <div className="flex items-center gap-2">
+                <MdMyLocation className="w-5 h-5" />
+                Location
+              </div>
+            </button>
+            
+            {permission === 'edit' && (
+              <button
+                className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 
+                focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 
+                transition duration-300 shadow-md hover:shadow-lg"
+                onClick={handleSaveShelters}
+              >
+                <div className="flex items-center gap-2">
+                  <MdSave className="w-5 h-5" />
+                  Save
+                </div>
+              </button>
+            )}
+            
+            <button
+              className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 
+              focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 
+              transition duration-300 shadow-md hover:shadow-lg"
+              onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
+            >
+              <div className="flex items-center gap-2">
+                <MdDirectionsCar className="w-5 h-5" />
+                Drive
+              </div>
+            </button>
+            
+            <button
+              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 
+              focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
+              transition duration-300 shadow-md hover:shadow-lg"
+              onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
+            >
+              <div className="flex items-center gap-2">
+                <MdDirectionsWalk className="w-5 h-5" />
+                Walk
+              </div>
+            </button>
+            
+            {isRouteDisplayed && (
+              <button
+                className="px-6 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 
+                focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 
+                transition duration-300 shadow-md hover:shadow-lg"
+                onClick={clearRoute}
+              >
+                <div className="flex items-center gap-2">
+                  <MdClose className="w-5 h-5" />
+                  Clear
+                </div>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-      
-      
-  
+
       {/* Resource Popup */}
       {isPopupOpen && selectedShelter && (
         <ResourcePopup
