@@ -400,26 +400,27 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-6">
+    <div className="min-h-screen p-2 md:p-6">
       {isLoading && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <LoadingSpinner />
         </div>
       )}
       
-      <div className="max-w-[1400px] mx-auto space-y-6">
+      <div className="max-w-[1400px] mx-auto space-y-4 md:space-y-6">
         {/* Map Container */}
         <div className="relative rounded-xl overflow-hidden shadow-lg">
-          <div id="map" className="w-full h-[75vh]"></div>
+          <div id="map" className="w-full h-[80vh] md:h-[75vh]"></div>
         </div>
         
         {/* Controls Container */}
-        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-          <div className="flex flex-wrap gap-3 justify-center">
+        <div className="bg-white rounded-xl p-3 md:p-6 shadow-lg border border-gray-200">
+          <div className="flex flex-wrap gap-2 md:gap-3 justify-center">
             <button
-              className="h-11 md:px-6 px-3 bg-green-700 text-white rounded-lg
-              transition-colors duration-200 flex items-center justify-center gap-2
-              hover:bg-green-800 font-medium text-sm tracking-wide"
+              className="h-10 md:h-11 px-3 md:px-6 bg-green-700 text-white rounded-lg
+              transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
+              hover:bg-green-800 font-medium text-[13px] md:text-sm tracking-wide
+              touch-manipulation active:bg-green-900"
               onClick={refreshLocation}
             >
               <MdMyLocation className="w-4 h-4" />
@@ -428,9 +429,10 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
             
             {permission === 'edit' && (
               <button
-                className="h-11 md:px-6 px-3 bg-green-700 text-white rounded-lg
-                transition-colors duration-200 flex items-center justify-center gap-2
-                hover:bg-green-800 font-medium text-sm tracking-wide"
+                className="h-10 md:h-11 px-3 md:px-6 bg-green-700 text-white rounded-lg
+                transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
+                hover:bg-green-800 font-medium text-[13px] md:text-sm tracking-wide
+                touch-manipulation active:bg-green-900"
                 onClick={handleSaveShelters}
               >
                 <MdSave className="w-4 h-4" />
@@ -439,9 +441,10 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
             )}
             
             <button
-              className="h-11 md:px-6 px-3 bg-green-700 text-white rounded-lg
-              transition-colors duration-200 flex items-center justify-center gap-2
-              hover:bg-green-800 font-medium text-sm tracking-wide"
+              className="h-10 md:h-11 px-3 md:px-6 bg-green-700 text-white rounded-lg
+              transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
+              hover:bg-green-800 font-medium text-[13px] md:text-sm tracking-wide
+              touch-manipulation active:bg-green-900"
               onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
             >
               <MdDirectionsCar className="w-4 h-4" />
@@ -449,9 +452,10 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
             </button>
             
             <button
-              className="h-11 md:px-6 px-3 bg-green-700 text-white rounded-lg
-              transition-colors duration-200 flex items-center justify-center gap-2
-              hover:bg-green-800 font-medium text-sm tracking-wide"
+              className="h-10 md:h-11 px-3 md:px-6 bg-green-700 text-white rounded-lg
+              transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
+              hover:bg-green-800 font-medium text-[13px] md:text-sm tracking-wide
+              touch-manipulation active:bg-green-900"
               onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
             >
               <MdDirectionsWalk className="w-4 h-4" />
@@ -459,9 +463,10 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
             </button>
             
             <button
-              className="h-11 md:px-6 px-3 bg-green-700 text-white rounded-lg
-              transition-colors duration-200 flex items-center justify-center gap-2
-              hover:bg-green-800 font-medium text-sm tracking-wide"
+              className="h-10 md:h-11 px-3 md:px-6 bg-green-700 text-white rounded-lg
+              transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
+              hover:bg-green-800 font-medium text-[13px] md:text-sm tracking-wide
+              touch-manipulation active:bg-green-900"
               onClick={() => setIsSelectingShelter(true)}
             >
               <MdRoute className="w-4 h-4" />
@@ -470,9 +475,10 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
             
             {isRouteDisplayed && (
               <button
-                className="h-11 md:px-6 px-3 bg-rose-500 text-white rounded-lg
-                transition-colors duration-200 flex items-center justify-center gap-2
-                hover:bg-rose-600 font-medium text-sm tracking-wide"
+                className="h-10 md:h-11 px-3 md:px-6 bg-rose-500 text-white rounded-lg
+                transition-colors duration-200 flex items-center justify-center gap-1.5 md:gap-2
+                hover:bg-rose-600 font-medium text-[13px] md:text-sm tracking-wide
+                touch-manipulation active:bg-rose-700"
                 onClick={clearRoute}
               >
                 <MdClose className="w-4 h-4" />

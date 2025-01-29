@@ -11,11 +11,12 @@ const Shelters: React.FC = () => {
       {!isSidebarOpen && (
         <button
           onClick={() => setIsSidebarOpen(true)}
-          className="md:hidden fixed top-4 left-4 z-50 p-2.5 rounded-lg bg-green-700 text-white 
+          className="md:hidden fixed top-3 left-3 z-50 p-2 rounded-lg bg-green-700 text-white 
           hover:bg-green-800 active:bg-green-900 transition-colors duration-200
           shadow-lg touch-manipulation"
+          aria-label="Open menu"
         >
-          <MdMenu className="w-6 h-6" />
+          <MdMenu className="w-5 h-5" />
         </button>
       )}
 
@@ -24,53 +25,61 @@ const Shelters: React.FC = () => {
         fixed md:static inset-y-0 left-0 transform 
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0 transition-transform duration-300 ease-in-out
-        bg-green-900 text-white w-[280px] md:w-64 flex flex-col h-screen z-40
-        overflow-y-auto overscroll-contain
+        bg-green-900 text-white w-[260px] md:w-64 flex flex-col h-screen z-40
+        overflow-y-auto overscroll-contain safe-top safe-bottom
       `}>
-        <div className="p-6 pb-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">CrisisCompass</h2>
+        <div className="sticky top-0 bg-green-900 p-4 flex justify-between items-center
+          border-b border-green-800">
+          <h2 className="text-xl font-bold">CrisisCompass</h2>
           {/* Close button - Only visible on mobile */}
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className="md:hidden p-1.5 rounded-lg hover:bg-green-800 active:bg-green-700 
-            transition-colors duration-200 touch-manipulation"
+            className="md:hidden p-2 rounded-lg hover:bg-green-800 active:bg-green-700 
+            transition-colors duration-200 touch-manipulation -mr-1"
+            aria-label="Close menu"
           >
-            <MdClose className="w-6 h-6" />
+            <MdClose className="w-5 h-5" />
           </button>
         </div>
         
         <nav className="flex-grow">
-          <ul className="flex flex-col">
-            <li>
-              <button className="w-full text-left py-4 md:py-3 px-6 hover:bg-green-700 
-              active:bg-green-800 transition duration-200 text-lg md:text-base
-              touch-manipulation">
+          <ul className="flex flex-col py-2">
+            <li className="px-2">
+              <button className="w-full text-left py-3.5 px-4 rounded-lg hover:bg-green-800/50 
+              active:bg-green-800 transition duration-200 text-[15px] font-medium
+              touch-manipulation flex items-center">
                 Home
               </button>
             </li>
-            <li>
-              <button className="w-full text-left py-4 md:py-3 px-6 hover:bg-green-700 
-              active:bg-green-800 transition duration-200 text-lg md:text-base
-              touch-manipulation">
+            <li className="px-2">
+              <button className="w-full text-left py-3.5 px-4 rounded-lg hover:bg-green-800/50 
+              active:bg-green-800 transition duration-200 text-[15px] font-medium
+              touch-manipulation flex items-center">
                 Shelter Zones
               </button>
             </li>
-            <li>
-              <button className="w-full text-left py-4 md:py-3 px-6 hover:bg-green-700 
-              active:bg-green-800 transition duration-200 text-lg md:text-base
-              touch-manipulation">
+            <li className="px-2">
+              <button className="w-full text-left py-3.5 px-4 rounded-lg hover:bg-green-800/50 
+              active:bg-green-800 transition duration-200 text-[15px] font-medium
+              touch-manipulation flex items-center">
                 Resources
               </button>
             </li>
-            <li>
-              <button className="w-full text-left py-4 md:py-3 px-6 hover:bg-green-700 
-              active:bg-green-800 transition duration-200 text-lg md:text-base
-              touch-manipulation">
+            <li className="px-2">
+              <button className="w-full text-left py-3.5 px-4 rounded-lg hover:bg-green-800/50 
+              active:bg-green-800 transition duration-200 text-[15px] font-medium
+              touch-manipulation flex items-center">
                 Contact Authorities
               </button>
             </li>
           </ul>
         </nav>
+
+        <div className="p-4 border-t border-green-800">
+          <div className="text-sm text-green-100/70">
+            Version 1.0.0
+          </div>
+        </div>
       </div>
       
       {/* Overlay for mobile */}
