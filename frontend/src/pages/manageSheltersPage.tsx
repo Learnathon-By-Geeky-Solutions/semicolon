@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { SERVER_URL } from "../constants/paths";
-import { Shelter, NewShelter } from "../types/shelterMapTypes";
+import { Shelter } from "../types/shelterMapTypes";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/authStore";
-import { getDistrictById, getDistricts } from "../helpers/district";
+import {  getDistricts } from "../helpers/district";
 import LoadingSpinner from "../components/loadingSpinner";
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { District } from "../types/districtTypes";

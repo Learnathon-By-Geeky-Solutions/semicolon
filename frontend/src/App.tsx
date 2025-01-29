@@ -12,7 +12,7 @@ import UserDashboard from "./pages/userDashboard";
 import Shelters from "./pages/shelters";
 import DistrictPage from "./pages/districtPage";
 import ManageSheltersPage from "./pages/manageSheltersPage";
-
+import ResourceAnalyticts from "./pages/resourceAnalyticts";
 import { ProtectedRoute } from "./components/protectedRoute";
 import { RedirectAuthenticatedUser } from "./components/redirectAuthenticatedUser";
 
@@ -65,7 +65,7 @@ function App() {
         <Route path="/shelters" element={<Shelters/>} />
         <Route path="/manage-shelters" element={<ManageSheltersPage/>} />
         <Route path="/districts" element={<DistrictPage />} />
-        
+        <Route path="/resource-analyticts" element={<ResourceAnalyticts/>} />
         <Route path="/logout" element={"LOGOUT"} />
       </Routes>
       <Toaster />
