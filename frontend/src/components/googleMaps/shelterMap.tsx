@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { GOOGLE_MAPS_API_KEY } from "../../constants/paths";
 import { Loader } from "@googlemaps/js-api-loader";
