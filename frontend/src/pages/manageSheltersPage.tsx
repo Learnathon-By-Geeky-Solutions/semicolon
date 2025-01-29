@@ -7,7 +7,6 @@ import { useAuthStore } from "../store/authStore";
 import { getDistrictById, getDistricts } from "../helpers/district";
 import LoadingSpinner from "../components/loadingSpinner";
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
-import { IoMdAdd } from 'react-icons/io';
 import { District } from "../types/districtTypes";
 
 const API_URL = `${SERVER_URL}/api/v1/shelters`;
@@ -18,9 +17,10 @@ const ShelterManagement = () => {
   const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [loading, setLoading] = useState(false);
-  const [editingShelter, setEditingShelter] = useState<string | null>(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newShelter, setNewShelter] = useState<NewShelter>({
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingShelter, setEditingShelter] = useState<Shelter | null>(null);
+  const [formData, setFormData] = useState<Shelter>({
+    _id: "",
     name: "",
     lat: 0,
     lng: 0,
@@ -68,75 +68,36 @@ const ShelterManagement = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, shelterId?: string) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (shelterId) {
-      setShelters(shelters.map(shelter =>
-        shelter._id === shelterId
-          ? { ...shelter, [name]: name === 'food' || name === 'water' || name === 'medicine' || name === 'lat' || name === 'lng' 
-              ? parseFloat(value) 
-              : value }
-          : shelter
-      ));
-    } else {
-      setNewShelter(prev => ({
+    const parsedValue = name === 'food' || name === 'water' || name === 'medicine' || name === 'lat' || name === 'lng'
+      ? parseFloat(value)
+      : value;
+
+    if (isEditModalOpen) {
+      setFormData(prev => ({
         ...prev,
-        [name]: name === 'food' || name === 'water' || name === 'medicine' || name === 'lat' || name === 'lng'
-          ? parseFloat(value)
-          : value
+        [name]: parsedValue
       }));
-    }
+    } 
   };
 
   const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const districtId = e.target.value;
     const district = districts.find(d => d._id === districtId) || null;
     setSelectedDistrict(district);
-    if (district) {
-      setNewShelter(prev => ({
-        ...prev,
-        district_id: district._id,
-        district_name: district.district_name
-      }));
-    }
   };
 
-  const addShelter = async () => {
-    if (!selectedDistrict) {
-      toast.error("Please select a district first");
-      return;
-    }
-
-    try {
-      const updatedShelters = [...shelters, { ...newShelter, _id: Date.now().toString() }];
-      await axios.post(`${API_URL}/all`, { shelters: updatedShelters });
-      toast.success("Shelter added successfully");
-      fetchShelters();
-      setNewShelter({
-        name: "",
-        lat: 0,
-        lng: 0,
-        district_id: selectedDistrict._id,
-        district_name: selectedDistrict.district_name,
-        food: 0,
-        water: 0,
-        medicine: 0,
-      });
-      setIsAddModalOpen(false);
-    } catch (error) {
-      console.error("Error saving shelter:", error);
-      toast.error("Failed to add shelter");
-    }
-  };
-
-  const updateShelter = async (updatedShelter: Shelter) => {
+  const updateShelter = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       const updatedShelters = shelters.map(shelter => 
-        shelter._id === updatedShelter._id ? updatedShelter : shelter
+        shelter._id === formData._id ? formData : shelter
       );
       
       await axios.post(`${API_URL}/all`, { shelters: updatedShelters });
       toast.success("Shelter updated successfully");
+      setIsEditModalOpen(false);
       setEditingShelter(null);
       fetchShelters();
     } catch (error) {
@@ -217,16 +178,6 @@ const ShelterManagement = () => {
                     </option>
                   ))}
                 </select>
-                {canEditShelters && (
-                  <button
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 
-                      transition-colors duration-200 flex items-center gap-2"
-                  >
-                    <IoMdAdd className="text-xl" />
-                    <span>Add Shelter</span>
-                  </button>
-                )}
               </div>
             </div>
           </div>
@@ -253,114 +204,40 @@ const ShelterManagement = () => {
                 {filteredShelters.map((shelter) => (
                   <tr key={shelter._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
-                      {editingShelter === shelter._id ? (
-                        <input
-                          type="text"
-                          name="name"
-                          value={shelter.name}
-                          onChange={(e) => handleInputChange(e, shelter._id)}
-                          className="border rounded p-1 w-full"
-                        />
-                      ) : (
-                        <div className="font-medium text-gray-900">{shelter.name}</div>
-                      )}
+                      <div className="font-medium text-gray-900">{shelter.name}</div>
                     </td>
                     <td className="px-6 py-4">
-                      {editingShelter === shelter._id ? (
-                        <div className="flex gap-2">
-                          <input
-                            type="number"
-                            name="lat"
-                            value={shelter.lat}
-                            onChange={(e) => handleInputChange(e, shelter._id)}
-                            className="border rounded p-1 w-20"
-                            disabled
-                          />
-                          <input
-                            type="number"
-                            name="lng"
-                            value={shelter.lng}
-                            onChange={(e) => handleInputChange(e, shelter._id)}
-                            className="border rounded p-1 w-20"
-                            disabled
-                          />
-                        </div>
-                      ) : (
-                        <div className="text-gray-900">{shelter.lat}, {shelter.lng}</div>
-                      )}
+                      <div className="text-gray-900">{shelter.lat}, {shelter.lng}</div>
                     </td>
                     <td className="px-6 py-4">
-                      {editingShelter === shelter._id ? (
-                        <input
-                          type="number"
-                          name="food"
-                          value={shelter.food}
-                          onChange={(e) => handleInputChange(e, shelter._id)}
-                          className="border rounded p-1 w-20"
-                        />
-                      ) : (
-                        <div className="text-gray-900">{shelter.food}</div>
-                      )}
+                      <div className="text-gray-900">{shelter.food}</div>
                     </td>
                     <td className="px-6 py-4">
-                      {editingShelter === shelter._id ? (
-                        <input
-                          type="number"
-                          name="water"
-                          value={shelter.water}
-                          onChange={(e) => handleInputChange(e, shelter._id)}
-                          className="border rounded p-1 w-20"
-                        />
-                      ) : (
-                        <div className="text-gray-900">{shelter.water}</div>
-                      )}
+                      <div className="text-gray-900">{shelter.water}</div>
                     </td>
                     <td className="px-6 py-4">
-                      {editingShelter === shelter._id ? (
-                        <input
-                          type="number"
-                          name="medicine"
-                          value={shelter.medicine}
-                          onChange={(e) => handleInputChange(e, shelter._id)}
-                          className="border rounded p-1 w-20"
-                        />
-                      ) : (
-                        <div className="text-gray-900">{shelter.medicine}</div>
-                      )}
+                      <div className="text-gray-900">{shelter.medicine}</div>
                     </td>
                     {canEditShelters && (
                       <td className="px-6 py-4">
-                        {editingShelter === shelter._id ? (
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => updateShelter(shelter)}
-                              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={() => setEditingShelter(null)}
-                              className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => setEditingShelter(shelter._id)}
-                              className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-full transition-colors"
-                            >
-                              <FiEdit2 className="w-5 h-5" />
-                            </button>
-                            <button
-                              onClick={() => deleteShelter(shelter._id)}
-                              className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full transition-colors"
-                            >
-                              <FiTrash2 className="w-5 h-5" />
-                            </button>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => {
+                              setEditingShelter(shelter);
+                              setFormData(shelter);
+                              setIsEditModalOpen(true);
+                            }}
+                            className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-full transition-colors"
+                          >
+                            <FiEdit2 className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => deleteShelter(shelter._id)}
+                            className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full transition-colors"
+                          >
+                            <FiTrash2 className="w-5 h-5" />
+                          </button>
+                        </div>
                       </td>
                     )}
                   </tr>
@@ -371,78 +248,126 @@ const ShelterManagement = () => {
         </main>
       </div>
 
-      {/* Add Shelter Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
-            <h2 className="text-xl font-semibold mb-4">Add New Shelter</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                name="name"
-                placeholder="Shelter Name"
-                value={newShelter.name}
-                onChange={handleInputChange}
-                className="border rounded p-2"
-              />
+      {/* Edit Shelter Modal */}
+      {isEditModalOpen && editingShelter && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl overflow-hidden">
+      <div className="bg-green-700 px-6 py-4 text-white flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Edit Shelter</h2>
+        <button
+          onClick={() => {
+            setIsEditModalOpen(false);
+            setEditingShelter(null);
+          }}
+          className="text-white hover:text-gray-200"
+          aria-label="Close modal"
+        >
+          &times;
+        </button>
+      </div>
+      <form onSubmit={updateShelter} className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Shelter Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Location
+            </label>
+            <div className="flex gap-2">
               <input
                 type="number"
                 name="lat"
-                placeholder="Latitude"
-                value={newShelter.lat}
+                value={formData.lat}
                 onChange={handleInputChange}
-                className="border rounded p-2"
+                className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+                placeholder="Latitude"
+                disabled
               />
               <input
                 type="number"
                 name="lng"
+                value={formData.lng}
+                onChange={handleInputChange}
+                className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
                 placeholder="Longitude"
-                value={newShelter.lng}
-                onChange={handleInputChange}
-                className="border rounded p-2"
+                disabled
               />
-              <input
-                type="number"
-                name="food"
-                placeholder="Food"
-                value={newShelter.food}
-                onChange={handleInputChange}
-                className="border rounded p-2"
-              />
-              <input
-                type="number"
-                name="water"
-                placeholder="Water"
-                value={newShelter.water}
-                onChange={handleInputChange}
-                className="border rounded p-2"
-              />
-              <input
-                type="number"
-                name="medicine"
-                placeholder="Medicine"
-                value={newShelter.medicine}
-                onChange={handleInputChange}
-                className="border rounded p-2"
-              />
-            </div>
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={() => setIsAddModalOpen(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={addShelter}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                Add Shelter
-              </button>
             </div>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Food
+            </label>
+            <input
+              type="number"
+              name="food"
+              value={formData.food}
+              onChange={handleInputChange}
+              className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Water
+            </label>
+            <input
+              type="number"
+              name="water"
+              value={formData.water}
+              onChange={handleInputChange}
+              className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Medicine
+            </label>
+            <input
+              type="number"
+              name="medicine"
+              value={formData.medicine}
+              onChange={handleInputChange}
+              className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
+              required
+            />
+          </div>
         </div>
-      )}
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setIsEditModalOpen(false);
+              setEditingShelter(null);
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-gray-300 focus:outline-none"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-600 focus:outline-none"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)
+}
     </div>
   );
 };
