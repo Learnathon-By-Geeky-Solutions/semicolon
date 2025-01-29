@@ -418,159 +418,147 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
         
         {/* Controls Container */}
         <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-wrap gap-3 justify-center">
             <button
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 
-              focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
-              transition duration-300 shadow-md hover:shadow-lg"
+              className="h-11 px-6 bg-green-700 text-white rounded-lg
+              transition-colors duration-200 flex items-center justify-center gap-2
+              hover:bg-green-800 font-medium text-sm tracking-wide"
               onClick={refreshLocation}
             >
-              <div className="flex items-center gap-2">
-                <MdMyLocation className="w-5 h-5" />
-                Location
-              </div>
+              <MdMyLocation className="w-4 h-4" />
+              Location
             </button>
             
             {permission === 'edit' && (
               <button
-                className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 
-                focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 
-                transition duration-300 shadow-md hover:shadow-lg"
+                className="h-11 px-6 bg-green-700 text-white rounded-lg
+                transition-colors duration-200 flex items-center justify-center gap-2
+                hover:bg-green-800 font-medium text-sm tracking-wide"
                 onClick={handleSaveShelters}
               >
-                <div className="flex items-center gap-2">
-                  <MdSave className="w-5 h-5" />
-                  Save
-                </div>
+                <MdSave className="w-4 h-4" />
+                Save
               </button>
             )}
             
             <button
-              className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 
-              focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 
-              transition duration-300 shadow-md hover:shadow-lg"
+              className="h-11 px-6 bg-green-700 text-white rounded-lg
+              transition-colors duration-200 flex items-center justify-center gap-2
+              hover:bg-green-800 font-medium text-sm tracking-wide"
               onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
             >
-              <div className="flex items-center gap-2">
-                <MdDirectionsCar className="w-5 h-5" />
-                Drive
-              </div>
+              <MdDirectionsCar className="w-4 h-4" />
+              Drive
             </button>
             
             <button
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 
-              focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
-              transition duration-300 shadow-md hover:shadow-lg"
+              className="h-11 px-6 bg-green-700 text-white rounded-lg
+              transition-colors duration-200 flex items-center justify-center gap-2
+              hover:bg-green-800 font-medium text-sm tracking-wide"
               onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
             >
-              <div className="flex items-center gap-2">
-                <MdDirectionsWalk className="w-5 h-5" />
-                Walk
-              </div>
+              <MdDirectionsWalk className="w-4 h-4" />
+              Walk
             </button>
             
             <button
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 
-              focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
-              transition duration-300 shadow-md hover:shadow-lg"
+              className="h-11 px-6 bg-green-700 text-white rounded-lg
+              transition-colors duration-200 flex items-center justify-center gap-2
+              hover:bg-green-800 font-medium text-sm tracking-wide"
               onClick={() => setIsSelectingShelter(true)}
             >
-              <div className="flex items-center gap-2">
-                <MdRoute className="w-5 h-5" />
-                Show Route
-              </div>
+              <MdRoute className="w-4 h-4" />
+              Show Route
             </button>
-
-            {isSelectingShelter && (
-              <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
-                  <h3 className="text-lg font-semibold mb-4">Select a Shelter</h3>
-                  
-                  <select
-                    className="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    value={selectedDestination?._id || ""}
-                    onChange={(e) => {
-                      const shelter = shelters.find(s => s._id === e.target.value);
-                      setSelectedDestination(shelter || null);
-                    }}
-                  >
-                    <option value="">Select a shelter...</option>
-                    {shelters.map((shelter) => (
-                      <option key={shelter._id} value={shelter._id}>
-                        {shelter.name}
-                      </option>
-                    ))}
-                  </select>
-
-                  <div className="mb-4">
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Travel Mode
-                    </label>
-                    <div className="flex gap-3">
-                      <button
-                        className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
-                          ${selectedTravelMode === 'DRIVING'
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          } transition-colors duration-200`}
-                        onClick={() => setSelectedTravelMode('DRIVING')}
-                      >
-                        <MdDirectionsCar className="w-5 h-5" />
-                        Drive
-                      </button>
-                      <button
-                        className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
-                          ${selectedTravelMode === 'WALKING'
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          } transition-colors duration-200`}
-                        onClick={() => setSelectedTravelMode('WALKING')}
-                      >
-                        <MdDirectionsWalk className="w-5 h-5" />
-                        Walk
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end gap-3">
-                    <button
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-                      onClick={() => {
-                        setIsSelectingShelter(false);
-                        setSelectedDestination(null);
-                      }}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 
-                      disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      disabled={!selectedDestination}
-                      onClick={() => selectedDestination && handleShowRoute(selectedDestination)}
-                    >
-                      Show Route
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
             
             {isRouteDisplayed && (
               <button
-                className="px-6 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 
-                focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 
-                transition duration-300 shadow-md hover:shadow-lg"
+                className="h-11 px-6 bg-rose-500 text-white rounded-lg
+                transition-colors duration-200 flex items-center justify-center gap-2
+                hover:bg-rose-600 font-medium text-sm tracking-wide"
                 onClick={clearRoute}
               >
-                <div className="flex items-center gap-2">
-                  <MdClose className="w-5 h-5" />
-                  Clear
-                </div>
+                <MdClose className="w-4 h-4" />
+                Clear
               </button>
             )}
           </div>
         </div>
       </div>
+
+      {/* Add the shelter selection modal */}
+      {isSelectingShelter && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Select a Shelter</h3>
+            <select
+              className="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
+              value={selectedDestination?._id || ""}
+              onChange={(e) => {
+                const shelter = shelters.find(s => s._id === e.target.value);
+                setSelectedDestination(shelter || null);
+              }}
+            >
+              <option value="">Select a shelter...</option>
+              {shelters.map((shelter) => (
+                <option key={shelter._id} value={shelter._id}>
+                  {shelter.name}
+                </option>
+              ))}
+            </select>
+
+            <div className="mb-4">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Travel Mode
+              </label>
+              <div className="flex gap-3">
+                <button
+                  className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
+                    ${selectedTravelMode === 'DRIVING'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    } transition-colors duration-200`}
+                  onClick={() => setSelectedTravelMode('DRIVING')}
+                >
+                  <MdDirectionsCar className="w-5 h-5" />
+                  Drive
+                </button>
+                <button
+                  className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
+                    ${selectedTravelMode === 'WALKING'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    } transition-colors duration-200`}
+                  onClick={() => setSelectedTravelMode('WALKING')}
+                >
+                  <MdDirectionsWalk className="w-5 h-5" />
+                  Walk
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                onClick={() => {
+                  setIsSelectingShelter(false);
+                  setSelectedDestination(null);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 
+                disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                disabled={!selectedDestination}
+                onClick={() => selectedDestination && handleShowRoute(selectedDestination)}
+              >
+                Show Route
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Resource Popup */}
       {isPopupOpen && selectedShelter && (
