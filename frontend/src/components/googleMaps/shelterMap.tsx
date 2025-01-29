@@ -55,11 +55,21 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
   useEffect(() => {
     const fetchDistrict = async () => {
-      const district = await getDistrictById(user?.district_id || "");
-      setDistrict(district);
+      try {
+        if (user && user.district_id) {
+          const district = await getDistrictById(user.district_id);
+          setDistrict(district);
+          console.log("District fetched:", district);
+        }
+      } catch (error) {
+        console.error("Error fetching district:", error);
+      }
     };
-    fetchDistrict();
-  }, [user?.district_id]);
+
+    if (user) {
+      fetchDistrict();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (shelters.length > 0) {
