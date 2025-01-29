@@ -1,7 +1,7 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
-import { useEffect,  } from "react";
+import { useEffect } from "react";
 import HomePage  from "./pages/homePage";
 import LoginPage from "./pages/loginPage";
 import SignUpPage from "./pages/signupPage";
@@ -15,6 +15,7 @@ import { ProtectedRoute } from "./components/protectedRoute";
 import { RedirectAuthenticatedUser } from "./components/redirectAuthenticatedUser";
 
 function App() {
+  const location = useLocation();
 
   const { user, isAuthenticated, checkAuth } = useAuthStore();
 
@@ -24,7 +25,26 @@ function App() {
 
   useEffect(() => {
     console.log("Auth State:", { isAuthenticated, user });
-  }, [isAuthenticated, user]); 
+  }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    // Add event listener for browser back/forward buttons
+    const handlePopState = () => {
+      window.location.reload();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // Cleanup listener on component unmount
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  // Optional: Force reload on location change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
 
   return (
     <div> 

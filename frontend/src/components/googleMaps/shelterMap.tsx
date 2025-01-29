@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { GOOGLE_MAPS_API_KEY } from "../../constants/paths";
 import { Loader } from "@googlemaps/js-api-loader";
@@ -22,10 +23,12 @@ interface MapWithSheltersProps {
 }
 
 const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
+  const location = useLocation();
   const mapRef = useRef<google.maps.Map | null>(null);
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [currentLocation, setCurrentLocation] = useState<google.maps.LatLng | null>(null);
   const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [isEditing, setIsEditing] = useState<{ [key: string]: boolean }>({ food: false, water: false, medicine: false });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -255,15 +258,31 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   };
 
   useEffect(() => {
-    initializeMap();
-    getShelters().then((shelters) => setShelters(shelters));
-  }, []);
+    const loadMapAndShelters = async () => {
+      setIsLoading(true);
+      await initializeMap();
+      const fetchedShelters = await getShelters();
+      setShelters(fetchedShelters);
+      setIsLoading(false);
+    };
 
+    loadMapAndShelters();
+
+    return () => {
+      // Cleanup markers
+      markersRef.current.forEach(marker => marker.map = null);
+      markersRef.current.clear();
+    };
+  }, [location.key]); // Re-run when location changes
+
+  // Update markers whenever shelters change
   useEffect(() => {
     if (mapRef.current && shelters.length >= 0) {
+      // Clear existing markers
       markersRef.current.forEach(marker => marker.map = null);
       markersRef.current.clear();
 
+      // Create new markers
       shelters.forEach(shelter => {
         const iconPath = shelter._id.startsWith('temp-') ? newlyPlacedShelterIcon : savedShelterIcon;
         
@@ -282,7 +301,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
         markersRef.current.set(shelter._id, marker);
       });
     }
-  }, [shelters, newlyPlacedShelterIcon, savedShelterIcon]);
+  }, [shelters]);
 
   const handleSaveShelters = async () => {
     const sheltersToSave = shelters.map(shelter => {      
