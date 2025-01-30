@@ -311,7 +311,9 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
       setIsLoading(false);
     };
 
-    if (district) {
+    if (permission === 'edit' && district) {
+      loadMapAndShelters();
+    } else if (permission === 'view') {
       loadMapAndShelters();
     }
 
@@ -464,7 +466,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
           <div className="p-4 flex flex-wrap gap-3 justify-start">
             <button
-              className="inline-flex items-center px-4 py-2.5 bg-green-600 text-white rounded-lg
+              className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
               hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
               font-medium text-sm gap-2"
               onClick={refreshLocation}
@@ -474,7 +476,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
             </button>
             
             <button
-              className="inline-flex items-center px-4 py-2.5 bg-green-600 text-white rounded-lg
+              className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
               hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
               font-medium text-sm gap-2"
               onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
@@ -484,7 +486,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
             </button>
             
             <button
-              className="inline-flex items-center px-4 py-2.5 bg-green-600 text-white rounded-lg
+              className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
               hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
               font-medium text-sm gap-2"
               onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
@@ -494,7 +496,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
             </button>
             
             <button
-              className="inline-flex items-center px-4 py-2.5 bg-green-600 text-white rounded-lg
+              className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
               hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
               font-medium text-sm gap-2"
               onClick={() => setIsSelectingShelter(true)}

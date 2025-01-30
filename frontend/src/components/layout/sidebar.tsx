@@ -1,33 +1,22 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { MdClose } from 'react-icons/md';
-import { IconType } from 'react-icons';
-
-interface NavItem {
-  label: string;
-  path: string;
-  icon: IconType;
-}
-
-interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-  navItems: NavItem[];
-}
+import { SidebarProps } from '../../types/layoutTypes';
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navItems }) => {
   const location = useLocation();
 
   return (
     <div className={`
-      fixed md:static inset-y-0 left-0 transform 
-      ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      md:translate-x-0 transition-transform duration-300 ease-in-out
-      bg-green-900 text-white w-[260px] md:w-64 flex flex-col h-screen z-40
-      overflow-y-auto overscroll-contain safe-top safe-bottom
+      ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      transition-transform duration-300 ease-in-out
+      bg-green-900 text-white w-64 h-screen
+      flex flex-col overflow-y-auto
+      md:shadow-lg
+      ${location.pathname !== '/' ? 'md:block' : 'md:hidden'}
     `}>
       <div className="sticky top-0 bg-green-900 p-4 flex justify-between items-center
-        border-b border-green-800">
+        border-b border-green-800 shadow-sm">
         <h2 className="text-xl font-bold">CrisisCompass</h2>
         <button
           onClick={onClose}
@@ -58,6 +47,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navItems }) => {
                       : 'hover:bg-green-800/50 active:bg-green-800'
                     }
                   `}
+                  onClick={() => {
+                    if (window.innerWidth < 768) {
+                      onClose();
+                    }
+                  }}
                 >
                   <Icon className="w-5 h-5" />
                   <span>{item.label}</span>

@@ -2,14 +2,7 @@ import React, { useState } from 'react';
 import { MdMenu } from 'react-icons/md';
 import Header from './header';
 import Sidebar from './sidebar';
-import { NavItem } from '../../types/layoutTypes';
-
-interface PageLayoutProps {
-  children: React.ReactNode;
-  title: string;
-  navItems: NavItem[];
-  headerRightContent?: React.ReactNode;
-}
+import { PageLayoutProps } from '../../types/layoutTypes';
 
 const PageLayout: React.FC<PageLayoutProps> = ({ 
   children, 
@@ -20,7 +13,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Hamburger Menu Button - Only visible on mobile when sidebar is closed */}
       {!isSidebarOpen && (
         <button
@@ -34,15 +27,26 @@ const PageLayout: React.FC<PageLayoutProps> = ({
         </button>
       )}
 
-      {/* Sidebar */}
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-        navItems={navItems}
-      />
+      {/* Fixed Sidebar Container */}
+      <div className="hidden md:block fixed inset-y-0 left-0 z-30">
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          navItems={navItems}
+        />
+      </div>
+
+      {/* Mobile Sidebar */}
+      <div className="md:hidden">
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          navItems={navItems}
+        />
+      </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 md:ml-64">
         <Header 
           title={title}
           rightContent={headerRightContent}

@@ -4,7 +4,8 @@ import {
   MdLocationOn, 
   MdAnalytics,
   MdSettings,
-  MdMap
+  MdMap,
+  MdManageHistory
 } from 'react-icons/md';
 
 export const mainNavItems: NavItem[] = [
@@ -32,5 +33,11 @@ export const mainNavItems: NavItem[] = [
     label: 'Resource Analytics',
     path: '/resource-analyticts',
     icon: MdAnalytics
+  },
+  {
+    label: 'Allocate Resources',
+    path: '/allocate-district-resources',
+    icon: MdManageHistory
   }
+  
 ];

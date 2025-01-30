@@ -1,12 +1,6 @@
 import React from 'react';
 import { MdMenu } from 'react-icons/md';
-
-interface HeaderProps {
-  title: string;
-  onMenuClick?: () => void;
-  showMenuButton?: boolean;
-  rightContent?: React.ReactNode;
-}
+import { HeaderProps } from '../../types/layoutTypes';
 
 const Header: React.FC<HeaderProps> = ({ 
   title, 
