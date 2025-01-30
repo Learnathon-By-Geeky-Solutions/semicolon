@@ -44,7 +44,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 ml-0 md:ml-64">
         <Header 
           title={title}
           rightContent={headerRightContent}
