@@ -196,30 +196,75 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
     }
   };
 
-  const getCurrentLocation = (map: google.maps.Map) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const pos = new google.maps.LatLng(
-            position.coords.latitude,
-            position.coords.longitude
-          );
-          setCurrentLocation(pos);
-          map.setCenter(pos);
+  const getCurrentLocation = async (map: google.maps.Map) => {
+    try {
+      // First check if geolocation permission is granted
+      const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
+      
+      if (permissionStatus.state === 'denied') {
+        toast.error("Location access is denied. Please enable location services to use this feature.");
+        return;
+      }
 
-          new google.maps.marker.AdvancedMarkerElement({
-            position: pos,
-            map,
-            title: "Your Location",
-          });
-        },
-        () => {
-          toast.error("Error: The Geolocation service failed.");
-        },
-        { enableHighAccuracy: true }
+      if (!navigator.geolocation) {
+        toast.error("Geolocation is not supported by your browser");
+        return;
+      }
+
+      // Show loading state
+      const loadingToast = toast.loading("Getting your location...");
+
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          reject,
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      });
+
+      const pos = new google.maps.LatLng(
+        position.coords.latitude,
+        position.coords.longitude
       );
-    } else {
-      toast.error("Error: Your browser doesn't support geolocation.");
+
+      // Update state and map
+      setCurrentLocation(pos);
+      map.setCenter(pos);
+
+      // Add user location marker
+      new google.maps.marker.AdvancedMarkerElement({
+        position: pos,
+        map,
+        title: "Your Location",
+      });
+
+      // Dismiss loading toast
+      toast.dismiss(loadingToast);
+
+    } catch (error) {
+      // Handle specific geolocation errors
+      if (error instanceof GeolocationPositionError) {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error("Location access was denied. Please enable location services to use this feature.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error("Location information is unavailable. Please try again later.");
+            break;
+          case error.TIMEOUT:
+            toast.error("Location request timed out. Please check your connection and try again.");
+            break;
+          default:
+            toast.error("An unknown error occurred while getting your location.");
+        }
+      } else {
+        toast.error("Failed to get your location. Please try again.");
+      }
+      console.error("Geolocation error:", error);
     }
   };
 
