@@ -6,6 +6,7 @@ import HomePage  from "./pages/homePage";
 import LoginPage from "./pages/loginPage";
 import SignUpPage from "./pages/signupPage";
 import AdminDashboard from "./pages/adminDashboard";
+import FriendDashboard from './pages/friendDashboard';
 import AuthorityDashboard from "./pages/authorityDashboard";
 import VolunteerDashboard from "./pages/volunteerDashboard";
 import UserDashboard from "./pages/userDashboard";
@@ -63,7 +64,7 @@ function App() {
         <Route path="/authority" element={ <ProtectedRoute>  <AuthorityDashboard/> </ProtectedRoute>} />
         <Route path="/volunteer" element={<ProtectedRoute> <VolunteerDashboard/> </ProtectedRoute>} />
         <Route path="/user/:email" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} /> {/* Dynamic user route */}
-
+        <Route path="/friend/:friendName" element={<FriendDashboard/>} /> {/* Route for Friend's profile */}
         <Route path="/shelters" element={<ProtectedRoute> <SheltersPage/> </ProtectedRoute>} />
         <Route path="/manage-shelters" element={<ProtectedRoute> <ManageSheltersPage/> </ProtectedRoute>} />
         <Route path="/districts" element={<ProtectedRoute>  <DistrictPage /> </ProtectedRoute>} />

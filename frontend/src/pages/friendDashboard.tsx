@@ -1,29 +1,27 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from '../store/authStore';
 
-const UserDashboard: React.FC = () => {
+const FriendDashboard: React.FC = () => {
+  const { friendName } = useParams();  // Get the friendName from URL
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showSearchResults, setShowSearchResults] = useState(false);
-  const { user, users } = useAuthStore();  // Assuming 'users' contains the list of all users (friends)
+  const { user, users, addFriend } = useAuthStore();  // Assuming you have an addFriend action
 
-  // Filter users based on the search query
-  const filteredUsers = users.filter((user) =>
-    user.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Find the friend from the users list
+  const friend = users.find((u) => u === friendName); 
 
-  // Simulated user info (replace with actual user data)
-  const userInfo = {
+  // Simulated friend info (replace with actual friend data)
+  const friendInfo = {
     profilePic: "https://via.placeholder.com/150",
-    name: user?.name,
-    email: user?.email,
+    name: friend,
+    email: `${friend}@example.com`,
     contact: "+1 234 567 890",
   };
 
-  // Handle click on a friend's name (navigate to their dashboard)
-  const handleFriendClick = (friendName: string) => {
-    navigate(`/friend/${friendName}`);  // Assuming this route takes you to the friend's dashboard
+  // Handle add friend action
+  const handleAddFriend = () => {
+    addFriend(friendName || "");  // Assuming addFriend is an action to add friend
+    alert(`You have added ${friendName} as a friend!`);
   };
 
   return (
@@ -50,6 +48,14 @@ const UserDashboard: React.FC = () => {
               Contact Authorities
             </button>
           </li>
+          <li>
+            <button
+              className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300 rounded"
+              onClick={() => navigate(`/dashboard`)}  // Navigate to own dashboard
+            >
+              Dashboard
+            </button>
+          </li>
         </ul>
       </div>
 
@@ -58,57 +64,33 @@ const UserDashboard: React.FC = () => {
         {/* Top Bar */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-4xl font-semibold text-green-900"> Welcome, {user?.name || 'Guest'}!</h1>
-
-          {/* Search Bar */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search for loved ones"
-              className="w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-              onFocus={() => setShowSearchResults(true)}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              value={searchQuery}
-            />
-            {showSearchResults && (
-              <div
-                className="absolute top-12 left-0 w-64 bg-white shadow-md rounded-lg p-4 z-10 max-h-48 overflow-y-auto"
-                onMouseLeave={() => setShowSearchResults(false)}
-              >
-                <ul>
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.map((friend, index) => (
-                      <li
-                        key={index}
-                        className="py-2 text-gray-700 hover:bg-green-100 cursor-pointer"
-                        onClick={() => handleFriendClick(friend)}  // Handle click to navigate to friend's dashboard
-                      >
-                        {friend}
-                      </li>
-                    ))
-                  ) : (
-                    <li className="py-2 text-gray-500">No results found</li>
-                  )}
-                </ul>
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* User Info - Top Left */}
+        {/* Friend Info - Top Left */}
         <div className="flex items-center mb-15 space-x-10">
           <img
-            src={userInfo.profilePic}
-            alt="Profile"
+            src={friendInfo.profilePic}
+            alt="Friend Profile"
             className="w-24 h-24 rounded-full"
           />
           <div className="text-left">
-            <h2 className="text-2xl font-semibold text-green-900">{userInfo.name}</h2>
-            <p className="text-gray-600">{userInfo.email}</p>
-            <p className="text-gray-600">{userInfo.contact}</p>
+            <h2 className="text-2xl font-semibold text-green-900">{friendInfo.name}</h2>
+            <p className="text-gray-600">{friendInfo.email}</p>
+            <p className="text-gray-600">{friendInfo.contact}</p>
           </div>
         </div>
 
-        {/* Features Section - Moved to Bottom Center */}
+        {/* Add Friend Button */}
+        <div className="mb-6">
+          <button
+            onClick={handleAddFriend}
+            className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300"
+          >
+            Add Friend
+          </button>
+        </div>
+
+        {/* Features Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center mt-12">
           {/* View Alerts */}
           <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
@@ -161,4 +143,4 @@ const UserDashboard: React.FC = () => {
   );
 };
 
-export default UserDashboard;
+export default FriendDashboard;
