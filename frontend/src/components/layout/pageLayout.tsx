@@ -3,6 +3,8 @@ import { MdMenu } from 'react-icons/md';
 import Header from './header';
 import Sidebar from './sidebar';
 import { PageLayoutProps } from '../../types/layoutTypes';
+import { useAuthStore } from '../../store/authStore';
+import { filterNavItemsByRole } from '../../utils/navigation';
 
 const PageLayout: React.FC<PageLayoutProps> = ({ 
   children, 
@@ -11,6 +13,9 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   headerRightContent 
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user } = useAuthStore();
+  
+  const filteredNavItems = filterNavItemsByRole(navItems, user?.role);
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -34,7 +39,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
-          navItems={navItems}
+          navItems={filteredNavItems}
         />
       </div>
 

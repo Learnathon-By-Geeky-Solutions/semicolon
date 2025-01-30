@@ -12,6 +12,7 @@ const SignUpPage: React.FC = () => {
   const [document, setDocument] = useState<File | null>(null);
   const [districts, setDistricts] = useState<District[]>([]);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const { signup } = useAuthStore();
@@ -37,6 +38,7 @@ const SignUpPage: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       if ((role === 'authority' || role === 'volunteer') && document) {
         if (!selectedDistrict) {
@@ -66,6 +68,7 @@ const SignUpPage: React.FC = () => {
         alert('Signup failed. Please try again.');
       }
     }
+    setIsLoading(false);
   };
 
   return (
@@ -187,7 +190,7 @@ const SignUpPage: React.FC = () => {
             type="submit"
             className="w-full py-2 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none transition duration-300"
           >
-            Sign Up
+            {isLoading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
 
