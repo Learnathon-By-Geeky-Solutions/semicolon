@@ -155,8 +155,7 @@ const UserDashboard: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+  
 };
 
-export default UserDashboard;
+export default UserDashboard;  

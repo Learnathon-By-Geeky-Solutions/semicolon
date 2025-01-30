@@ -1,7 +1,7 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
-import { useEffect,  } from "react";
+import { useEffect } from "react";
 import HomePage  from "./pages/homePage";
 import LoginPage from "./pages/loginPage";
 import SignUpPage from "./pages/signupPage";
@@ -9,12 +9,17 @@ import AdminDashboard from "./pages/adminDashboard";
 import AuthorityDashboard from "./pages/authorityDashboard";
 import VolunteerDashboard from "./pages/volunteerDashboard";
 import UserDashboard from "./pages/userDashboard";
-
-
+import SheltersPage from "./pages/sheltersPage";
+import DistrictPage from "./pages/districtPage";
+import ManageSheltersPage from "./pages/manageSheltersPage";
+import ResourceAnalytictsPage from "./pages/resourceAnalytictsPage";
 import { ProtectedRoute } from "./components/protectedRoute";
 import { RedirectAuthenticatedUser } from "./components/redirectAuthenticatedUser";
+import AllocateDistrictResources from "./pages/allocateDistrictResources";
+
 
 function App() {
+  const location = useLocation();
 
   const { user, isAuthenticated, checkAuth } = useAuthStore();
 
@@ -24,7 +29,26 @@ function App() {
 
   useEffect(() => {
     console.log("Auth State:", { isAuthenticated, user });
-  }, [isAuthenticated, user]); 
+  }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    // Add event listener for browser back/forward buttons
+    const handlePopState = () => {
+      window.location.reload();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // Cleanup listener on component unmount
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  // Optional: Force reload on location change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
 
   return (
     <div> 
@@ -40,7 +64,12 @@ function App() {
         <Route path="/volunteer" element={<ProtectedRoute> <VolunteerDashboard/> </ProtectedRoute>} />
         <Route path="/user/:email" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} /> {/* Dynamic user route */}
 
-
+        <Route path="/shelters" element={<ProtectedRoute> <SheltersPage/> </ProtectedRoute>} />
+        <Route path="/manage-shelters" element={<ProtectedRoute> <ManageSheltersPage/> </ProtectedRoute>} />
+        <Route path="/districts" element={<ProtectedRoute>  <DistrictPage /> </ProtectedRoute>} />
+        <Route path="/resource-analyticts" element={ <ProtectedRoute>  <ResourceAnalytictsPage/>  </ProtectedRoute>} />
+        <Route path="/allocate-district-resources" element={ <ProtectedRoute>  <AllocateDistrictResources/> </ProtectedRoute>} />
+        
         <Route path="/logout" element={"LOGOUT"} />
       </Routes>
       <Toaster />

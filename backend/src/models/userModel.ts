@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: Object.values(Role), required: true, default: Role.User },
-    districtId: { type: String }, 
+    district_id: { type: String, ref: 'District' }, 
     approved: { type: Boolean, default: false },
     permissions: { type: [String], enum: Object.values(Permission) },
     documents: { type: Buffer },

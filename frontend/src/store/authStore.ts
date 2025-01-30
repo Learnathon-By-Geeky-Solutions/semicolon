@@ -17,6 +17,7 @@ interface User {
     role: "admin" | "authority" | "volunteer" | "user"; 
     family: string[];
     documents?: Document[]; 
+    district_id?: string;
 }
 
 interface AuthState {
@@ -27,8 +28,9 @@ interface AuthState {
   isCheckingAuth: boolean;
   users:string[];
   message: string | null;
-  
-  signup: (email: string, password: string, name: string, role: "admin" | "authority" | "volunteer" | "user", document?: File | string ) => Promise<void>;
+
+  signup: (email: string, password: string, name: string, role: "admin" | "authority" | "volunteer" | "user", document?: File | string, district_id?: string) => Promise<void>;
+
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -45,7 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isCheckingAuth: true,
   message: null,
 
-  signup: async (email, password, name, role, document) => {
+  signup: async (email, password, name, role, document, district_id) => {
     set({ isLoading: true, error: null });
     try {
         const formData = new FormData();
@@ -58,7 +60,11 @@ export const useAuthStore = create<AuthState>((set) => ({
         if ((role === 'authority' || role === 'volunteer') && document) {
           formData.append("document", document); 
         }
+        if ((role === 'authority' || role === 'volunteer') && district_id) {
+          formData.append("district_id", district_id);
+        }
     
+
         console.log("final formData", formData);
             const response = await axios.post(`${API_URL}/signup`, formData, {
           headers: {

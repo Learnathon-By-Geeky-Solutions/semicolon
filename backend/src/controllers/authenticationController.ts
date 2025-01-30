@@ -6,7 +6,7 @@ import {  AuthenticatedRequest } from "../types/types.js";
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
 
-        const {email, password, name, role} = req.body;
+        const {email, password, name, role, district_id} = req.body;
         const documentFile = req.file;
         try {
             if(!email || !password || !name || !role){
@@ -14,6 +14,9 @@ export const signup = async (req:Request, res:Response, next:NextFunction) => {
             }
             if ((role === "authority" || role === "volunteer") && !documentFile) {
                 return res.status(400).json({ success: false, message: "Document upload is required for this role." });
+            }
+            else if ((role === "authority" || role === "volunteer") && !district_id) {
+                return res.status(400).json({ success: false, message: "District is required for this role." });
             }
             const userAlreadyExist = await User.findOne({email});
             if(userAlreadyExist){
@@ -29,7 +32,8 @@ export const signup = async (req:Request, res:Response, next:NextFunction) => {
                 role : role,
                 documents: documentFile ? documentFile.buffer : null,
                 verificationToken : verificationCode,
-                verificationTokenExpiresAt: Date.now() + 24*60*60*1000 // 24 hours validity 
+                verificationTokenExpiresAt: Date.now() + 24*60*60*1000, // 24 hours validity 
+                district_id : district_id? district_id : null
             })
             await user.save();
 
