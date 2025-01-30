@@ -27,17 +27,10 @@ const PageLayout: React.FC<PageLayoutProps> = ({
         </button>
       )}
 
-      {/* Fixed Sidebar Container */}
-      <div className="hidden md:block fixed inset-y-0 left-0 z-30">
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-          navItems={navItems}
-        />
-      </div>
-
-      {/* Mobile Sidebar */}
-      <div className="md:hidden">
+      {/* Sidebar - Combined for both mobile and desktop */}
+      <div className={`fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+        md:translate-x-0 md:static md:transform-none`}>
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
@@ -46,12 +39,12 @@ const PageLayout: React.FC<PageLayoutProps> = ({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 md:ml-64">
+      <div className="flex-1 flex flex-col min-w-0">
         <Header 
           title={title}
           rightContent={headerRightContent}
         />
-        <main className="flex-1">
+        <main className="flex-1 p-4">
           {children}
         </main>
       </div>

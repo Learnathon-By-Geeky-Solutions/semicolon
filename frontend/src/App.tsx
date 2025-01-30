@@ -64,11 +64,12 @@ function App() {
         <Route path="/volunteer" element={<ProtectedRoute> <VolunteerDashboard/> </ProtectedRoute>} />
         <Route path="/user" element={<ProtectedRoute><UserDashboard/></ProtectedRoute>} />
 
-        <Route path="/shelters" element={<SheltersPage/>} />
-        <Route path="/manage-shelters" element={<ManageSheltersPage/>} />
-        <Route path="/districts" element={<DistrictPage />} />
-        <Route path="/resource-analyticts" element={<ResourceAnalytictsPage/>} />
-        <Route path="/allocate-district-resources" element={<AllocateDistrictResources/>} />
+        <Route path="/shelters" element={<ProtectedRoute> <SheltersPage/> </ProtectedRoute>} />
+        <Route path="/manage-shelters" element={<ProtectedRoute> <ManageSheltersPage/> </ProtectedRoute>} />
+        <Route path="/districts" element={<ProtectedRoute>  <DistrictPage /> </ProtectedRoute>} />
+        <Route path="/resource-analyticts" element={ <ProtectedRoute>  <ResourceAnalytictsPage/>  </ProtectedRoute>} />
+        <Route path="/allocate-district-resources" element={ <ProtectedRoute>  <AllocateDistrictResources/> </ProtectedRoute>} />
+        
         <Route path="/logout" element={"LOGOUT"} />
       </Routes>
       <Toaster />

@@ -519,7 +519,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
             {permission === 'edit' && (
               <button
-                className="inline-flex items-center px-4 py-2.5 ml-auto bg-green-700 text-white rounded-lg
+                className="inline-flex items-center px-4 py-2.5 ml-auto bg-indigo-700 text-white rounded-lg
                 hover:bg-green-800 shadow-sm transition-all duration-200"
                 onClick={handleSaveShelters}
               >
