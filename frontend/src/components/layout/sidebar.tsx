@@ -8,8 +8,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navItems }) => {
 
   return (
     <div className={`
-      h-full w-64 bg-green-900 text-white
-      flex flex-col overflow-y-auto
+      h-screen w-64 bg-green-900 text-white
+      flex flex-col fixed top-0 left-0
       md:shadow-lg shrink-0
     `}>
       <div className="sticky top-0 bg-green-900 p-4 flex justify-between items-center
