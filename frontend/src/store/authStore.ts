@@ -26,7 +26,7 @@ interface AuthState {
   error: string | null;
   isLoading: boolean;
   isCheckingAuth: boolean;
-  users:string[];
+  users:User[];
   message: string | null;
 
   signup: (email: string, password: string, name: string, role: "admin" | "authority" | "volunteer" | "user", document?: File | string, district_id?: string) => Promise<void>;
@@ -34,7 +34,8 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
-  addFriend:(friendName: string)=>Promise<void>;
+  addFriend:(userId: string, friendId: string)=>Promise<void>;
+  getUser :() => Promise<void>;
 
 }
 axios.defaults.withCredentials = true;
@@ -94,13 +95,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       const response = await axios.post(`${API_URL}/login`, { email, password });
 
       console.log("2");
-      const usersResponse = await axios.get("http://localhost:5000/api/v1/user/all"); // Assuming this is the endpoint to fetch all users
-      const allUsers = usersResponse.data.data; // Store users in an array
-      console.log(allUsers);
+     // const usersResponse = await axios.get("http://localhost:5000/api/v1/user/all"); // Assuming this is the endpoint to fetch all users
+     // const allUsers = usersResponse.data.data; // Store users in an array
+     // console.log(allUsers);
       set({
         isAuthenticated: true,
         user: response.data.user,
-        users:allUsers,
+       // users:allUsers,
         error: null,
         isLoading: false,
       });
@@ -152,23 +153,25 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw error;
       }
     },
-    addFriend: async (friendName: string) => {
+    addFriend: async (userId: string, friendId: string) => {
       set({ isLoading: true, error: null }); // Set loading state
       try {
         const formData = new FormData();
-        
-        // Assuming you want to send friendName as part of the request body
-        formData.append("friendName", friendName);
-        
+    
+        // Append userId and friendId to the FormData (assuming your API expects these fields)
+        formData.append("userId", userId);
+        formData.append("friendId", friendId);
+    
         console.log("Adding friend with formData", formData);
-        
+    
         const response = await axios.post(`${API_URL}/addFriend`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-        
-        // Optionally, you can return the response or updated data
+    
+        // Optionally, you can handle the response here, like updating the user state
+        console.log("Friend added successfully", response.data);
     
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
@@ -183,5 +186,36 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     },
     
+  
+  getUser: async () => {
+    //set({ isLoading: true, error: null });
+    try {
+      //const response = await axios.post(`${API_URL}/login`, { email, password });
+
+      console.log("3");
+      const usersResponse = await axios.get("http://localhost:5000/api/v1/user/all"); // Assuming this is the endpoint to fetch all users
+      const allUsers = usersResponse.data.data; // Store users in an array
+      console.log(allUsers);
+      
+     set({
+        //isAuthenticated: true,
+        //user: response.data.user,
+        users:allUsers,
+        //error: null,
+        //isLoading: false,
+      });
+      
+    }catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          set({
+            error: error.response?.data?.message || "Error fetching users",
+            isLoading: false,
+          });
+        } else {
+          set({ error: "Unexpected error occurred", isLoading: false });
+        }
+        throw error;
+      }
+    },
   }
 ));

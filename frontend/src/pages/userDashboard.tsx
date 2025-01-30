@@ -6,13 +6,13 @@ const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const { user, users } = useAuthStore();  // Assuming 'users' contains the list of all users (friends)
-
-  // Filter users based on the search query
-  const filteredUsers = users.filter((user) =>
-    user.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
+  const { user, users,getUser } = useAuthStore();  // Assuming 'users' contains the list of all users (friends)
+  
+// Filter users based on the search query
+const filteredUsers = users.filter((user) =>
+  user.name.toLowerCase().includes(searchQuery.toLowerCase())
+);
+  
   // Simulated user info (replace with actual user data)
   const userInfo = {
     profilePic: "https://via.placeholder.com/150",
@@ -20,10 +20,20 @@ const UserDashboard: React.FC = () => {
     email: user?.email,
     contact: "+1 234 567 890",
   };
-
+  const adduser = async () => {
+      
+      try {
+        await getUser();
+        console.log(users);
+       // navigate("/");
+      } catch (error) {
+        console.error('Login failed', error);
+      }
+      //setIsLoading(false);
+    };
   // Handle click on a friend's name (navigate to their dashboard)
-  const handleFriendClick = (friendName: string) => {
-    navigate(`/friend/${friendName}`);  // Assuming this route takes you to the friend's dashboard
+  const handleFriendClick = (friendName: string, friendid : string) => {
+    navigate(`/friend/${friendid}`);  // Assuming this route takes you to the friend's dashboard
   };
 
   return (
@@ -63,9 +73,9 @@ const UserDashboard: React.FC = () => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search for loved ones"
+              placeholder="Search for users"
               className="w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-              onFocus={() => setShowSearchResults(true)}
+              onFocus={() => { adduser(); setShowSearchResults(true)}}
               onChange={(e) => setSearchQuery(e.target.value)}
               value={searchQuery}
             />
@@ -74,21 +84,22 @@ const UserDashboard: React.FC = () => {
                 className="absolute top-12 left-0 w-64 bg-white shadow-md rounded-lg p-4 z-10 max-h-48 overflow-y-auto"
                 onMouseLeave={() => setShowSearchResults(false)}
               >
-                <ul>
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.map((friend, index) => (
-                      <li
-                        key={index}
-                        className="py-2 text-gray-700 hover:bg-green-100 cursor-pointer"
-                        onClick={() => handleFriendClick(friend)}  // Handle click to navigate to friend's dashboard
-                      >
-                        {friend}
-                      </li>
-                    ))
-                  ) : (
-                    <li className="py-2 text-gray-500">No results found</li>
-                  )}
-                </ul>
+                    <ul>
+    {filteredUsers.length > 0 ? (
+    filteredUsers.map((friend, index) => (
+             <li
+                key={index}
+                 className="py-2 text-gray-700 hover:bg-green-100 cursor-pointer"
+                  onClick={() => handleFriendClick(friend.name, friend._id)}  // Assuming friend has an `id` property
+      >
+                    {friend.name}  {/* Display the friend's name */}
+                </li>
+                ))
+           ) : (
+              <li className="py-2 text-gray-500">No results found</li>
+                )}
+          </ul>
+
               </div>
             )}
           </div>

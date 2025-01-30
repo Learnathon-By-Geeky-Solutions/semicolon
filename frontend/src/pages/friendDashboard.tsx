@@ -3,25 +3,34 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from '../store/authStore';
 
 const FriendDashboard: React.FC = () => {
-  const { friendName } = useParams();  // Get the friendName from URL
+  const { friendid } = useParams();  // Get the friendid from the URL params
   const navigate = useNavigate();
   const { user, users, addFriend } = useAuthStore();  // Assuming you have an addFriend action
-
-  // Find the friend from the users list
-  const friend = users.find((u) => u === friendName); 
-
+  
+  // Find the friend from the users list by comparing ids
+  const friend = users.find((u) => u._id === friendid);  // Assuming each user has an `id` field
+  
+  if (friend) {
+    // You have found the friend, now you can navigate to their profile or display their info
+    console.log(friend);  // You can replace this with actual navigation or display logic
+  } else {
+    // Handle case where the friend wasn't found
+    console.log('Friend not found');
+  }
+  
   // Simulated friend info (replace with actual friend data)
   const friendInfo = {
     profilePic: "https://via.placeholder.com/150",
-    name: friend,
+    name: friend?.name,
     email: `${friend}@example.com`,
     contact: "+1 234 567 890",
   };
 
   // Handle add friend action
-  const handleAddFriend = () => {
-    addFriend(friendName || "");  // Assuming addFriend is an action to add friend
-    alert(`You have added ${friendName} as a friend!`);
+  const handleAddFriend = async () => {
+    addFriend(user?._id || " ",friend?._id||" ");
+    //addFriend(friendName || "");  // Assuming addFriend is an action to add friend
+    //alert(`You have added ${friendName} as a friend!`);
   };
 
   return (
