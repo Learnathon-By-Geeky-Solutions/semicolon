@@ -97,13 +97,23 @@ const ResourceAnalytictsPage = () => {
         {/* Resource Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {Object.entries(totals).map(([resource, total]) => (
-            <div 
+            <button 
               key={resource}
-              className={`bg-white p-4 rounded-lg shadow cursor-pointer transition-all duration-200 ${
-                selectedResource === resource ? 'ring-2 ring-green-500' : ''
-              }`}
+              className={`bg-white p-4 rounded-lg shadow cursor-pointer transition-all duration-200 w-full text-left
+                ${selectedResource === resource ? 'ring-2 ring-green-500' : 'hover:ring-2 hover:ring-green-200'}
+              `}
               style={{ borderLeft: `4px solid ${resourceColors[resource as ResourceType]}` }}
               onClick={() => setSelectedResource(resource as ResourceType)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedResource(resource as ResourceType);
+                }
+              }}
+              role="tab"
+              aria-selected={selectedResource === resource}
+              aria-controls={`${resource}-panel`}
+              tabIndex={0}
             >
               <div className="text-sm font-medium text-gray-600 capitalize">
                 {resourceLabels[resource as ResourceType]}
@@ -114,7 +124,7 @@ const ResourceAnalytictsPage = () => {
               <div className="text-sm text-gray-500 mt-1">
                 {selectedDistrictShelters.length} shelters
               </div>
-            </div>
+            </button>
           ))}
         </div>
 
