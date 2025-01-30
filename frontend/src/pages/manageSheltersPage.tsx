@@ -15,6 +15,7 @@ const API_URL = `${SERVER_URL}/api/v1/shelters`;
 
 const ShelterManagement = () => {
   const { user } = useAuthStore();
+  const [permissions, setPermissions] = useState("view");
   const [districts, setDistricts] = useState<District[]>([]);
   const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
   const [shelters, setShelters] = useState<Shelter[]>([]);
@@ -32,6 +33,16 @@ const ShelterManagement = () => {
     water: 0,
     medicine: 0,
   });
+
+  useEffect(() => {
+    if (user) {
+      if(user.role === "admin" || user.role === "authority") {
+        setPermissions("edit");
+      } else {
+        setPermissions("view");
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     fetchDistricts();
@@ -122,7 +133,7 @@ const ShelterManagement = () => {
     }
   };
 
-  const canEditShelters = user && selectedDistrict && user.district_id === selectedDistrict._id;
+  const canEditShelters = (user && selectedDistrict && user.district_id === selectedDistrict._id) || (user && user.role === "admin");
   const filteredShelters = selectedDistrict 
     ? shelters.filter(shelter => shelter.district_id === selectedDistrict._id)
     : shelters;

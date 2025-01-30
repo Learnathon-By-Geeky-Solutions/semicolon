@@ -5,18 +5,29 @@ import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { IoMdAdd } from 'react-icons/io';
 import PageLayout from "../components/layout/pageLayout";
 import { mainNavItems } from "../config/navigation";
+import { useAuthStore } from "../store/authStore";
 
 const DistrictPage: React.FC = () => {
+  const { user } = useAuthStore();
+  const [permissions, setPermissions] = useState("view");
   const [districts, setDistricts] = useState<District[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
+
   const [formData, setFormData] = useState<NewDistrict>({
     district_name: "",
     total_food: 0,
     total_water: 0,
     total_medicine: 0,
   });
+  useEffect(() => {
+    if(user){
+      if(user.role === "admin"){
+        setPermissions("edit");
+      }
+    }
+  }, [user]);
 
   // Fetch districts
   useEffect(() => {
@@ -90,6 +101,7 @@ const DistrictPage: React.FC = () => {
       title="Districts"
       navItems={mainNavItems}
       headerRightContent={
+        permissions === "edit" && (
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg
@@ -99,6 +111,7 @@ const DistrictPage: React.FC = () => {
           <IoMdAdd className="w-5 h-5" />
           <span>Add District</span>
         </button>
+        )
       }
     >
       <div className="max-w-[1400px] mx-auto p-4 md:p-8">
@@ -120,9 +133,13 @@ const DistrictPage: React.FC = () => {
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Medicine
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+
+                  {permissions === "edit" && (
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  )}
+
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -140,26 +157,28 @@ const DistrictPage: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {district.total_medicine}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => {
-                            setSelectedDistrict(district);
-                            setFormData(district);
-                            setIsEditModalOpen(true);
-                          }}
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          <FiEdit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(district)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <FiTrash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
+                    {permissions === "edit" && (
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => {
+                              setSelectedDistrict(district);
+                              setFormData(district);
+                              setIsEditModalOpen(true);
+                            }}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            <FiEdit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(district)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <FiTrash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

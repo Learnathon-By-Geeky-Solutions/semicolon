@@ -147,7 +147,8 @@ const AllocateDistrictResources = () => {
 
   useEffect(() => {
     if (user) {
-      setPermission(user.role === 'authority' ? 'edit' : 'view');
+      if(user.role === 'authority' || user.role === 'admin') setPermission('edit');
+      else setPermission('view');
       
       const loadData = async () => {
         if (!user.district_id) return;

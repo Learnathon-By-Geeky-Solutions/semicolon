@@ -9,7 +9,7 @@ const AdminDashboard: React.FC = () => {
   return (
     <div>
       <PageLayout
-      title="Welcome, Authority!"
+      title="Welcome, Admin!"
       navItems={mainNavItems}
     >
       <div className="flex flex-col items-center justify-center h-full">
