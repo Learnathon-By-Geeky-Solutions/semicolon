@@ -47,6 +47,121 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   const [selectedTravelMode, setSelectedTravelMode] = useState<TravelMode>('DRIVING');
   const [district, setDistrict] = useState<District | null>(null);
 
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [locationConsent, setLocationConsent] = useState<boolean | null>(null);
+
+  const LocationConsentDialog = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+        <h2 className="text-xl font-semibold mb-4">Location Access Required</h2>
+        <p className="text-gray-600 mb-6">
+          We need your location to:
+          <ul className="list-disc ml-6 mt-2">
+            <li>Show your current position on the map</li>
+            <li>Find the nearest emergency shelter to you</li>
+            <li>Provide accurate directions to shelters</li>
+          </ul>
+          Your location data is only used within the app and is never stored or shared.
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => {
+              setLocationConsent(false);
+              setShowLocationDialog(false);
+              toast.error("Location access denied. Some features will be limited.");
+            }}
+            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 
+            transition-colors duration-200"
+          >
+            Deny
+          </button>
+          <button
+            onClick={() => {
+              setLocationConsent(true);
+              setShowLocationDialog(false);
+              requestLocation();
+            }}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 
+            transition-colors duration-200"
+          >
+            Allow Location Access
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const requestLocation = async () => {
+    try {
+      // First check if geolocation permission is granted
+      const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
+      
+      if (permissionStatus.state === 'denied') {
+        toast.error("Location access is denied. Please enable location services in your browser settings to use this feature.");
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        toast.error("Geolocation is not supported by your browser");
+        return;
+      }
+
+      const loadingToast = toast.loading("Getting your location...");
+
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          reject,
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      });
+
+      const pos = new google.maps.LatLng(
+        position.coords.latitude,
+        position.coords.longitude
+      );
+
+      // Update state and map
+      setCurrentLocation(pos);
+      if (mapRef.current) {
+        mapRef.current.setCenter(pos);
+        
+        // Add user location marker
+        new google.maps.marker.AdvancedMarkerElement({
+          position: pos,
+          map: mapRef.current,
+          title: "Your Location",
+        });
+      }
+
+      toast.dismiss(loadingToast);
+
+    } catch (error) {
+      if (error instanceof GeolocationPositionError) {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error("Location access was denied. You can enable it in your browser settings.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error("Location information is unavailable. Please try again later.");
+            break;
+          case error.TIMEOUT:
+            toast.error("Location request timed out. Please check your connection and try again.");
+            break;
+          default:
+            toast.error("An unknown error occurred while getting your location.");
+        }
+      } else {
+        toast.error("Failed to get your location. Please try again.");
+      }
+      console.error("Geolocation error:", error);
+    }
+  };
+
   const initializeShelterCount = () => {
     shelterCountRef.current = shelters.length;
   };
@@ -196,75 +311,12 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
     }
   };
 
-  const getCurrentLocation = async (map: google.maps.Map) => {
-    try {
-      // First check if geolocation permission is granted
-      const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
-      
-      if (permissionStatus.state === 'denied') {
-        toast.error("Location access is denied. Please enable location services to use this feature.");
-        return;
-      }
-
-      if (!navigator.geolocation) {
-        toast.error("Geolocation is not supported by your browser");
-        return;
-      }
-
-      // Show loading state
-      const loadingToast = toast.loading("Getting your location...");
-
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          reject,
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
-        );
-      });
-
-      const pos = new google.maps.LatLng(
-        position.coords.latitude,
-        position.coords.longitude
-      );
-
-      // Update state and map
-      setCurrentLocation(pos);
-      map.setCenter(pos);
-
-      // Add user location marker
-      new google.maps.marker.AdvancedMarkerElement({
-        position: pos,
-        map,
-        title: "Your Location",
-      });
-
-      // Dismiss loading toast
-      toast.dismiss(loadingToast);
-
-    } catch (error) {
-      // Handle specific geolocation errors
-      if (error instanceof GeolocationPositionError) {
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            toast.error("Location access was denied. Please enable location services to use this feature.");
-            break;
-          case error.POSITION_UNAVAILABLE:
-            toast.error("Location information is unavailable. Please try again later.");
-            break;
-          case error.TIMEOUT:
-            toast.error("Location request timed out. Please check your connection and try again.");
-            break;
-          default:
-            toast.error("An unknown error occurred while getting your location.");
-        }
-      } else {
-        toast.error("Failed to get your location. Please try again.");
-      }
-      console.error("Geolocation error:", error);
+  const getCurrentLocation = (map: google.maps.Map) => {
+    mapRef.current = map;
+    if (locationConsent === null) {
+      setShowLocationDialog(true);
+    } else if (locationConsent) {
+      requestLocation();
     }
   };
 
@@ -493,192 +545,195 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50">
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div>
-          <LoadingSpinner />
-        </div>
-      )}
-      
-      <div className="flex-1 p-4 space-y-4">
-        {/* Map Container */}
-        <div className="relative rounded-2xl overflow-hidden shadow-xl bg-white p-1 h-[calc(100vh-12rem)]">
-          <div id="map" className="w-full h-full rounded-xl" />
-        </div>
-        
-        {/* Controls Container */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-          <div className="p-4 flex flex-wrap gap-3 justify-start">
-            <button
-              className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
-              hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
-              font-medium text-sm gap-2"
-              onClick={refreshLocation}
-            >
-              <MdMyLocation className="w-5 h-5" />
-              <span>My Location</span>
-            </button>
-            
-            <button
-              className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
-              hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
-              font-medium text-sm gap-2"
-              onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
-            >
-              <MdDirectionsCar className="w-5 h-5" />
-              <span>Find Nearest (Drive)</span>
-            </button>
-            
-            <button
-              className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
-              hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
-              font-medium text-sm gap-2"
-              onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
-            >
-              <MdDirectionsWalk className="w-5 h-5" />
-              <span>Find Nearest (Walk)</span>
-            </button>
-            
-            <button
-              className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
-              hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
-              font-medium text-sm gap-2"
-              onClick={() => setIsSelectingShelter(true)}
-            >
-              <MdRoute className="w-5 h-5" />
-              <span>Plan Route</span>
-            </button>
-            
-            {isRouteDisplayed && (
-              <button
-                className="inline-flex items-center px-4 py-2.5 bg-rose-500 text-white rounded-lg
-                hover:bg-rose-600 transition-all duration-200 shadow-sm hover:shadow
-                font-medium text-sm gap-2"
-                onClick={clearRoute}
-              >
-                <MdClose className="w-5 h-5" />
-                <span>Clear Route</span>
-              </button>
-            )}
-
-            {permission === 'edit' && (
-              <button
-                className="inline-flex items-center px-4 py-2.5 ml-auto bg-gray-600 text-white rounded-lg
-                hover:bg-green-800 shadow-sm transition-all duration-200"
-                onClick={handleSaveShelters}
-              >
-                <MdSave className="w-5 h-5" />
-                <span>Save Changes</span>
-              </button>
-            )}
+    <>
+      {showLocationDialog && <LocationConsentDialog />}
+      <div className="flex-1 flex flex-col bg-gray-50">
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div>
+            <LoadingSpinner />
           </div>
-        </div>
-
-        {/* Shelter Selection Modal */}
-        {isSelectingShelter && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50
-            animate-[fadeIn_0.2s_ease-out]">
-            <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-md w-full mx-4
-              animate-[slideIn_0.3s_ease-out]">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6">Plan Your Route</h3>
+        )}
+        
+        <div className="flex-1 p-4 space-y-4">
+          {/* Map Container */}
+          <div className="relative rounded-2xl overflow-hidden shadow-xl bg-white p-1 h-[calc(100vh-12rem)]">
+            <div id="map" className="w-full h-full rounded-xl" />
+          </div>
+          
+          {/* Controls Container */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
+            <div className="p-4 flex flex-wrap gap-3 justify-start">
+              <button
+                className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
+                hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
+                font-medium text-sm gap-2"
+                onClick={refreshLocation}
+              >
+                <MdMyLocation className="w-5 h-5" />
+                <span>My Location</span>
+              </button>
               
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Destination
-                  </label>
-                  <select
-                    className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50
-                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    value={selectedDestination?._id || ""}
-                    onChange={(e) => {
-                      const shelter = shelters.find(s => s._id === e.target.value);
-                      setSelectedDestination(shelter || null);
-                    }}
-                  >
-                    <option value="">Choose a shelter...</option>
-                    {shelters.map((shelter) => (
-                      <option key={shelter._id} value={shelter._id}>
-                        {shelter.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Travel Mode
-                  </label>
-                  <div className="flex gap-3">
-                    <button
-                      className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2
-                        transition-all duration-200 ${
-                          selectedTravelMode === 'DRIVING'
-                            ? 'bg-green-600 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      onClick={() => setSelectedTravelMode('DRIVING')}
-                    >
-                      <MdDirectionsCar className="w-5 h-5" />
-                      Drive
-                    </button>
-                    <button
-                      className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2
-                        transition-all duration-200 ${
-                          selectedTravelMode === 'WALKING'
-                            ? 'bg-green-600 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      onClick={() => setSelectedTravelMode('WALKING')}
-                    >
-                      <MdDirectionsWalk className="w-5 h-5" />
-                      Walk
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 mt-8">
+              <button
+                className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
+                hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
+                font-medium text-sm gap-2"
+                onClick={() => findNearestShelter(google.maps.TravelMode.DRIVING)}
+              >
+                <MdDirectionsCar className="w-5 h-5" />
+                <span>Find Nearest (Drive)</span>
+              </button>
+              
+              <button
+                className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
+                hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
+                font-medium text-sm gap-2"
+                onClick={() => findNearestShelter(google.maps.TravelMode.WALKING)}
+              >
+                <MdDirectionsWalk className="w-5 h-5" />
+                <span>Find Nearest (Walk)</span>
+              </button>
+              
+              <button
+                className="inline-flex items-center px-4 py-2.5 bg-green-800 text-white rounded-lg
+                hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow
+                font-medium text-sm gap-2"
+                onClick={() => setIsSelectingShelter(true)}
+              >
+                <MdRoute className="w-5 h-5" />
+                <span>Plan Route</span>
+              </button>
+              
+              {isRouteDisplayed && (
                 <button
-                  className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium transition-colors"
-                  onClick={() => {
-                    setIsSelectingShelter(false);
-                    setSelectedDestination(null);
-                  }}
+                  className="inline-flex items-center px-4 py-2.5 bg-rose-500 text-white rounded-lg
+                  hover:bg-rose-600 transition-all duration-200 shadow-sm hover:shadow
+                  font-medium text-sm gap-2"
+                  onClick={clearRoute}
                 >
-                  Cancel
+                  <MdClose className="w-5 h-5" />
+                  <span>Clear Route</span>
                 </button>
+              )}
+
+              {permission === 'edit' && (
                 <button
-                  className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 
-                  disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200
-                  shadow-sm hover:shadow font-medium"
-                  disabled={!selectedDestination}
-                  onClick={() => selectedDestination && handleShowRoute(selectedDestination)}
+                  className="inline-flex items-center px-4 py-2.5 ml-auto bg-gray-600 text-white rounded-lg
+                  hover:bg-green-800 shadow-sm transition-all duration-200"
+                  onClick={handleSaveShelters}
                 >
-                  Show Route
+                  <MdSave className="w-5 h-5" />
+                  <span>Save Changes</span>
                 </button>
-              </div>
+              )}
             </div>
           </div>
-        )}
 
-        {/* Resource Popup */}
-        {isPopupOpen && selectedShelter && (
-          <ResourcePopup
-            shelter={selectedShelter}
-            isEditing={isEditing}
-            onEdit={handleEdit}
-            onSave={handleSaveResources}
-            onClose={() => setIsPopupOpen(false)}
-            onDelete={handleDelete}
-            onResourceChange={handleResourceChange}
-            permission={permission}
-            onShowRoute={handleShowRouteFromPopup}
-          />
-        )}
+          {/* Shelter Selection Modal */}
+          {isSelectingShelter && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50
+              animate-[fadeIn_0.2s_ease-out]">
+              <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-md w-full mx-4
+                animate-[slideIn_0.3s_ease-out]">
+                <h3 className="text-xl font-semibold text-gray-800 mb-6">Plan Your Route</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Destination
+                    </label>
+                    <select
+                      className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50
+                      focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      value={selectedDestination?._id || ""}
+                      onChange={(e) => {
+                        const shelter = shelters.find(s => s._id === e.target.value);
+                        setSelectedDestination(shelter || null);
+                      }}
+                    >
+                      <option value="">Choose a shelter...</option>
+                      {shelters.map((shelter) => (
+                        <option key={shelter._id} value={shelter._id}>
+                          {shelter.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Travel Mode
+                    </label>
+                    <div className="flex gap-3">
+                      <button
+                        className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2
+                          transition-all duration-200 ${
+                            selectedTravelMode === 'DRIVING'
+                              ? 'bg-green-600 text-white shadow-md'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        onClick={() => setSelectedTravelMode('DRIVING')}
+                      >
+                        <MdDirectionsCar className="w-5 h-5" />
+                        Drive
+                      </button>
+                      <button
+                        className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2
+                          transition-all duration-200 ${
+                            selectedTravelMode === 'WALKING'
+                              ? 'bg-green-600 text-white shadow-md'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        onClick={() => setSelectedTravelMode('WALKING')}
+                      >
+                        <MdDirectionsWalk className="w-5 h-5" />
+                        Walk
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 mt-8">
+                  <button
+                    className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                    onClick={() => {
+                      setIsSelectingShelter(false);
+                      setSelectedDestination(null);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 
+                    disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200
+                    shadow-sm hover:shadow font-medium"
+                    disabled={!selectedDestination}
+                    onClick={() => selectedDestination && handleShowRoute(selectedDestination)}
+                  >
+                    Show Route
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Resource Popup */}
+          {isPopupOpen && selectedShelter && (
+            <ResourcePopup
+              shelter={selectedShelter}
+              isEditing={isEditing}
+              onEdit={handleEdit}
+              onSave={handleSaveResources}
+              onClose={() => setIsPopupOpen(false)}
+              onDelete={handleDelete}
+              onResourceChange={handleResourceChange}
+              permission={permission}
+              onShowRoute={handleShowRouteFromPopup}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
