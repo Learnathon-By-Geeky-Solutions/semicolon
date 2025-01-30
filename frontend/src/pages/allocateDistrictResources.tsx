@@ -49,12 +49,6 @@ const ResourcePieChart = ({ data, title, total }: ResourcePieChartProps) => {
                   strokeWidth={1}
                 />
               ))}
-              <Label
-                value={`${title}`}
-                position="center"
-                className="text-sm"
-                fill="#374151"
-              />
             </Pie>
             <Tooltip 
               formatter={(value: number, name: string, props: any) => [
@@ -93,8 +87,8 @@ const ResourceSummaryChart: React.FC<ResourceSummaryChartProps> = ({ resources }
   return (
     <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
       <h3 className="text-xl font-semibold text-center mb-6 text-gray-800">Resource Usage Summary</h3>
-      <div className="grid grid-cols-3 gap-8">
-        {Object.entries(resources).map(([key, value]) => (
+      <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      {Object.entries(resources).map(([key, value]) => (
           <div key={key} className="text-center">
             <h4 className="font-semibold capitalize mb-2">{key}</h4>
             <div className="h-48">
