@@ -195,16 +195,10 @@ const AllocateDistrictResources = () => {
     }));
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <LoadingSpinner />
-      </div>
-    );
-  }
 
   return (
     <PageLayout title="Allocate Resources" navItems={mainNavItems}>
+        {loading ? <LoadingSpinner /> : (
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Update Resources Form */}
         {permission === 'edit' && district && (
@@ -328,8 +322,10 @@ const AllocateDistrictResources = () => {
             />
           </div>
         </div> */}
-      </div>
+      </div>)}
+      
     </PageLayout>
+    
   );
 };
 

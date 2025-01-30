@@ -6,6 +6,7 @@ import { IoMdAdd } from 'react-icons/io';
 import PageLayout from "../components/layout/pageLayout";
 import { mainNavItems } from "../config/navigation";
 import { useAuthStore } from "../store/authStore";
+import LoadingSpinner from "../components/loadingSpinner";
 
 const DistrictPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -14,6 +15,7 @@ const DistrictPage: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [formData, setFormData] = useState<NewDistrict>({
     district_name: "",
@@ -22,16 +24,22 @@ const DistrictPage: React.FC = () => {
     total_medicine: 0,
   });
   useEffect(() => {
+    setIsLoading(true);
     if(user){
       if(user.role === "admin"){
         setPermissions("edit");
       }
+      setIsLoading(false);
     }
+    
   }, [user]);
 
   // Fetch districts
   useEffect(() => {
+    setIsLoading(false);
     fetchDistricts();
+    setIsLoading(false);
+
   }, []);
 
   const fetchDistricts = async () => {
@@ -114,6 +122,8 @@ const DistrictPage: React.FC = () => {
         )
       }
     >
+
+      {isLoading ? <LoadingSpinner /> : (
       <div className="max-w-[1400px] mx-auto p-4 md:p-8">
         {/* Districts Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -408,7 +418,7 @@ const DistrictPage: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
+      </div>)}
     </PageLayout>
   );
 };

@@ -138,9 +138,7 @@ const ShelterManagement = () => {
     ? shelters.filter(shelter => shelter.district_id === selectedDistrict._id)
     : shelters;
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+ 
 
   return (
     <PageLayout
@@ -161,6 +159,7 @@ const ShelterManagement = () => {
         </select>
       }
     >
+      {loading ? <LoadingSpinner /> : (
       <div className="max-w-[1400px] mx-auto p-4 md:p-8">
         {/* Shelters Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -356,7 +355,7 @@ const ShelterManagement = () => {
             </div>
           </div>
         )}
-      </div>
+      </div>)}
     </PageLayout>
   );
 };

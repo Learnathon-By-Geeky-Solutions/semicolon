@@ -50,9 +50,6 @@ const ResourceAnalytictsPage = () => {
     fetchData();
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
 
   const selectedDistrictShelters = shelters.filter(
     shelter => shelter.district_id === selectedDistrictId
@@ -95,6 +92,7 @@ const ResourceAnalytictsPage = () => {
         </select>
       }
     >
+      {loading ? <LoadingSpinner /> : (
       <div className="flex-1 overflow-y-auto p-6">
         {/* Resource Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -207,7 +205,7 @@ const ResourceAnalytictsPage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div>)}
     </PageLayout>
   );
 };

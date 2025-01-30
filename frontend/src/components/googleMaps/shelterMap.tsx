@@ -451,7 +451,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
     <div className="flex-1 flex flex-col bg-gray-50">
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div>
           <LoadingSpinner />
         </div>
       )}
