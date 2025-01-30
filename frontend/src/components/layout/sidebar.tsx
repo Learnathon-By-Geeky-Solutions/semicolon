@@ -13,7 +13,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, navItems }) => {
       bg-green-900 text-white w-64 h-screen
       flex flex-col overflow-y-auto
       md:shadow-lg
-      ${location.pathname !== '/' ? 'md:block' : 'md:hidden'}
     `}>
       <div className="sticky top-0 bg-green-900 p-4 flex justify-between items-center
         border-b border-green-800 shadow-sm">

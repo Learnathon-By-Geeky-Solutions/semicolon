@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, Label } from 'recharts';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as BarTooltip, Legend as BarLegend } from 'recharts';
 import { getDistrictById, updateDistrict } from '../helpers/district';
 import PageLayout from '../components/layout/pageLayout';
 import { useAuthStore } from '../store/authStore';
@@ -9,16 +8,14 @@ import LoadingSpinner from '../components/loadingSpinner';
 import { mainNavItems } from '../config/navigation';
 import { getShelters } from '../helpers/shelter';
 import { Shelter } from '../types/shelterMapTypes';
-
+import { ResourceData } from '../types/resourceAnalyticsTypes';
+import { toast } from 'react-hot-toast';
+import { MdSave } from 'react-icons/md';
 const COLORS = ['#60A5FA', '#34D399', '#FBBF24', '#F87171', '#A78BFA'];
 
-interface ResourceChartData {
-  name: string;
-  value: number;
-}
 
 interface ResourcePieChartProps {
-  data: ResourceChartData[];
+  data: ResourceData[];
   title: string;
   total: number;
 }
@@ -181,8 +178,10 @@ const AllocateDistrictResources = () => {
     try {
       await updateDistrict(updatedDistrict);
       setDistrict(updatedDistrict);
+      toast.success('District resources updated successfully');
     } catch (error) {
       console.error('Error updating district:', error);
+      toast.error('Failed to update district resources');
     } finally {
       setLoading(false);
     }
@@ -274,12 +273,13 @@ const AllocateDistrictResources = () => {
                   </label>
                 </div>
               </div>
-              <div className="mt-6">
+              <div className="mt-4">
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition duration-150 ease-in-out shadow-md hover:shadow-lg"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-3 rounded-lg transition duration-150 ease-in-out shadow-md hover:shadow-lg"
                 >
-                  Update Resources
+                <MdSave className="inline-block mr-2"/>
+                Update Resources
                 </button>
               </div>
             </form>

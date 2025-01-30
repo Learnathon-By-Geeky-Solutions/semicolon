@@ -17,12 +17,7 @@ import { ProtectedRoute } from "./components/protectedRoute";
 import { RedirectAuthenticatedUser } from "./components/redirectAuthenticatedUser";
 import AllocateDistrictResources from "./pages/allocateDistrictResources";
 
-/**
- * The main application component, which contains the navigation and authentication logic.
- * This component is responsible for rendering the correct page based on the user's authentication state and location.
- * It also handles the logic for the browser's back/forward buttons and forces a reload on location change.
- * @returns The main application component.
- */
+
 function App() {
   const location = useLocation();
 
