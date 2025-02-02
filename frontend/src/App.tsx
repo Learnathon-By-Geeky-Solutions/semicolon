@@ -16,6 +16,7 @@ import ResourceAnalytictsPage from "./pages/resourceAnalytictsPage";
 import { ProtectedRoute } from "./components/protectedRoute";
 import { RedirectAuthenticatedUser } from "./components/redirectAuthenticatedUser";
 import AllocateDistrictResources from "./pages/allocateDistrictResources";
+import Settings from "./pages/settings";
 
 
 function App() {
@@ -69,6 +70,7 @@ function App() {
         <Route path="/districts" element={<ProtectedRoute>  <DistrictPage /> </ProtectedRoute>} />
         <Route path="/resource-analyticts" element={ <ProtectedRoute>  <ResourceAnalytictsPage/>  </ProtectedRoute>} />
         <Route path="/allocate-district-resources" element={ <ProtectedRoute>  <AllocateDistrictResources/> </ProtectedRoute>} />
+        <Route path="/settings" element={ <ProtectedRoute>  <Settings/> </ProtectedRoute>} />
         
         <Route path="/logout" element={"LOGOUT"} />
       </Routes>

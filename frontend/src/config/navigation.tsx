@@ -44,5 +44,11 @@ export const mainNavItems: NavItem[] = [
     path: '/allocate-district-resources',
     icon: MdManageHistory,
     roles: ['authority'] // only admin and authority can allocate resources
+  },
+  {
+    label: 'Settings',
+    path: '/settings',
+    icon: MdSettings,
+    roles: ['user', 'admin', 'authority', 'volunteer'] // everyone can access settings
   }
 ];
