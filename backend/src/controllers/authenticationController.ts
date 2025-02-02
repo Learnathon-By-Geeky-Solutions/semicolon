@@ -5,7 +5,7 @@ import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 import {  AuthenticatedRequest } from "../types/types.js";
 import passport from "passport";
 import { Role } from "../constants/roles.js";
-
+import { generateVerificationCode } from "../utils/generateVerficationCode.js";
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
 
@@ -26,7 +26,7 @@ export const signup = async (req:Request, res:Response, next:NextFunction) => {
                 return res.status(400).json({success: false, message: "User already exists"});
             }
             const hashedPassword = await hash(password, 10);
-            const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            const verificationCode = generateVerificationCode();
 
             const user = new User ({
                 name : name,

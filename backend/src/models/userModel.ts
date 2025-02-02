@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
     approved: { type: Boolean, default: false },
     permissions: { type: [String], enum: Object.values(Permission) },
     documents: { type: Buffer },
+    lastLogin: { type: Date, default: Date.now },
     isVerfied: {type: Boolean, default : false},
 
     resetPasswordToken : String,

@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\" ",
     "build": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:mailtrap": "ts-node src/mailtrap/mailtrap.config.ts"
   },
   "keywords": [],
   "author": "",
@@ -42,7 +43,7 @@
     "@types/multer": "^1.4.12",
     "@types/node": "^20.4.8",
     "nodemon": "^3.0.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   }
 }
