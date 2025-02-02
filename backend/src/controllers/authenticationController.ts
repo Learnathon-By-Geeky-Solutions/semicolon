@@ -6,7 +6,7 @@ import {  AuthenticatedRequest } from "../types/types.js";
 import passport from "passport";
 import { Role } from "../constants/roles.js";
 import { generateVerificationCode } from "../utils/generateVerficationCode.js";
-import { sendVerificationEmail } from "../mailtrap/emails.js";
+import { sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/emails.js";
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
 
@@ -169,3 +169,21 @@ export const googleSignup = async (accessToken, refreshToken, profile, done) => 
         done(null, profile);
     }
 };
+
+export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+    const { email, verificationCode } = req.body;
+    const user = await User.findOne({ email });
+    if(user && user.verificationToken === verificationCode){
+        user.isVerified = true; 
+        user.verificationToken = undefined;
+        user.verificationTokenExpiresAt = undefined;
+        await user.save();
+
+        await sendWelcomeEmail(user.email, user.name);
+
+        res.status(200).json({ success: true, message: "Email verified successfully" });
+    }
+    else{
+        res.status(400).json({ success: false, message: "Invalid verification code" });
+    }
+}

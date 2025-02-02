@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     permissions: { type: [String], enum: Object.values(Permission) },
     documents: { type: Buffer },
     lastLogin: { type: Date, default: Date.now },
-    isVerfied: {type: Boolean, default : false},
+    isVerified: {type: Boolean, default : false},
 
     resetPasswordToken : String,
     resetPasswordExpiresAt : Date,
