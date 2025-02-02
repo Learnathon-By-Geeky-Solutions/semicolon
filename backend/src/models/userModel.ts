@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     googleId: { type: String },
     role: { type: String, enum: Object.values(Role), required: true, default: Role.User },
-    districtId: { type: String }, 
+    district_id: { type: String, ref: 'District' }, 
     approved: { type: Boolean, default: false },
     permissions: { type: [String], enum: Object.values(Permission) },
     documents: { type: Buffer },

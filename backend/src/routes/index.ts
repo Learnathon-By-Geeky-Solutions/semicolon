@@ -6,6 +6,8 @@ import authorityRouter from "./authorityRoutes.js";
 import volunteerRouter from "./volunteerRoutes.js";
 import { verifyToken } from "../middlewares/authenticationMiddleware.js";
 import { authorizeRole } from "../middlewares/roleMiddleware.js";
+import shelterRouter from "./shelterRoutes.js";
+import districtRouter from "./districtRoutes.js";
 
 const appRouter = Router();
 
@@ -15,5 +17,7 @@ appRouter.use("/admin", verifyToken, authorizeRole("admin"), adminRouter);
 appRouter.use("/authority", verifyToken, authorizeRole("admin", "authority"), authorityRouter);
 appRouter.use("/volunteer", verifyToken, authorizeRole("admin","authority", "volunteer"), volunteerRouter);
 appRouter.use("/user", verifyToken, authorizeRole("admin","authority", "volunteer", "user"), userRouter);
+appRouter.use("/shelters", shelterRouter);
+appRouter.use("/district", districtRouter);
 
 export default appRouter;
