@@ -35,4 +35,10 @@ export const signupValidator = [
         }
         return true;
     }),
+    body("district_id").custom((_, { req }) => {
+        if ((req.body.role === "authority" || req.body.role === "volunteer") && !req.body.district_id) {
+            throw new Error("District is required for this role");
+        }
+        return true;
+    }),
 ];
