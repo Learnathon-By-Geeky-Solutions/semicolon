@@ -6,6 +6,7 @@ import {  AuthenticatedRequest } from "../types/types.js";
 import passport from "passport";
 import { Role } from "../constants/roles.js";
 import { generateVerificationCode } from "../utils/generateVerficationCode.js";
+import { sendVerificationEmail } from "../mailtrap/emails.js";
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
 
@@ -41,6 +42,9 @@ export const signup = async (req:Request, res:Response, next:NextFunction) => {
             await user.save();
 
             generateTokenAndSetCookie(res, user._id, user.email, user.role);
+
+            await sendVerificationEmail(user.email, verificationCode);
+            
             res.status(201).json({
                 success: true,
                 message : "user created successfully",
