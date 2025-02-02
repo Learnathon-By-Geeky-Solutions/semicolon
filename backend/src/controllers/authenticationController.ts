@@ -6,7 +6,7 @@ import {  AuthenticatedRequest } from "../types/types.js";
 import passport from "passport";
 import { Role } from "../constants/roles.js";
 import { generateVerificationCode } from "../utils/generateVerficationCode.js";
-import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from "../mailtrap/emails.js";
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } from "../mailtrap/emails.js";
 import  * as crypto from "crypto";
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
@@ -222,5 +222,39 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
         console.log("Error in forgotPassword", error);
         res.status(400).json({success: false, message: error.message});
 
+    }
+}
+
+export const resetPassword = async(req:Request, res:Response) => {
+    try{
+        const {token} = req.params;
+        const {password} = req.body;
+
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpiresAt: { $gt: Date.now() },
+        })
+
+        if(!user){
+            return res.status(400).json({success: false, message: "Invalid or Expired Reset Token"});
+        }
+
+        const hashedPassword = await hash(password, 10);
+
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiresAt = undefined;
+
+        await user.save();
+
+        await sendResetSuccessEmail(user.email);
+
+        res.status(200).json({success: true, message:"Password reset successful"});
+
+
+    }
+    catch (error){
+        console.log("Error in Sending Reset Email", error);
+        res.status(400).json({success: false, message: error.message});
     }
 }
