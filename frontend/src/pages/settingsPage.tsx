@@ -3,11 +3,14 @@ import { Mail, User, Shield, X } from 'lucide-react';
 import PageLayout from '../components/layout/pageLayout';
 import { mainNavItems } from '../config/navigation';
 import { useAuthStore } from '../store/authStore';
+import { verifyEmail } from '../helpers/settings';
 
 const SettingsPage = () => {
-  const [name, setName] = useState('John Doe');
-  const [email, setEmail] = useState('john.doe@example.com');
+  const { user } = useAuthStore();
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(user?.isVerified || false);
   const [verificationCode, setVerificationCode] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const { isAuthenticated } = useAuthStore();
@@ -20,11 +23,16 @@ const SettingsPage = () => {
   };
 
   const handleVerificationSubmit = async (e: React.FormEvent) => {
+    setIsSaving(true);
     e.preventDefault();
-    // Simulate verification API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsVerificationModalOpen(false);
-    setVerificationCode('');
+    const isVerified = await verifyEmail({email, verificationCode, name});   
+    if (isVerified) {
+        setIsEmailVerified(true);
+        setVerificationCode('');
+        setIsSaving(false);
+    } else {
+        setIsSaving(false);
+    }
   };
 
   return (
@@ -79,15 +87,17 @@ const SettingsPage = () => {
               </div>
 
               {/* Email Verification */}
-              <div className="mb-6">
-                <button
-                  onClick={() => setIsVerificationModalOpen(true)}
+              {isEmailVerified ? (<></>) : (
+                <div className="mb-6">
+                  <button
+                    onClick={() => setIsVerificationModalOpen(true)}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 >
                   <Shield className="h-5 w-5 mr-2" />
                   Verify Email
                 </button>
               </div>
+              )}
 
               {/* Save Button */}
               <div className="flex justify-end">
@@ -118,6 +128,7 @@ const SettingsPage = () => {
               </button>
             </div>
             
+            {!isEmailVerified ? (
             <form onSubmit={handleVerificationSubmit} className="p-6">
               <p className="text-sm text-gray-600 mb-4">
                 We've sent a verification code to your email address. Please enter it below.
@@ -152,6 +163,22 @@ const SettingsPage = () => {
                 </button>
               </div>
             </form>
+            ) : (
+              <div className="p-6">
+                <p className="text-sm text-gray-600 mb-4">
+                  Email verification successful!
+                </p>
+                <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsVerificationModalOpen(false)}
+                  className="mr-3 px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500 focus:outline-none"
+                >
+                  Close
+                </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

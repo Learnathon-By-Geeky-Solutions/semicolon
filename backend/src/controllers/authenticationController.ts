@@ -175,13 +175,19 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
     const user = await User.findOne({ email });
     if(user && user.verificationToken === verificationCode){
         user.isVerified = true; 
-        user.verificationToken = undefined;
         user.verificationTokenExpiresAt = undefined;
         await user.save();
 
         await sendWelcomeEmail(user.email, user.name);
 
-        res.status(200).json({ success: true, message: "Email verified successfully" });
+        res.status(200).json({ 
+            success: true, 
+            message: "Email verified successfully",
+            user: {
+                ...user.toObject(),
+                password: undefined,
+            },
+         });
     }
     else{
         res.status(400).json({ success: false, message: "Invalid verification code" });

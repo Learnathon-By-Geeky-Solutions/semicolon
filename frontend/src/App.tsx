@@ -16,7 +16,7 @@ import ResourceAnalytictsPage from "./pages/resourceAnalytictsPage";
 import { ProtectedRoute } from "./components/protectedRoute";
 import { RedirectAuthenticatedUser } from "./components/redirectAuthenticatedUser";
 import AllocateDistrictResources from "./pages/allocateDistrictResources";
-import Settings from "./pages/settings";
+import Settings from "./pages/settingsPage";
 
 
 function App() {

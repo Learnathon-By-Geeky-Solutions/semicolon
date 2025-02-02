@@ -17,6 +17,7 @@ interface User {
     role: "admin" | "authority" | "volunteer" | "user"; 
     documents?: Document[]; 
     district_id?: string;
+    isVerified: boolean;
 }
 
 interface AuthState {
@@ -127,7 +128,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isCheckingAuth: true, error: null });
     try {
       const response = await axios.get(`${API_URL}/check-auth`);
-      set({ user: response.data.user, isAuthenticated: true, isCheckingAuth: false });
+      set({ user: response.data.user, isAuthenticated: true, isCheckingAuth: false});
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           set({
