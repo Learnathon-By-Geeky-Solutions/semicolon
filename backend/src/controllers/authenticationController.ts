@@ -6,7 +6,8 @@ import {  AuthenticatedRequest } from "../types/types.js";
 import passport from "passport";
 import { Role } from "../constants/roles.js";
 import { generateVerificationCode } from "../utils/generateVerficationCode.js";
-import { sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/emails.js";
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from "../mailtrap/emails.js";
+import  * as crypto from "crypto";
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
 
@@ -191,5 +192,35 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
     }
     else{
         res.status(400).json({ success: false, message: "Invalid verification code" });
+    }
+}
+
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+        const {email} = req.body;
+    
+    try{
+        const user = await User.findOne({email});
+
+        if(!user){
+            return res.status(400).json({success:false, message:"user not found"});
+        }
+
+        const resetToken = crypto.randomBytes(20).toString("hex");
+        const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpiresAt = resetTokenExpiresAt;
+
+        await user.save();
+
+        await sendPasswordResetEmail(user.email, `${process.env.FRONTEND_ORIGIN}/reset-password/${resetToken}`);
+
+        res.status(200).json({success: true, message: "Password reset link sent to your email"});
+
+    }
+    catch(error){
+        console.log("Error in forgotPassword", error);
+        res.status(400).json({success: false, message: error.message});
+
     }
 }

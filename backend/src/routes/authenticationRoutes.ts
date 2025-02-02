@@ -1,5 +1,5 @@
 import express  from "express";
-import { login, signup, logout, checkAuth, googleRedirect, googleCallback, googleCallbackHandler, verifyEmail } from "../controllers/authenticationController.js";
+import { login, signup, logout, checkAuth, googleRedirect, googleCallback, googleCallbackHandler, verifyEmail, forgotPassword } from "../controllers/authenticationController.js";
 import { loginValidator, signupValidator, validate } from "../middlewares/validationMiddleware.js";
 import upload from "../middlewares/fileUploadMiddleware.js";
 import { verifyTokenForCheckAuth } from "../middlewares/authenticationMiddleware.js";
@@ -12,6 +12,7 @@ authenticationRouter.post("/logout", logout);
 authenticationRouter.get("/check-auth", verifyTokenForCheckAuth , checkAuth);
 
 authenticationRouter.post("/verify-email", verifyEmail);
+authenticationRouter.post("/forgot-password", forgotPassword);  
 
 authenticationRouter.get("/google", googleRedirect);
 authenticationRouter.get("/google/callback", googleCallback, googleCallbackHandler);
