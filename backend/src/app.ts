@@ -6,7 +6,6 @@ import cookieParser from 'cookie-parser';
 import cors from "cors";
 import passport from "passport";
 import session from "express-session";
-import passportConfig from "./config/passportConfig.js";
 import GoogleStrategy from "passport-google-oauth20";
 import { googleSignup } from "./controllers/authenticationController.js";
 
@@ -14,7 +13,7 @@ config()
 
 const app = express();
 
-app.use(cors({origin:"https://5cf2-103-203-92-101.ngrok-free.app", credentials: true}));
+app.use(cors({origin:"http://localhost:5173", credentials: true}));
 
 app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
