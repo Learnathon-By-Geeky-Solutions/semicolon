@@ -32,6 +32,7 @@ interface AuthState {
   googleAuth: () => void;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
 }
 axios.defaults.withCredentials = true;
 
@@ -143,7 +144,25 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     },
 
-    googleAuth: () => {
+  googleAuth: () => {
       window.location.href = `${API_URL}/google`;
+    },
+
+  forgotPassword: async (email) => {
+      set({ isLoading: true, error: null});
+      try {
+        const response = await axios.post(`${API_URL}/forgot-password`, { email });
+        set({ message: response.data.message, isLoading: false });
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          set({
+            error: error.response?.data?.message || "Error sending forgot password email",
+            isLoading: false,
+          });
+        } else {
+          set({ error: "Unexpected error occurred", isLoading: false });
+        }
+        throw error;
+      }
     }
   }));

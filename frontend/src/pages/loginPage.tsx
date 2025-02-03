@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import { useAuthStore } from '../store/authStore';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 const LoginPage: React.FC = () => {
@@ -61,6 +61,11 @@ const LoginPage: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+          </div>
+          <div className="flex items-center justify-between">
+            <Link to="/forgot-password" className="text-green-600 hover:underline">
+              Forgot Password?
+            </Link>
           </div>
           <button
             type="submit"

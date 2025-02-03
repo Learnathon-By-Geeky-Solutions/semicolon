@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import HomePage  from "./pages/homePage";
 import LoginPage from "./pages/loginPage";
 import SignUpPage from "./pages/signupPage";
+import ForgotPasswordPage from "./pages/forgotPasswordPage";
 import AdminDashboard from "./pages/adminDashboard";
 import AuthorityDashboard from "./pages/authorityDashboard";
 import VolunteerDashboard from "./pages/volunteerDashboard";
@@ -59,6 +60,8 @@ function App() {
         
         <Route path="/signup" element={<RedirectAuthenticatedUser> <SignUpPage/> </RedirectAuthenticatedUser>} />
         <Route path="/login" element={ <RedirectAuthenticatedUser> <LoginPage/></RedirectAuthenticatedUser> } />
+
+        <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
 
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard/></ProtectedRoute>} />
         <Route path="/authority" element={ <ProtectedRoute>  <AuthorityDashboard/> </ProtectedRoute>} />
