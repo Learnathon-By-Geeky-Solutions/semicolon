@@ -29,7 +29,6 @@ const FriendDashboard: React.FC = () => {
 
   // Handle add friend action
   const handleAddFriend = async () => {
-    console.log(friendemail);
     addFriend(user?.email || " ",currentUser?.email||" ");
     //addFriend(friendName || "");  // Assuming addFriend is an action to add friend
     //alert(`You have added ${friendName} as a friend!`);

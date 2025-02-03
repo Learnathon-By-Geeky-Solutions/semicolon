@@ -8,14 +8,10 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
       const users = await User.find(); // Mongoose method to get all users
   
       // Extract the names from the users array
-<<<<<<< Updated upstream
-      const userNames = users.map((user: any) => user.name);
-=======
       const userNames = users.map((user: any) => ({
         email: user.email,  // Mongoose returns the _id field by default
         name: user.name,
       }));
->>>>>>> Stashed changes
   
       // Send the user names in the response
       res.status(200).json({ success: true, data: userNames });
@@ -24,16 +20,13 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
       console.error("Error fetching users:", error);
       res.status(400).json({ success: false, message: error.message });
     }
-<<<<<<< Updated upstream
-  };
-=======
   };
 
 
   export const addFriend = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userEmail, friendEmail } = req.body; // Get userEmail and friendEmail from the request body
-      //console.log(userEmail);
+      console.log(userEmail+"jdsfni");
       // Check if both userEmail and friendEmail are provided
       if (!userEmail || !friendEmail) {
         return res.status(400).json({ success: false, message: "userEmail and friendEmail are required" });
@@ -72,8 +65,7 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
     } catch (error) {
       // Handle any errors
       console.error("Error adding friend:", error);
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: error.message +"in add d=" });
     }
   };
   
->>>>>>> Stashed changes

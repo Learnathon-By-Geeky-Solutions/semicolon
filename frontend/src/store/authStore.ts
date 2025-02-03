@@ -30,11 +30,7 @@ interface AuthState {
   error: string | null;
   isLoading: boolean;
   isCheckingAuth: boolean;
-<<<<<<< Updated upstream
-  users:string[];
-=======
   users:Alluser[];
->>>>>>> Stashed changes
   message: string | null;
   allUser : Alluser | null;
   currentUser: Alluser | null; // Add a field to store the selected friend
@@ -44,6 +40,8 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  addFriend:(userId: string, friendId: string)=>Promise<void>;
+  getUser :() => Promise<void>;
 
 }
 axios.defaults.withCredentials = true;
@@ -105,13 +103,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       const response = await axios.post(`${API_URL}/login`, { email, password });
 
       console.log("2");
-      const usersResponse = await axios.get("http://localhost:5000/api/v1/user/all"); // Assuming this is the endpoint to fetch all users
-      const allUsers = usersResponse.data.data; // Store users in an array
-     console.log(allUsers);
+     // const usersResponse = await axios.get("http://localhost:5000/api/v1/user/all"); // Assuming this is the endpoint to fetch all users
+     // const allUsers = usersResponse.data.data; // Store users in an array
+     // console.log(allUsers);
       set({
         isAuthenticated: true,
         user: response.data.user,
-        users:allUsers,
+       // users:allUsers,
         error: null,
         isLoading: false,
       });
@@ -163,9 +161,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw error;
       }
     },
-<<<<<<< Updated upstream
-  }));
-=======
     addFriend: async (userEmail: string, friendEmail: string) => {
       set({ isLoading: true, error: null }); // Set loading state
       try {
@@ -238,4 +233,3 @@ export const useAuthStore = create<AuthState>((set) => ({
     },
   }
 ));
->>>>>>> Stashed changes
