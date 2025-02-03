@@ -18,7 +18,7 @@ import { ProtectedRoute } from "./components/protectedRoute";
 import { RedirectAuthenticatedUser } from "./components/redirectAuthenticatedUser";
 import AllocateDistrictResources from "./pages/allocateDistrictResources";
 import Settings from "./pages/settingsPage";
-
+import ResetPasswordPage from "./pages/resetPasswordPage";
 
 function App() {
   const location = useLocation();
@@ -62,6 +62,7 @@ function App() {
         <Route path="/login" element={ <RedirectAuthenticatedUser> <LoginPage/></RedirectAuthenticatedUser> } />
 
         <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
+        <Route path="/reset-password/:token" element={<RedirectAuthenticatedUser> <ResetPasswordPage/> </RedirectAuthenticatedUser>} />
 
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard/></ProtectedRoute>} />
         <Route path="/authority" element={ <ProtectedRoute>  <AuthorityDashboard/> </ProtectedRoute>} />

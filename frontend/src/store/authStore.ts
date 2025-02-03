@@ -14,6 +14,8 @@ interface User {
     _id: string,
     name: string;
     email: string;
+    token: string;
+    password: string;
     role: "admin" | "authority" | "volunteer" | "user"; 
     documents?: Document[]; 
     district_id?: string;
@@ -33,6 +35,7 @@ interface AuthState {
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (password: string | undefined, token: string) => Promise<void>;
 }
 axios.defaults.withCredentials = true;
 
@@ -164,5 +167,22 @@ export const useAuthStore = create<AuthState>((set) => ({
         }
         throw error;
       }
+    },
+  resetPassword: async (token, password) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/reset-password/${token}`, { password });
+      set({ message: response.data.message, isLoading: false });
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        set({
+          error: error.response?.data?.message || "Error resetting password",
+          isLoading: false,
+        });
+      } else {
+        set({ error: "Unexpected error occurred", isLoading: false });
+      }
+      throw error;
     }
-  }));
+    },
+}));
