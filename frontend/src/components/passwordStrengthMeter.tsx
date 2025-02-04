@@ -64,9 +64,9 @@ const PasswordStrengthMeter = ({password} : {password: string}) => {
         </div>
 
         <div className='flex space-x-1'>
-            {[...Array(4)].map((_, index) => (
+            {Array.from({ length: 4 }, (_, index) => (
                 <div 
-                    key={index} className={`w-1/4 h-1 rounded-full  transition-colors duration-300
+                    key={`strength-bar-${index}`} className={`w-1/4 h-1 rounded-full  transition-colors duration-300
                         ${index < strength ? getColor(strength) : "bg-gray-600"}`}
                 />
             ))}

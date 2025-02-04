@@ -9,7 +9,7 @@ import {
     ResponsiveContainer
   } from 'recharts';
 const CustomAreaChart = ({ data, dataKey, color, name }: {
-    data: any[],
+    data: { name: string; [key: string]: number | string }[],
     dataKey: string,
     color: string,
     name: string

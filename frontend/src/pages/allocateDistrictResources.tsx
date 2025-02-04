@@ -8,65 +8,10 @@ import LoadingSpinner from '../components/loadingSpinner';
 import { mainNavItems } from '../config/navigation';
 import { getShelters } from '../helpers/shelter';
 import { Shelter } from '../types/shelterMapTypes';
-import { ResourceData } from '../types/resourceAnalyticsTypes';
 import { toast } from 'react-hot-toast';
 import { MdSave } from 'react-icons/md';
-const COLORS = ['#60A5FA', '#34D399', '#FBBF24', '#F87171', '#A78BFA'];
 
 
-interface ResourcePieChartProps {
-  data: ResourceData[];
-  title: string;
-  total: number;
-}
-
-const ResourcePieChart = ({ data, title, total }: ResourcePieChartProps) => {
-  const formattedData = data.map(item => ({
-    ...item,
-    percentage: ((item.value / total) * 100).toFixed(1)
-  }));
-
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <h3 className="text-xl font-semibold text-center mb-3 text-gray-800">{title}</h3>
-      <p className="text-sm text-center text-gray-600 mb-4">Total: {total}</p>
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={formattedData}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={80}
-              paddingAngle={5}
-              dataKey="value"
-            >
-              {formattedData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={COLORS[index % COLORS.length]} 
-                  strokeWidth={1}
-                />
-              ))}
-            </Pie>
-            <Tooltip 
-              formatter={(value: number, name: string, props: any) => [
-                `${value} (${props.payload.percentage}%)`,
-                name
-              ]}
-            />
-            <Legend 
-              layout="horizontal" 
-              align="center" 
-              verticalAlign="bottom"
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
-};
 
 interface ResourceSummaryChartProps {
   resources: {
@@ -104,7 +49,7 @@ const ResourceSummaryChart: React.FC<ResourceSummaryChartProps> = ({ resources }
                     dataKey="value"
                   >
                     {createPieData(value.used, value.total).map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
                     ))}
                     <Label
                       value={`${Math.round((value.used / value.total) * 100)}%`}
@@ -182,12 +127,6 @@ const AllocateDistrictResources = () => {
     }
   };
 
-  const prepareChartData = (resourceKey: keyof Pick<Shelter, 'food' | 'water' | 'medicine'>) => {
-    return shelters.map(shelter => ({
-      name: shelter.name,
-      value: shelter[resourceKey] || 0
-    }));
-  };
 
 
   return (
@@ -280,15 +219,15 @@ const AllocateDistrictResources = () => {
           <ResourceSummaryChart
             resources={{
               food: {
-                total: district?.total_food || 0,
+                total: district?.total_food ?? 0,
                 used: shelters.reduce((acc, shelter) => acc + (shelter.food || 0), 0),
               },
               water: {
-                total: district?.total_water || 0,
+                total: district?.total_water ?? 0,
                 used: shelters.reduce((acc, shelter) => acc + (shelter.water || 0), 0),
               },
               medicine: {
-                total: district?.total_medicine || 0,
+                total: district?.total_medicine ?? 0,
                 used: shelters.reduce((acc, shelter) => acc + (shelter.medicine || 0), 0),
               },
             }}

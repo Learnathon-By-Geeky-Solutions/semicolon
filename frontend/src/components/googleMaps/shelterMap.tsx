@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { GOOGLE_MAPS_API_KEY } from "../../constants/paths";
 import { Loader } from "@googlemaps/js-api-loader";
@@ -162,9 +162,9 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
     }
   };
 
-  const initializeShelterCount = () => {
+  const initializeShelterCount = useCallback(() => {
     shelterCountRef.current = shelters.length;
-  };
+  }, [shelters.length]);
 
   useEffect(() => {
     console.log("Current district state:", district);
@@ -173,11 +173,11 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   useEffect(() => {
     const fetchDistrict = async () => {
       try {
-        if (user && user.district_id) {
+        if (user?.district_id) {
           console.log("Fetching district for user:", user.district_id);
           const fetchedDistrict = await getDistrictById(user.district_id);
           console.log("Fetched district:", fetchedDistrict);
-          if (fetchedDistrict && fetchedDistrict._id) {
+          if (fetchedDistrict?._id) {
             setDistrict(fetchedDistrict);
           } else {
             console.error("Invalid district data received");
@@ -199,7 +199,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
     if (shelters.length > 0) {
       initializeShelterCount();
     }
-  }, [shelters]);
+  }, [shelters, initializeShelterCount]);
 
   const handleEdit = (field: string) => {
     setIsEditing(prev => ({
@@ -241,8 +241,8 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
   const initializeMap = async () => {
     try {
-      await loader.load();
-      const map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
+      const { Map } = await loader.importLibrary("maps");
+      const map = new Map(document.getElementById("map") as HTMLElement, {
         center,
         zoom: 12,
         mapId: "shelter-map",
@@ -257,7 +257,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
           console.log("Current district when creating shelter:", district);
 
           // Strict check for district
-          if (!district || !district._id) {
+          if (!district?._id) {
             toast.error("No district assigned. Please contact an administrator.");
             return;
           }
@@ -408,9 +408,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
       setIsLoading(false);
     };
 
-    if (permission === 'edit' && district) {
-      loadMapAndShelters();
-    } else if (permission === 'view') {
+    if ((permission === 'edit' && district) || permission === 'view') {
       loadMapAndShelters();
     }
 
@@ -423,7 +421,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
   // Update markers whenever shelters change
   useEffect(() => {
-    if (mapRef.current && shelters.length >= 0) {
+    if (mapRef.current && shelters.length > 0) {
       // Clear existing markers
       markersRef.current.forEach(marker => marker.map = null);
       markersRef.current.clear();
@@ -639,13 +637,14 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="destination-select" className="block text-sm font-medium text-gray-700 mb-2">
                       Select Destination
                     </label>
                     <select
+                      id="destination-select"
                       className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50
                       focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      value={selectedDestination?._id || ""}
+                      value={selectedDestination?._id ?? ''}
                       onChange={(e) => {
                         const shelter = shelters.find(s => s._id === e.target.value);
                         setSelectedDestination(shelter || null);
@@ -661,7 +660,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="travel-mode" className="block text-sm font-medium text-gray-700 mb-2">
                       Travel Mode
                     </label>
                     <div className="flex gap-3">

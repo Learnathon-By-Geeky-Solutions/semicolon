@@ -38,7 +38,7 @@ export const signup = async (req:Request, res:Response, next:NextFunction) => {
                 documents: documentFile ? documentFile.buffer : null,
                 verificationToken : verificationCode,
                 verificationTokenExpiresAt: Date.now() + 24*60*60*1000, // 24 hours validity 
-                district_id : district_id? district_id : null
+                district_id : district_id || null
             })
             await user.save();
 

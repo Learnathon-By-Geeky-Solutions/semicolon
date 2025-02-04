@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { District } from "../models/districtModel.js";
 import { ShelterList } from "../models/shelterModel.js";
 
@@ -22,10 +22,10 @@ export const getDistrictById = async (req: Request, res: Response) => {
 export const createDistrict = async (req: Request, res: Response) => {
   try {
     const { district_name, total_food, total_water, total_medicine } = req.body;
-    
+
     if (!district_name) {
-      return res.status(400).json({ 
-        message: "District name is required" 
+      return res.status(400).json({
+        message: "District name is required",
       });
     }
 
@@ -33,18 +33,18 @@ export const createDistrict = async (req: Request, res: Response) => {
       district_name,
       total_food: total_food || 0,
       total_water: total_water || 0,
-      total_medicine: total_medicine || 0
+      total_medicine: total_medicine || 0,
     });
 
     const savedDistrict = await district.save();
     res.status(201).json({
       message: "District created successfully",
-      data: savedDistrict
+      data: savedDistrict,
     });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({ 
-        message: "District name already exists" 
+      return res.status(400).json({
+        message: "District name already exists",
       });
     }
     res.status(500).json({ message: error.message });
@@ -54,13 +54,17 @@ export const createDistrict = async (req: Request, res: Response) => {
 // Update a district
 export const updateDistrict = async (req: Request, res: Response) => {
   try {
-    
-    const { _id ,district_name, total_food, total_water, total_medicine } = req.body;
+    const { _id, district_name, total_food, total_water, total_medicine } =
+      req.body;
 
-    if (!district_name && total_food === undefined && 
-        total_water === undefined && total_medicine === undefined) {
+    if (
+      !district_name &&
+      total_food === undefined &&
+      total_water === undefined &&
+      total_medicine === undefined
+    ) {
       return res.status(400).json({
-        message: "At least one field must be provided for update"
+        message: "At least one field must be provided for update",
       });
     }
 
@@ -68,14 +72,12 @@ export const updateDistrict = async (req: Request, res: Response) => {
       ...(district_name && { district_name }),
       ...(total_food !== undefined && { total_food }),
       ...(total_water !== undefined && { total_water }),
-      ...(total_medicine !== undefined && { total_medicine })
+      ...(total_medicine !== undefined && { total_medicine }),
     };
 
-    const district = await District.findByIdAndUpdate(
-      _id,
-      updateData,
-      { new: true }
-    );
+    const district = await District.findByIdAndUpdate(_id, updateData, {
+      new: true,
+    });
 
     if (!district) {
       return res.status(404).json({ message: "District not found" });
@@ -83,7 +85,7 @@ export const updateDistrict = async (req: Request, res: Response) => {
 
     res.json({
       message: "District updated successfully",
-      data: district
+      data: district,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -97,12 +99,13 @@ export const deleteDistrict = async (req: Request, res: Response) => {
 
     // Check if district has any shelters
     const shelterList = await ShelterList.findOne({
-      "shelters.district_id": _id
+      "shelters.district_id": _id,
     });
 
     if (shelterList && shelterList.shelters.length > 0) {
       return res.status(400).json({
-        message: "Cannot delete district that has shelters. Please remove or reassign shelters first."
+        message:
+          "Cannot delete district that has shelters. Please remove or reassign shelters first.",
       });
     }
 
@@ -114,7 +117,7 @@ export const deleteDistrict = async (req: Request, res: Response) => {
 
     res.json({
       message: "District deleted successfully",
-      data: district
+      data: district,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -53,8 +53,6 @@ const HomePage: React.FC = () => {
                   management tasks with ease.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                 
-                    <>
                       <button
                         className="px-6 py-3 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-800 transition duration-300"
                         onClick={handleDashboardClick}
@@ -67,8 +65,6 @@ const HomePage: React.FC = () => {
                       >
                         Log Out
                       </button>
-                    </>
-              
                 </div>
               </div>
       
@@ -90,8 +86,6 @@ const HomePage: React.FC = () => {
                management tasks with ease.
              </p>
              <div className="flex flex-col sm:flex-row gap-4">
-              
-                 <>
                    <button
                      className="px-6 py-3 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-800 transition duration-300"
                      onClick={handleLoginClick}
@@ -104,8 +98,6 @@ const HomePage: React.FC = () => {
                    >
                      Sign Up
                    </button>
-                 </>
-           
              </div>
            </div>
    

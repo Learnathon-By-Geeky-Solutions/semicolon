@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      await googleAuth();
+      googleAuth();
       console.log(user);
       navigate("/");
     } catch (error) {

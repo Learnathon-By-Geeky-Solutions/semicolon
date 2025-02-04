@@ -39,11 +39,12 @@ const DistrictModal: React.FC<DistrictModalProps> = ({
           <div className="space-y-4">
             {/* District Name Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="district_name" className="block text-sm font-medium text-gray-700 mb-1">
                 District Name
               </label>
               <input
                 type="text"
+                id="district_name"
                 value={formData.district_name}
                 onChange={(e) => onNameChange(e.target.value)}
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 
