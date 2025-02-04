@@ -1,16 +1,18 @@
 import React, { useState, FormEvent } from 'react';
 import { useAuthStore } from '../store/authStore';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const { login , user} = useAuthStore();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { login , googleAuth, user} = useAuthStore();
   const navigate = useNavigate();
   
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       await login(email, password);
       console.log(user);
@@ -18,12 +20,25 @@ const LoginPage: React.FC = () => {
     } catch (error) {
       console.error('Login failed', error);
     }
+    setIsLoading(false);
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      googleAuth();
+      console.log(user);
+      navigate("/");
+    } catch (error) {
+      console.error('Google login failed', error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-3xl font-semibold text-gray-800 text-center mb-6">Login</h2>
+        <h2 className="text-3xl font-semibold text-gray-800 text-center mb-6">
+          Login
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-600">Email</label>
@@ -47,13 +62,21 @@ const LoginPage: React.FC = () => {
               required
             />
           </div>
+          <div className="flex items-center justify-between">
+            <Link to="/forgot-password" className="text-green-600 hover:underline">
+              Forgot Password?
+            </Link>
+          </div>
           <button
             type="submit"
             className="w-full py-2 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none transition duration-300"
           >
-            Login
+           {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+        <button onClick={handleGoogleLogin} className="w-full py-2 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none transition duration-300 mt-4">
+            Login with Google
+        </button>
         <div className="mt-4 text-center text-gray-600">
           <p>
             Don't have an account?{' '}
