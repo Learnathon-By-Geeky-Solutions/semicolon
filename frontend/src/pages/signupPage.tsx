@@ -3,6 +3,7 @@ import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import {getDistricts} from "../helpers/district";
 import { District } from "../types/districtTypes";
+import PasswordStrengthMeter from "../components/passwordStrengthMeter";
 
 const SignUpPage: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -184,6 +185,9 @@ const SignUpPage: React.FC = () => {
               {document && <p className="text-sm text-green-600 mt-2">Selected: {document.name}</p>}
             </div>
           )}
+
+          {/* Password Strength Meter */}
+          <PasswordStrengthMeter password={password}/>
 
           {/* Submit Button */}
           <button

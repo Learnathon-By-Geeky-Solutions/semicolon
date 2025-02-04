@@ -14,9 +14,12 @@ interface User {
     _id: string,
     name: string;
     email: string;
+    token: string;
+    password: string;
     role: "admin" | "authority" | "volunteer" | "user"; 
     documents?: Document[]; 
     district_id?: string;
+    isVerified: boolean;
 }
 
 interface AuthState {
@@ -31,6 +34,8 @@ interface AuthState {
   googleAuth: () => void;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (password: string | undefined, token: string) => Promise<void>;
 }
 axios.defaults.withCredentials = true;
 
@@ -127,7 +132,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isCheckingAuth: true, error: null });
     try {
       const response = await axios.get(`${API_URL}/check-auth`);
-      set({ user: response.data.user, isAuthenticated: true, isCheckingAuth: false });
+      set({ user: response.data.user, isAuthenticated: true, isCheckingAuth: false});
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           set({
@@ -142,7 +147,42 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     },
 
-    googleAuth: () => {
+  googleAuth: () => {
       window.location.href = `${API_URL}/google`;
+    },
+
+  forgotPassword: async (email) => {
+      set({ isLoading: true, error: null});
+      try {
+        const response = await axios.post(`${API_URL}/forgot-password`, { email });
+        set({ message: response.data.message, isLoading: false });
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          set({
+            error: error.response?.data?.message || "Error sending forgot password email",
+            isLoading: false,
+          });
+        } else {
+          set({ error: "Unexpected error occurred", isLoading: false });
+        }
+        throw error;
+      }
+    },
+  resetPassword: async (token, password) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/reset-password/${token}`, { password });
+      set({ message: response.data.message, isLoading: false });
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        set({
+          error: error.response?.data?.message || "Error resetting password",
+          isLoading: false,
+        });
+      } else {
+        set({ error: "Unexpected error occurred", isLoading: false });
+      }
+      throw error;
     }
-  }));
+    },
+}));

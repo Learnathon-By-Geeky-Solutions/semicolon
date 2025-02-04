@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getDistricts } from '../helpers/district';
 import { getShelters } from '../helpers/shelter';
 import { District } from '../types/districtTypes';

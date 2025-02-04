@@ -5,7 +5,9 @@ import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 import {  AuthenticatedRequest } from "../types/types.js";
 import passport from "passport";
 import { Role } from "../constants/roles.js";
-
+import { generateVerificationCode } from "../utils/generateVerficationCode.js";
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } from "../mailtrap/emails.js";
+import  * as crypto from "crypto";
 
 export const signup = async (req:Request, res:Response, next:NextFunction) => {
 
@@ -26,7 +28,7 @@ export const signup = async (req:Request, res:Response, next:NextFunction) => {
                 return res.status(400).json({success: false, message: "User already exists"});
             }
             const hashedPassword = await hash(password, 10);
-            const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            const verificationCode = generateVerificationCode();
 
             const user = new User ({
                 name : name,
@@ -41,6 +43,9 @@ export const signup = async (req:Request, res:Response, next:NextFunction) => {
             await user.save();
 
             generateTokenAndSetCookie(res, user._id, user.email, user.role);
+
+            await sendVerificationEmail(user.email, verificationCode);
+            
             res.status(201).json({
                 success: true,
                 message : "user created successfully",
@@ -165,3 +170,92 @@ export const googleSignup = async (accessToken, refreshToken, profile, done) => 
         done(null, profile);
     }
 };
+
+export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+    const { email, verificationCode } = req.body;
+    const user = await User.findOne({ email });
+    if(user && user.verificationToken === verificationCode){
+        user.isVerified = true; 
+        user.verificationTokenExpiresAt = undefined;
+        await user.save();
+
+        await sendWelcomeEmail(user.email, user.name);
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Email verified successfully",
+            user: {
+                ...user.toObject(),
+                password: undefined,
+            },
+         });
+    }
+    else{
+        res.status(400).json({ success: false, message: "Invalid verification code" });
+    }
+}
+
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+        const {email} = req.body;
+    
+    try{
+        const user = await User.findOne({email});
+
+        if(!user){
+            return res.status(400).json({success:false, message:"user not found"});
+        }
+
+        const resetToken = crypto.randomBytes(20).toString("hex");
+        const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpiresAt = resetTokenExpiresAt;
+
+        await user.save();
+
+        await sendPasswordResetEmail(user.email, `${process.env.FRONTEND_ORIGIN}/reset-password/${resetToken}`);
+
+        res.status(200).json({success: true, message: "Password reset link sent to your email"});
+
+    }
+    catch(error){
+        console.log("Error in forgotPassword", error);
+        res.status(400).json({success: false, message: error.message});
+
+    }
+}
+
+export const resetPassword = async(req:Request, res:Response) => {
+    try{
+        const {token} = req.params;
+        const {password} = req.body;
+
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpiresAt: { $gt: Date.now() },
+        })
+
+        if(!user){
+            console.log("Invalid or Expired Reset Token");
+            return res.status(400).json({success: false, message: "Invalid or Expired Reset Token"});
+        }
+
+        const hashedPassword = await hash(password, 10);
+
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiresAt = undefined;
+
+        await user.save();
+
+        await sendResetSuccessEmail(user.email);
+
+        res.status(200).json({success: true, message:"Password reset successful"});
+
+
+    }
+    catch (error){
+        console.log("Error in Sending Reset Email", error);
+        res.status(400).json({success: false, message: error.message});
+    }
+}
