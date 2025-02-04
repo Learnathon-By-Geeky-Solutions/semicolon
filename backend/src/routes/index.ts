@@ -14,9 +14,24 @@ const appRouter = Router();
 appRouter.use("/auth", authenticationRouter);
 
 appRouter.use("/admin", verifyToken, authorizeRole("admin"), adminRouter);
-appRouter.use("/authority", verifyToken, authorizeRole("admin", "authority"), authorityRouter);
-appRouter.use("/volunteer", verifyToken, authorizeRole("admin","authority", "volunteer"), volunteerRouter);
-appRouter.use("/user", verifyToken, authorizeRole("admin","authority", "volunteer", "user"), userRouter);
+appRouter.use(
+  "/authority",
+  verifyToken,
+  authorizeRole("admin", "authority"),
+  authorityRouter,
+);
+appRouter.use(
+  "/volunteer",
+  verifyToken,
+  authorizeRole("admin", "authority", "volunteer"),
+  volunteerRouter,
+);
+appRouter.use(
+  "/user",
+  verifyToken,
+  authorizeRole("admin", "authority", "volunteer", "user"),
+  userRouter,
+);
 appRouter.use("/shelters", shelterRouter);
 appRouter.use("/district", districtRouter);
 

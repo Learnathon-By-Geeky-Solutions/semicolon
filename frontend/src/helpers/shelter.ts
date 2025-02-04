@@ -10,7 +10,7 @@ export const getShelters = async (): Promise<Shelter[]> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching shelters:', error);
-    return [];
+    throw new Error('Failed to fetch shelters');
   }
 };
 

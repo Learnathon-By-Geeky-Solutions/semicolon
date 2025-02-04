@@ -27,12 +27,10 @@ export const saveShelters = async (req: Request, res: Response) => {
       { upsert: true, new: true },
     );
 
-    res
-      .status(201)
-      .json({
-        message: "Shelters saved successfully",
-        data: shelterList.shelters,
-      });
+    res.status(201).json({
+      message: "Shelters saved successfully",
+      data: shelterList.shelters,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

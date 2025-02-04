@@ -13,7 +13,11 @@ const CustomAreaChart = ({ data, dataKey, color, name }: {
     dataKey: string,
     color: string,
     name: string
-  }) => (
+  }) => 
+    
+    
+    (
+      
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart

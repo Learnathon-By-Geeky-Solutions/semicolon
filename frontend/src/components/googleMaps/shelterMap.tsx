@@ -414,7 +414,9 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
     return () => {
       // Cleanup markers
-      markersRef.current.forEach(marker => marker.map = null);
+      markersRef.current.forEach(marker => {
+        marker.map = null
+      });
       markersRef.current.clear();
     };
   }, [district]);

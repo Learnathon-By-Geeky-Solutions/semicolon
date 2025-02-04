@@ -104,7 +104,11 @@ const ShelterManagement = () => {
       fetchShelters();
     } catch (error) {
       console.error("Error updating shelter:", error);
-      toast.error("Failed to update shelter");
+     if (axios.isAxiosError(error)) {
+       toast.error(`Failed to update shelter: ${error.response?.data?.message || 'Network error'}`);
+     } else {
+       toast.error("An unexpected error occurred while updating shelter");
+     }
     }
   };
 
@@ -294,6 +298,7 @@ const ShelterManagement = () => {
                       onChange={handleInputChange}
                       className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-600 focus:outline-none"
                       required
+                      max="999999"
                     />
                   </div>
                   <div>

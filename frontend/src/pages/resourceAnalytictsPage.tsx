@@ -66,13 +66,16 @@ const ResourceAnalytictsPage = () => {
   const pieData: ResourceData[] = Object.entries(totals).map(([name, value]) => ({ name, value }));
 
   // Prepare data for area charts
-  const areaData: AreaChartData[] = selectedDistrictShelters.map(shelter => ({
+  const areaData: AreaChartData[] = selectedDistrictShelters.map(shelter => {
+  const resourceData = {} as Record<ResourceType, number>;
+  (Object.keys(resourceColors) as ResourceType[]).forEach(resource => {
+    resourceData[resource] = shelter[resource];
+  });
+  return {
     name: shelter.name,
-    ...(Object.keys(resourceColors) as ResourceType[]).reduce((acc, resource) => ({
-      ...acc,
-      [resource]: shelter[resource]
-    }), {})
-  }));
+    ...resourceData
+  };
+ });
 
   return (
     <PageLayout

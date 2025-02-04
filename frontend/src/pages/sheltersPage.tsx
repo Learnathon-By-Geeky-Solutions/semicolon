@@ -3,6 +3,11 @@ import ShelterMap from "../components/googleMaps/shelterMap";
 import PageLayout from "../components/layout/pageLayout";
 import { mainNavItems } from "../config/navigation";
 import { useAuthStore } from "../store/authStore";
+import { ErrorBoundary } from "react-error-boundary";
+
+const ErrorFallback: React.FC = () => (
+  <div>Error loading shelter map. Please try again.</div>
+);
 
 const SheltersPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -13,7 +18,9 @@ const SheltersPage: React.FC = () => {
       title="Emergency Shelters"
       navItems={mainNavItems}
     >
-      <ShelterMap permission={permission} />
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ShelterMap permission={permission} />
+        </ErrorBoundary>
     </PageLayout>
   );
 };

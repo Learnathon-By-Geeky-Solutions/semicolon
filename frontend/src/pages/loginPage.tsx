@@ -71,7 +71,7 @@ const LoginPage: React.FC = () => {
             type="submit"
             className="w-full py-2 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none transition duration-300"
           >
-           {isLoading ? 'Loggin in...' : 'Login'}
+           {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
         <button onClick={handleGoogleLogin} className="w-full py-2 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none transition duration-300 mt-4">

@@ -13,9 +13,16 @@ export const getDistricts = async (req: Request, res: Response) => {
 };
 
 export const getDistrictById = async (req: Request, res: Response) => {
-  const { _id } = req.body;
-  const district = await District.findById(_id);
-  res.json(district);
+  try {
+    const { _id } = req.body;
+    if (typeof _id !== "string") {
+      return res.status(400).json({ message: "Invalid district ID" });
+    }
+    const district = await District.findById({ $eq: _id });
+    res.json(district);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // Create a new district
@@ -30,7 +37,7 @@ export const createDistrict = async (req: Request, res: Response) => {
     }
 
     const district = new District({
-      district_name,
+      district_name: district_name.trim().replace(/[<>]/g, ""),
       total_food: total_food || 0,
       total_water: total_water || 0,
       total_medicine: total_medicine || 0,
@@ -75,9 +82,13 @@ export const updateDistrict = async (req: Request, res: Response) => {
       ...(total_medicine !== undefined && { total_medicine }),
     };
 
-    const district = await District.findByIdAndUpdate(_id, updateData, {
-      new: true,
-    });
+    const district = await District.findByIdAndUpdate(
+      { _id: { $eq: _id } },
+      updateData,
+      {
+        new: true,
+      },
+    );
 
     if (!district) {
       return res.status(404).json({ message: "District not found" });

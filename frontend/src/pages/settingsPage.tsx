@@ -25,13 +25,17 @@ const SettingsPage = () => {
   const handleVerificationSubmit = async (e: React.FormEvent) => {
     setIsSaving(true);
     e.preventDefault();
-    const isVerified = await verifyEmail({email, verificationCode, name});   
-    if (isVerified) {
-        setIsEmailVerified(true);
-        setVerificationCode('');
-        setIsSaving(false);
-    } else {
-        setIsSaving(false);
+    try {
+      const isVerified = await verifyEmail({email, verificationCode, name});   
+      if (isVerified) {
+          setIsEmailVerified(true);
+          setVerificationCode('');
+          setIsSaving(false);
+      } else {
+          setIsSaving(false);
+      }
+    } catch (error) {
+      console.error('Error verifying email:', error);
     }
   };
 

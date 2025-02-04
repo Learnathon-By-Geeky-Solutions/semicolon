@@ -9,6 +9,12 @@ export const sendVerificationEmail = async (
   email: string,
   verificationCode: string,
 ) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.exec(email)) {
+    throw new Error("Invalid email format");
+  }
+  const sanitizedCode = encodeURIComponent(verificationCode);
+
   const recipients = [
     {
       email: email,
@@ -21,7 +27,7 @@ export const sendVerificationEmail = async (
       from: sender,
       to: recipients,
       subject: "Verify Your Email",
-      html: html.replace("{verificationCode}", verificationCode),
+      html: html.replace("{verificationCode}", sanitizedCode),
       category: "Verification Email",
     });
 

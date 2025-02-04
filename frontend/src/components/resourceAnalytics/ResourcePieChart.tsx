@@ -10,6 +10,16 @@ interface ResourcePieChartProps {
 
 
 export const ResourcePieChart = ({ data, title, total }: ResourcePieChartProps) => {
+  if (total === 0) {
+    return (
+      <div className="bg-white rounded-xl p-6 shadow-lg">
+        <h3 className="text-xl font-semibold text-center mb-3 text-gray-800">{title}</h3>
+        <p className="text-sm text-center text-gray-600">No data available</p>
+      </div>
+    );
+  }
+  
+  
   const formattedData = data.map(item => ({
     ...item,
     percentage: ((item.value / total) * 100).toFixed(1)

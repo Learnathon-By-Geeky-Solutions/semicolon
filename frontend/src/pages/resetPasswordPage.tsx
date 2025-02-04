@@ -67,7 +67,6 @@ const ResetPasswordPage = () => {
                     <button type="submit" className="w-full py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600">
                        { isLoading ? "Loading..." : " Reset Password" }
                     </button>
-                {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                 </form>
                 <div className="mt-4 text-center text-gray-600">
                     <p>

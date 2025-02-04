@@ -173,6 +173,7 @@ const AllocateDistrictResources = () => {
                       name="total_food"
                       defaultValue={district.total_food}
                       min="0"
+                      max="999999"
                     />
                   </label>
                 </div>

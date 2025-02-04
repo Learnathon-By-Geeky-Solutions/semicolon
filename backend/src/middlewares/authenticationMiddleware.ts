@@ -36,16 +36,14 @@ export const verifyToken = (
     } catch (error) {
       console.log("Error in verifyToken ", error);
       return res
-        .status(400)
-        .json({ success: false, message: "Token is not valid error" });
+        .status(401)
+        .json({ success: false, message: "Invalid or expired token" });
     }
   } else {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: "No token is provided. Authorization denied.",
-      });
+    return res.status(400).json({
+      success: false,
+      message: "No token is provided. Authorization denied.",
+    });
   }
 };
 
@@ -70,6 +68,8 @@ export const verifyTokenForCheckAuth = (
     next();
   } catch (error) {
     console.log("Error in verifyToken ", error);
-    return res.status(500).json({ success: false, message: "Server error" });
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid or expired token" });
   }
 };

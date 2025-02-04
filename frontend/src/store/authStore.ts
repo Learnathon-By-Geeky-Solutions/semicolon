@@ -35,7 +35,7 @@ interface AuthState {
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
-  resetPassword: (password: string | undefined, token: string) => Promise<void>;
+  resetPassword: (token: string | undefined, password: string) => Promise<void>;
 }
 axios.defaults.withCredentials = true;
 
@@ -91,7 +91,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      console.log(API_URL);
       const response = await axios.post(`${API_URL}/login`, { email, password });
       set({
         isAuthenticated: true,
@@ -147,9 +146,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     },
 
-  googleAuth: () => {
+   googleAuth: () => {
+    try {
       window.location.href = `${API_URL}/google`;
-    },
+    } catch (error) {
+      console.error("Error initiating Google authentication:", error);
+      set({ error: "Failed to initiate Google authentication" });
+    }
+  },
 
   forgotPassword: async (email) => {
       set({ isLoading: true, error: null});

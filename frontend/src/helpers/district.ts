@@ -21,6 +21,7 @@ export const createDistrict = async (district: NewDistrict): Promise<void> => {
     await axios.post(url, district);
   } catch (error) {
     console.error('Error saving district:', error);
+    throw error;
   }
 };
 
@@ -30,6 +31,7 @@ export const updateDistrict = async (district: District): Promise<void> => {
       await axios.post(url, district);
     } catch (error) {
       console.error('Error updating district:', error);
+      throw error;
     }
 };
 
@@ -40,6 +42,7 @@ export const deleteDistrict = async (district: District): Promise<void> => {
       await axios.post(url, district);
     } catch (error) {
       console.error('Error deleting district:', error);
+      throw error;
     }
 };
 
