@@ -173,7 +173,7 @@ export const googleSignup = async (accessToken, refreshToken, profile, done) => 
 
 export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
     const { email, verificationCode } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: { $eq: email } });
     if(user && user.verificationToken === verificationCode){
         user.isVerified = true; 
         user.verificationTokenExpiresAt = undefined;
