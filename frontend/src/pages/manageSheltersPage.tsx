@@ -15,7 +15,6 @@ const API_URL = `${SERVER_URL}/api/v1/shelters`;
 
 const ShelterManagement = () => {
   const { user } = useAuthStore();
-  const [permissions, setPermissions] = useState("view");
   const [districts, setDistricts] = useState<District[]>([]);
   const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
   const [shelters, setShelters] = useState<Shelter[]>([]);
@@ -33,16 +32,6 @@ const ShelterManagement = () => {
     water: 0,
     medicine: 0,
   });
-
-  useEffect(() => {
-    if (user) {
-      if(user.role === "admin" || user.role === "authority") {
-        setPermissions("edit");
-      } else {
-        setPermissions("view");
-      }
-    }
-  }, [user]);
 
   useEffect(() => {
     fetchDistricts();
@@ -146,7 +135,7 @@ const ShelterManagement = () => {
       navItems={mainNavItems}
       headerRightContent={
         <select
-          value={selectedDistrict?._id || ""}
+          value={selectedDistrict?._id ?? ""}
           onChange={handleDistrictChange}
           className="border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
         >
@@ -256,10 +245,11 @@ const ShelterManagement = () => {
               <form onSubmit={updateShelter} className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="shelterName" className="block text-sm font-medium text-gray-700 mb-1">
                       Shelter Name
                     </label>
                     <input
+                      id="shelterName"
                       type="text"
                       name="name"
                       value={formData.name}
@@ -269,7 +259,7 @@ const ShelterManagement = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="Location" className="block text-sm font-medium text-gray-700 mb-1">
                       Location
                     </label>
                     <div className="flex gap-2">
@@ -294,7 +284,7 @@ const ShelterManagement = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="Food" className="block text-sm font-medium text-gray-700 mb-1">
                       Food
                     </label>
                     <input
@@ -307,7 +297,7 @@ const ShelterManagement = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="Water"  className="block text-sm font-medium text-gray-700 mb-1">
                       Water
                     </label>
                     <input
@@ -320,7 +310,7 @@ const ShelterManagement = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="Medicine"  className="block text-sm font-medium text-gray-700 mb-1">
                       Medicine
                     </label>
                     <input

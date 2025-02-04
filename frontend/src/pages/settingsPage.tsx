@@ -7,8 +7,8 @@ import { verifyEmail } from '../helpers/settings';
 
 const SettingsPage = () => {
   const { user } = useAuthStore();
-  const [name, setName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
+  const [name, setName] = useState(user?.name ?? '');
+  const [email, setEmail] = useState(user?.email ?? '');
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(user?.isVerified || false);
   const [verificationCode, setVerificationCode] = useState('');
@@ -50,7 +50,7 @@ const SettingsPage = () => {
               
               {/* Name Input */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="Name" className="block text-sm font-medium text-gray-700 mb-2">
                   Name
                 </label>
                 <div className="relative">
@@ -69,7 +69,7 @@ const SettingsPage = () => {
 
               {/* Email Input */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="Email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email
                 </label>
                 <div className="relative">
@@ -135,7 +135,7 @@ const SettingsPage = () => {
               </p>
               
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="VerificationCode"  className="block text-sm font-medium text-gray-700 mb-2">
                   Verification Code
                 </label>
                 <input
