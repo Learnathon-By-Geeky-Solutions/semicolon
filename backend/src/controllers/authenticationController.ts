@@ -163,7 +163,7 @@ export const googleCallbackHandler = (req: Request, res: Response) => {
   console.log("googleCallbackHandler done");
   // Redirect to frontend dashboard or desired page
   console.log(req);
-  res.redirect("https://5cf2-103-203-92-101.ngrok-free.app"); // e.g., https://your-frontend.com/
+  res.redirect(process.env.FRONTEND_ORIGIN);
 };
 
 export const googleSignup = async (

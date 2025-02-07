@@ -20,6 +20,7 @@ import AllocateDistrictResources from "./pages/allocateDistrictResources";
 import Settings from "./pages/settingsPage";
 import ResetPasswordPage from "./pages/resetPasswordPage";
 
+
 function App() {
   const location = useLocation();
 
@@ -52,7 +53,7 @@ function App() {
     window.scrollTo(0, 0);
   }, [location]);
 
-  return (
+  return ( 
     <div> 
       <Routes>
         
@@ -60,7 +61,7 @@ function App() {
         
         <Route path="/signup" element={<RedirectAuthenticatedUser> <SignUpPage/> </RedirectAuthenticatedUser>} />
         <Route path="/login" element={ <RedirectAuthenticatedUser> <LoginPage/></RedirectAuthenticatedUser> } />
-
+      
         <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
         <Route path="/reset-password/:token" element={<RedirectAuthenticatedUser> <ResetPasswordPage/> </RedirectAuthenticatedUser>} />
 
