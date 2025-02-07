@@ -26,13 +26,12 @@ appRouter.use(
   authorizeRole("admin", "authority", "volunteer"),
   volunteerRouter,
 );
-appRouter.use(
-  "/user",
-  verifyToken,
-  authorizeRole("admin", "authority", "volunteer", "user"),
-  userRouter,
-);
+
+appRouter.use("/user", userRouter);
+//=======
+//appRouter.use("/user", verifyToken, authorizeRole("admin","authority", "volunteer", "user"), userRouter);
 appRouter.use("/shelters", shelterRouter);
 appRouter.use("/district", districtRouter);
+//>>>>>>> origin/dev
 
 export default appRouter;
