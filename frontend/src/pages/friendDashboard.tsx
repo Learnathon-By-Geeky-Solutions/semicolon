@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from '../store/authStore';
-
+import { Toaster, toast } from 'react-hot-toast';
+import PageLayout from "../components/layout/pageLayout";
+import { mainNavItems } from "../config/navigation"; 
 const FriendDashboard: React.FC = () => {
    // Get the friendid from the URL params
   const navigate = useNavigate();
@@ -30,50 +32,23 @@ const FriendDashboard: React.FC = () => {
   // Handle add friend action
   const handleAddFriend = async () => {
     addFriend(user?.email || " ",currentUser?.email||" ");
+    toast.success(`You have added ${friend?.name} as a friend!`);
     //addFriend(friendName || "");  // Assuming addFriend is an action to add friend
     //alert(`You have added ${friendName} as a friend!`);
   };
+ // Handle navigation to dashboard
 
-  return (
-    <div className="min-h-screen bg-gray-100 flex font-sans">
-      {/* Sidebar */}
-      <div className="bg-green-900 text-white w-64 p-6 flex flex-col h-screen shadow-md">
-        <h2 className="text-3xl font-bold mb-6">CrisisCompass</h2>
-        <ul className="flex flex-col flex-grow">
-          <li>
-            <button
-              className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300 rounded"
-              onClick={() => navigate("/")}
-            >
-              Home
-            </button>
-          </li>
-          <li>
-            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300 rounded">
-              Shelter Zones
-            </button>
-          </li>
-          <li>
-            <button className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300 rounded">
-              Contact Authorities
-            </button>
-          </li>
-          <li>
-            <button
-              className="w-full text-left py-2 px-4 hover:bg-green-700 transition duration-300 rounded"
-              onClick={() => navigate(`/dashboard`)}  // Navigate to own dashboard
-            >
-              Dashboard
-            </button>
-          </li>
-        </ul>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 p-8 bg-white shadow-inner">
+return (
+  <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
+    {/* Main Content */}
+    <div className="flex-1 p-8 bg-white shadow-inner">
+    <PageLayout
+        title="Friend Dashboard"
+        navItems={mainNavItems}
+      >
         {/* Top Bar */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-4xl font-semibold text-green-900"> Welcome, {user?.name || 'Guest'}!</h1>
+          <h1 className="text-4xl font-semibold text-green-900">Welcome, {friendInfo.name}!</h1>
         </div>
 
         {/* Friend Info - Top Left */}
@@ -100,42 +75,6 @@ const FriendDashboard: React.FC = () => {
           </button>
         </div>
 
-        {/* Features Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center mt-12">
-          {/* View Alerts */}
-          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-            <h3 className="text-xl font-semibold text-green-800 mb-4">Real-Time Alerts</h3>
-            <p className="text-gray-600 mb-4">
-              Stay updated with the latest emergency alerts in your area.
-            </p>
-            <button className="w-full px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300">
-              View Alerts
-            </button>
-          </div>
-
-          {/* Monitor Loved Ones */}
-          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-            <h3 className="text-xl font-semibold text-green-800 mb-4">Monitor Loved Ones</h3>
-            <p className="text-gray-600 mb-4">
-              Check the real-time safety status of your family members.
-            </p>
-            <button className="w-full px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300">
-              View Family Status
-            </button>
-          </div>
-
-          {/* AI Assistant */}
-          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-            <h3 className="text-xl font-semibold text-green-800 mb-4">AI Assistant</h3>
-            <p className="text-gray-600 mb-4">
-              Get instant guidance and recommendations during crises.
-            </p>
-            <button className="w-full px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300">
-              Ask AI Assistant
-            </button>
-          </div>
-        </div>
-
         {/* Footer Section */}
         <div className="mt-12 text-center text-gray-600">
           <p className="text-xl font-semibold">Stay Safe, Download Our App</p>
@@ -148,9 +87,13 @@ const FriendDashboard: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </PageLayout>
     </div>
-  );
+
+    {/* Toaster for notifications */}
+    <Toaster />
+  </div>
+);
 };
 
 export default FriendDashboard;
