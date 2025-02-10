@@ -83,7 +83,7 @@ export const updateDistrict = async (req: Request, res: Response) => {
     };
 
     const district = await District.findByIdAndUpdate(
-      { _id: { $eq: _id } },
+      _id,
       updateData,
       {
         new: true,
