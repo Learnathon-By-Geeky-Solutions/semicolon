@@ -68,6 +68,8 @@ const UserDashboard: React.FC = () => {
               onFocus={() => { handleSearch(); setShowSearchResults(true) }}
               onChange={(e) => setSearchQuery(e.target.value)}
               value={searchQuery}
+              aria-label="Search users"
+              role="searchbox"
             />
             <FiSearch className="w-5 h-5 text-gray-400" />
           </div>
@@ -80,20 +82,28 @@ const UserDashboard: React.FC = () => {
               {isLoading ? (
                 <div className="p-4"><LoadingSpinner /></div>
               ) : (
-                <ul className="max-h-48 overflow-y-auto">
+                <ul role="listbox" className="max-h-48 overflow-y-auto">
                   {filteredUsers.length > 0 ? (
                     filteredUsers.map((friend) => (
                       <li
                         key={friend.email}
+                        role="option"
+                        tabIndex={0}
                         className="px-3 py-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center gap-2"
                         onClick={() => { setCurrentUser(friend); handleFriendClick(friend.name, friend.email); }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            setCurrentUser(friend);
+                            handleFriendClick(friend.name, friend.email);
+                          }
+                        }}
                       >
-                        <FiUser className="w-4 h-4 text-gray-400" />
+                        <FiUser className="w-4 h-4 text-gray-400" aria-hidden="true" />
                         <span className="text-sm text-gray-700">{friend.name}</span>
                       </li>
                     ))
                   ) : (
-                    <li className="px-3 py-2 text-sm text-gray-500">No results found</li>
+                    <li role="alert" className="px-3 py-2 text-sm text-gray-500">No results found</li>
                   )}
                 </ul>
               )}
@@ -127,8 +137,10 @@ const UserDashboard: React.FC = () => {
               <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
               <p className="text-gray-600 mb-4">{feature.description}</p>
               <button
+                type="button"
                 onClick={feature.action}
                 className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                aria-label={`View ${feature.title}`}
               >
                 View Details
               </button>
