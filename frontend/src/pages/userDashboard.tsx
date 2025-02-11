@@ -82,30 +82,30 @@ const UserDashboard: React.FC = () => {
               {isLoading ? (
                 <div className="p-4"><LoadingSpinner /></div>
               ) : (
-                <select 
-                  className="max-h-48 overflow-y-auto w-full border-none"
-                  onChange={(e) => {
-                    const friend = filteredUsers.find(f => f.email === e.target.value);
-                    if (friend) {
-                      setCurrentUser(friend);
-                      handleFriendClick(friend.name, friend.email);
-                    }
-                  }}
-                >
+                <ul role="listbox" className="max-h-48 overflow-y-auto">
                   {filteredUsers.length > 0 ? (
                     filteredUsers.map((friend) => (
-                      <option
+                      <li
                         key={friend.email}
-                        value={friend.email}
-                        className="px-3 py-2"
+                        role="option"
+                        tabIndex={0}
+                        className="px-3 py-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center gap-2"
+                        onClick={() => { setCurrentUser(friend); handleFriendClick(friend.name, friend.email); }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            setCurrentUser(friend);
+                            handleFriendClick(friend.name, friend.email);
+                          }
+                        }}
                       >
-                        {friend.name}
-                      </option>
+                        <FiUser className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                        <span className="text-sm text-gray-700">{friend.name}</span>
+                      </li>
                     ))
                   ) : (
-                    <option disabled>No results found</option>
+                    <li role="alert" className="px-3 py-2 text-sm text-gray-500">No results found</li>
                   )}
-                </select>
+                </ul>
               )}
             </div>
           )}
