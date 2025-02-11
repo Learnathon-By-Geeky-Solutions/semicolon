@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import HomePage  from "./pages/homePage";
 import LoginPage from "./pages/loginPage";
 import SignUpPage from "./pages/signupPage";
+import ForgotPasswordPage from "./pages/forgotPasswordPage";
 import AdminDashboard from "./pages/adminDashboard";
 import AuthorityDashboard from "./pages/authorityDashboard";
 import VolunteerDashboard from "./pages/volunteerDashboard";
@@ -16,6 +17,9 @@ import ResourceAnalytictsPage from "./pages/resourceAnalytictsPage";
 import { ProtectedRoute } from "./components/protectedRoute";
 import { RedirectAuthenticatedUser } from "./components/redirectAuthenticatedUser";
 import AllocateDistrictResources from "./pages/allocateDistrictResources";
+import Settings from "./pages/settingsPage";
+import ResetPasswordPage from "./pages/resetPasswordPage";
+import FriendDashboard from "./pages/friendDashboard";
 
 
 function App() {
@@ -59,16 +63,20 @@ function App() {
         <Route path="/signup" element={<RedirectAuthenticatedUser> <SignUpPage/> </RedirectAuthenticatedUser>} />
         <Route path="/login" element={ <RedirectAuthenticatedUser> <LoginPage/></RedirectAuthenticatedUser> } />
 
+        <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
+        <Route path="/reset-password/:token" element={<RedirectAuthenticatedUser> <ResetPasswordPage/> </RedirectAuthenticatedUser>} />
+
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard/></ProtectedRoute>} />
         <Route path="/authority" element={ <ProtectedRoute>  <AuthorityDashboard/> </ProtectedRoute>} />
         <Route path="/volunteer" element={<ProtectedRoute> <VolunteerDashboard/> </ProtectedRoute>} />
-        <Route path="/user" element={<ProtectedRoute><UserDashboard/></ProtectedRoute>} />
-
+        <Route path="/user/:email" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} /> {/* Dynamic user route */}
+        <Route path="/friend/:email" element={<ProtectedRoute><FriendDashboard /></ProtectedRoute>} /> 
         <Route path="/shelters" element={<ProtectedRoute> <SheltersPage/> </ProtectedRoute>} />
         <Route path="/manage-shelters" element={<ProtectedRoute> <ManageSheltersPage/> </ProtectedRoute>} />
         <Route path="/districts" element={<ProtectedRoute>  <DistrictPage /> </ProtectedRoute>} />
         <Route path="/resource-analyticts" element={ <ProtectedRoute>  <ResourceAnalytictsPage/>  </ProtectedRoute>} />
         <Route path="/allocate-district-resources" element={ <ProtectedRoute>  <AllocateDistrictResources/> </ProtectedRoute>} />
+        <Route path="/settings" element={ <ProtectedRoute>  <Settings/> </ProtectedRoute>} />
         
         <Route path="/logout" element={"LOGOUT"} />
       </Routes>

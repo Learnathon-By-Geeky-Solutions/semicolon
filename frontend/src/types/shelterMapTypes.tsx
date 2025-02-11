@@ -42,6 +42,6 @@ export interface ResourcePopupProps {
   onClose: () => void;
   onDelete: () => void;
   onResourceChange: (field: string, value: number | string) => void;
-  permission: string;
+  permission: 'view' | 'edit';
   onShowRoute: (shelter: Shelter, mode: TravelMode) => void;
 } 

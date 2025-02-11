@@ -2,6 +2,8 @@ import axios from 'axios';
 import { SERVER_URL } from '../constants/paths';
 import { District, NewDistrict } from '../types/districtTypes';
 
+
+
 const API_URL = `${SERVER_URL}/api/v1/district`;
 
 export const getDistricts = async (): Promise<District[]> => {
@@ -21,6 +23,7 @@ export const createDistrict = async (district: NewDistrict): Promise<void> => {
     await axios.post(url, district);
   } catch (error) {
     console.error('Error saving district:', error);
+    throw error;
   }
 };
 
@@ -30,6 +33,7 @@ export const updateDistrict = async (district: District): Promise<void> => {
       await axios.post(url, district);
     } catch (error) {
       console.error('Error updating district:', error);
+      throw error;
     }
 };
 
@@ -40,11 +44,18 @@ export const deleteDistrict = async (district: District): Promise<void> => {
       await axios.post(url, district);
     } catch (error) {
       console.error('Error deleting district:', error);
+      throw error;
     }
 };
 
 export const getDistrictById = async (id: string): Promise<District> => {
-  const url = `${API_URL}/getDistrictById`
-  const response = await axios.post(url, { _id: id });
-  return response.data;
+  try {
+    const url = `${API_URL}/getDistrictById`;
+    const response = await axios.post(url, { _id: id });
+    return response.data;
+
+  } catch (error) {
+    console.error('Error fetching district by id:', error);
+    throw error;
+  }
 };

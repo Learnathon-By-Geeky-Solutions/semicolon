@@ -23,13 +23,16 @@ const HomePage: React.FC = () => {
   };
 
   const handleDashboardClick = () => {
+    if (!user) return;
+  
     const roleBasedRedirect: Record<string, string> = {
       admin: "/admin",
       authority: "/authority",
       volunteer: "/volunteer",
-      user: "/user",
+      user: `/user/${encodeURIComponent(user.email)}`, // Dynamic path for users based on email
     };
-    if (user && user.role in roleBasedRedirect) {
+  
+    if (user.role in roleBasedRedirect) {
       navigate(roleBasedRedirect[user.role]);
     }
   };
@@ -53,8 +56,6 @@ const HomePage: React.FC = () => {
                   management tasks with ease.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                 
-                    <>
                       <button
                         className="px-6 py-3 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-800 transition duration-300"
                         onClick={handleDashboardClick}
@@ -67,8 +68,6 @@ const HomePage: React.FC = () => {
                       >
                         Log Out
                       </button>
-                    </>
-              
                 </div>
               </div>
       
@@ -90,8 +89,6 @@ const HomePage: React.FC = () => {
                management tasks with ease.
              </p>
              <div className="flex flex-col sm:flex-row gap-4">
-              
-                 <>
                    <button
                      className="px-6 py-3 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-800 transition duration-300"
                      onClick={handleLoginClick}
@@ -104,8 +101,6 @@ const HomePage: React.FC = () => {
                    >
                      Sign Up
                    </button>
-                 </>
-           
              </div>
            </div>
    

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { MdDelete, MdSave, MdClose, MdEdit, MdDirectionsCar, MdDirectionsWalk } from 'react-icons/md';
 import { ResourcePopupProps } from "../../types/shelterMapTypes";
 
@@ -21,9 +21,6 @@ export const ResourcePopup: React.FC<ResourcePopupProps> = ({
       medicine: shelter.medicine
     };
 
-    useEffect(() => {
-      console.log(shelter);
-    }, [shelter]);
     return (
       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50
         animate-[fadeIn_0.2s_ease-out]">

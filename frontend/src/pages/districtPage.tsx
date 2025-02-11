@@ -93,6 +93,10 @@ const DistrictPage: React.FC = () => {
 
   const handleNumberInput = (field: 'total_food' | 'total_water' | 'total_medicine', value: string) => {
     const numberValue = value === '' ? 0 : Number(value);
+    if (numberValue < 0) {
+      alert(`${field.replace('_', ' ')} cannot be negative`);
+      return;
+    }
     setFormData(prev => ({
       ...prev,
       [field]: numberValue

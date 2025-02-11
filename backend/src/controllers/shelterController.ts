@@ -1,5 +1,4 @@
-
-import { Request,Response,NextFunction } from "express";
+import { Request, Response } from "express";
 import { ShelterList } from "../models/shelterModel.js";
 
 export const getShelters = async (req: Request, res: Response) => {
@@ -15,7 +14,6 @@ export const getShelters = async (req: Request, res: Response) => {
   }
 };
 
-
 export const saveShelters = async (req: Request, res: Response) => {
   try {
     const { shelters } = req.body;
@@ -24,12 +22,15 @@ export const saveShelters = async (req: Request, res: Response) => {
     }
 
     const shelterList = await ShelterList.findOneAndUpdate(
-      {}, 
+      {},
       { shelters },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
-    res.status(201).json({ message: "Shelters saved successfully", data: shelterList.shelters });
+    res.status(201).json({
+      message: "Shelters saved successfully",
+      data: shelterList.shelters,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
