@@ -3,152 +3,140 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from '../store/authStore';
 import PageLayout from "../components/layout/pageLayout";
 import { mainNavItems } from "../config/navigation";
+import { FiSearch, FiUser, FiBell, FiUsers, FiMessageSquare } from 'react-icons/fi';
+import LoadingSpinner from "../components/loadingSpinner";
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const { user, users, getUser, setCurrentUser } = useAuthStore(); // Assuming 'users' contains the list of all users (friends)
+  const [isLoading, setIsLoading] = useState(false);
+  const { user, users, getUser, setCurrentUser } = useAuthStore();
 
-  // Filter users based on the search query
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Simulated user info (replace with actual user data)
-  const userInfo = {
-    profilePic: "https://via.placeholder.com/150",
-    name: user?.name,
-    email: user?.email,
-    contact: "+1 234 567 890",
-  };
-
-  const adduser = async () => {
+  const handleSearch = async () => {
+    setIsLoading(true);
     try {
       await getUser();
       console.log(users);
     } catch (error) {
-      console.error('Login failed', error);
+      console.error('Search failed', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Handle click on a friend's name (navigate to their dashboard)
-  const handleFriendClick = (friendName: string, friendid: string) => {
-    navigate(`/friend/${friendid}`); // Assuming this route takes you to the friend's dashboard
+  const handleFriendClick = (friendName: string, friendId: string) => {
+    navigate(`/friend/${friendId}`);
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-100 font-sans">
-      <PageLayout
-        title="Dashboard"
-        navItems={mainNavItems}
-      >
-        {/* Main Content */}
-        <div className="flex-1 p-8 bg-white shadow-inner">
-          {/* Top Bar */}
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-4xl font-semibold text-green-900"> Welcome, {user?.name || 'Guest'}!</h1>
+  const features = [
+    {
+      title: "Real-Time Alerts",
+      description: "Stay updated with the latest emergency alerts in your area.",
+      icon: <FiBell className="w-8 h-8" />,
+      action: () => navigate('/alerts')
+    },
+    {
+      title: "Monitor Loved Ones",
+      description: "Check the real-time safety status of your family members.",
+      icon: <FiUsers className="w-8 h-8" />,
+      action: () => navigate('/family-status')
+    },
+    {
+      title: "AI Assistant",
+      description: "Get instant guidance and recommendations during crises.",
+      icon: <FiMessageSquare className="w-8 h-8" />,
+      action: () => navigate('/ai-assistant')
+    }
+  ];
 
-            {/* Search Bar */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search for users"
-                className="w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-                onFocus={() => { adduser(); setShowSearchResults(true) }}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                value={searchQuery}
-              />
-              {showSearchResults && (
-                <div
-                  className="absolute top-12 left-0 w-64 bg-white shadow-md rounded-lg p-4 z-10 max-h-48 overflow-y-auto"
-                  onMouseLeave={() => setShowSearchResults(false)}
-                >
-                  <ul>
-                    {filteredUsers.length > 0 ? (
-                      filteredUsers.map((friend, index) => (
-                        <li
-                          key={index}
-                          className="py-2 text-gray-700 hover:bg-green-100 cursor-pointer"
-                          onClick={() => { setCurrentUser(friend); handleFriendClick(friend.name, friend.email); }} // Assuming friend has an `id` property
-                        >
-                          {friend.name} {/* Display the friend's name */}
-                        </li>
-                      ))
-                    ) : (
-                      <li className="py-2 text-gray-500">No results found</li>
-                    )}
-                  </ul>
-                </div>
+  return (
+    <PageLayout
+      title="Dashboard"
+      navItems={mainNavItems}
+      headerRightContent={
+        <div className="relative">
+          <div className="flex items-center bg-white rounded-lg px-3 py-2 shadow-sm">
+            <input
+              type="text"
+              placeholder="Search for users"
+              className="w-64 outline-none text-sm"
+              onFocus={() => { handleSearch(); setShowSearchResults(true) }}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQuery}
+            />
+            <FiSearch className="w-5 h-5 text-gray-400" />
+          </div>
+          
+          {showSearchResults && (
+            <div 
+              className="absolute top-12 left-0 w-full bg-white shadow-lg rounded-lg p-2 z-50"
+              onMouseLeave={() => setShowSearchResults(false)}
+            >
+              {isLoading ? (
+                <div className="p-4"><LoadingSpinner /></div>
+              ) : (
+                <ul className="max-h-48 overflow-y-auto">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((friend) => (
+                      <li
+                        key={friend.email}
+                        className="px-3 py-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center gap-2"
+                        onClick={() => { setCurrentUser(friend); handleFriendClick(friend.name, friend.email); }}
+                      >
+                        <FiUser className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-700">{friend.name}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="px-3 py-2 text-sm text-gray-500">No results found</li>
+                  )}
+                </ul>
               )}
             </div>
-          </div>
-
-          {/* User Info - Top Left */}
-          <div className="flex items-center mb-15 space-x-10">
-            <img
-              src={userInfo.profilePic}
-              alt="Profile"
-              className="w-24 h-24 rounded-full"
-            />
-            <div className="text-left">
-              <h2 className="text-2xl font-semibold text-green-900">{userInfo.name}</h2>
-              <p className="text-gray-600">{userInfo.email}</p>
-              <p className="text-gray-600">{userInfo.contact}</p>
+          )}
+        </div>
+      }
+    >
+      <div className="max-w-7xl mx-auto p-4 md:p-8">
+        {/* User Profile Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex items-center gap-6">
+            <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center">
+              <FiUser className="w-12 h-12 text-green-600" />
             </div>
-          </div>
-
-          {/* Features Section - Moved to Bottom Center */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center mt-12">
-            {/* View Alerts */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-              <h3 className="text-xl font-semibold text-green-800 mb-4">Real-Time Alerts</h3>
-              <p className="text-gray-600 mb-4">
-                Stay updated with the latest emergency alerts in your area.
-              </p>
-              <button className="w-full px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300">
-                View Alerts
-              </button>
-            </div>
-
-            {/* Monitor Loved Ones */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-              <h3 className="text-xl font-semibold text-green-800 mb-4">Monitor Loved Ones</h3>
-              <p className="text-gray-600 mb-4">
-                Check the real-time safety status of your family members.
-              </p>
-              <button className="w-full px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300">
-                View Family Status
-              </button>
-            </div>
-
-            {/* AI Assistant */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-              <h3 className="text-xl font-semibold text-green-800 mb-4">AI Assistant</h3>
-              <p className="text-gray-600 mb-4">
-                Get instant guidance and recommendations during crises.
-              </p>
-              <button className="w-full px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 focus:outline-none transition duration-300">
-                Ask AI Assistant
-              </button>
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">{user?.name}</h2>
+              <p className="text-gray-600">{user?.email}</p>
             </div>
           </div>
         </div>
-      </PageLayout>
 
-      {/* Footer Section */}
-      <div className="mt-12 text-center text-gray-600 bg-gray-200 py-4">
-        <p className="text-xl font-semibold">Stay Safe, Download Our App</p>
-        <div className="flex justify-center mt-4 gap-4">
-          <button className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 transition duration-300 shadow">
-            App Store
-          </button>
-          <button className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-600 transition duration-300 shadow">
-            Google Play
-          </button>
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+            >
+              <div className="mb-4 text-green-600">{feature.icon}</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
+              <p className="text-gray-600 mb-4">{feature.description}</p>
+              <button
+                onClick={feature.action}
+                className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                View Details
+              </button>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 
