@@ -69,6 +69,7 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
     }
   };
   
+
 export const checkFriendship = async (req: Request, res: Response) => {
   try {
     const { userEmail, friendEmail } = req.body;
@@ -85,3 +86,4 @@ export const checkFriendship = async (req: Request, res: Response) => {
   }
 };
   
+
