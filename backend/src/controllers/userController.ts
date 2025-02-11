@@ -69,3 +69,21 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
     }
   };
   
+
+export const checkFriendship = async (req: Request, res: Response) => {
+  try {
+    const { userEmail, friendEmail } = req.body;
+    
+    const user = await User.findOne({ email: userEmail });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isFriend = user.family.includes(friendEmail);
+    res.json({ isFriend });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+  
+

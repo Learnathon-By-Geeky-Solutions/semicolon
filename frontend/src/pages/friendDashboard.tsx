@@ -7,27 +7,29 @@ import { mainNavItems } from "../config/navigation";
 const FriendDashboard: React.FC = () => {
    // Get the friendid from the URL params
   const navigate = useNavigate();
-  const { currentUser,user, users, addFriend } = useAuthStore();  // Assuming you have an addFriend action
-  const friendemail  = currentUser?.email;
-  // Find the friend from the users list by comparing ids
-  const friend = users.find((u) => u.email === friendemail);  // Assuming each user has an `id` field
-  
-  if (friend) {
-    console.log(friendemail);
-    // You have found the friend, now you can navigate to their profile or display their info
-    console.log(friend);  // You can replace this with actual navigation or display logic
-  } else {
-    // Handle case where the friend wasn't found
-    console.log('Friend not found');
-  }
-  
-  // Simulated friend info (replace with actual friend data)
-  const friendInfo = {
-    profilePic: "https://via.placeholder.com/150",
-    name: friend?.name,
-    email: friendemail,
-    contact: "+1 234 567 890",
-  };
+  const { currentUser, user, users, addFriend } = useAuthStore();
+  const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
+  const friendEmail = currentUser?.email;
+  const friend = users.find((u) => u.email === friendEmail);
+
+  useEffect(() => {
+    const checkFriendshipStatus = async () => {
+      try {
+        const response = await axios.post(`${SERVER_URL}/api/v1/user/checkFriendship`, {
+          userEmail: user?.email,
+          friendEmail: friendEmail
+        });
+        setIsAlreadyFriend(response.data.isFriend);
+      } catch (error) {
+        console.error('Error checking friendship status:', error);
+      }
+    };
+
+    if (user?.email && friendEmail) {
+      checkFriendshipStatus();
+    }
+  }, [user?.email, friendEmail]);
+
 
   // Handle add friend action
   const handleAddFriend = async () => {

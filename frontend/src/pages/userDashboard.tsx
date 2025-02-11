@@ -38,48 +38,58 @@ const UserDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100 font-sans">
-      <PageLayout
-        title="Dashboard"
-        navItems={mainNavItems}
-      >
-        {/* Main Content */}
-        <div className="flex-1 p-8 bg-white shadow-inner">
-          {/* Top Bar */}
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-4xl font-semibold text-green-900"> Welcome, {user?.name || 'Guest'}!</h1>
+    <PageLayout
+      title="Dashboard"
+      navItems={mainNavItems}
+      headerRightContent={
+        <div className="relative">
+          <div className="flex items-center bg-white rounded-lg px-3 py-2 shadow-sm">
+            <input
+              type="text"
+              placeholder="Search for users"
+              className="w-64 outline-none text-sm"
+              onFocus={() => { handleSearch(); setShowSearchResults(true) }}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQuery}
+              aria-label="Search users"
+              role="searchbox"
+            />
+            <FiSearch className="w-5 h-5 text-gray-400" />
+          </div>
+          
+          {showSearchResults && (
+            <div 
+              className="absolute top-12 left-0 w-full bg-white shadow-lg rounded-lg p-2 z-50"
+              onMouseLeave={() => setShowSearchResults(false)}
+            >
+              {isLoading ? (
+                <div className="p-4"><LoadingSpinner /></div>
+              ) : (
+                <ul role="listbox" className="max-h-48 overflow-y-auto">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((friend) => (
+                      <li
+                        key={friend.email}
+                        role="option"
+                        tabIndex={0}
+                        className="px-3 py-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center gap-2"
+                        onClick={() => { setCurrentUser(friend); handleFriendClick(friend.name, friend.email); }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            setCurrentUser(friend);
+                            handleFriendClick(friend.name, friend.email);
+                          }
+                        }}
+                      >
+                        <FiUser className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                        <span className="text-sm text-gray-700">{friend.name}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <li role="alert" className="px-3 py-2 text-sm text-gray-500">No results found</li>
+                  )}
+                </ul>
 
-            {/* Search Bar */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search for users"
-                className="w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-                onFocus={() => { adduser(); setShowSearchResults(true) }}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                value={searchQuery}
-              />
-              {showSearchResults && (
-                <div
-                  className="absolute top-12 left-0 w-64 bg-white shadow-md rounded-lg p-4 z-10 max-h-48 overflow-y-auto"
-                  onMouseLeave={() => setShowSearchResults(false)}
-                >
-                  <ul>
-                    {filteredUsers.length > 0 ? (
-                      filteredUsers.map((friend, index) => (
-                        <li
-                          key={index}
-                          className="py-2 text-gray-700 hover:bg-green-100 cursor-pointer"
-                          onClick={() => { setCurrentUser(friend); handleFriendClick(friend.name, friend.email); }} // Assuming friend has an `id` property
-                        >
-                          {friend.name} {/* Display the friend's name */}
-                        </li>
-                      ))
-                    ) : (
-                      <li className="py-2 text-gray-500">No results found</li>
-                    )}
-                  </ul>
-                </div>
               )}
             </div>
           </div>
