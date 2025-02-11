@@ -82,30 +82,30 @@ const UserDashboard: React.FC = () => {
               {isLoading ? (
                 <div className="p-4"><LoadingSpinner /></div>
               ) : (
-                <ul role="listbox" className="max-h-48 overflow-y-auto">
+                <select 
+                  className="max-h-48 overflow-y-auto w-full border-none"
+                  onChange={(e) => {
+                    const friend = filteredUsers.find(f => f.email === e.target.value);
+                    if (friend) {
+                      setCurrentUser(friend);
+                      handleFriendClick(friend.name, friend.email);
+                    }
+                  }}
+                >
                   {filteredUsers.length > 0 ? (
                     filteredUsers.map((friend) => (
-                      <li
+                      <option
                         key={friend.email}
-                        role="option"
-                        tabIndex={0}
-                        className="px-3 py-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center gap-2"
-                        onClick={() => { setCurrentUser(friend); handleFriendClick(friend.name, friend.email); }}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            setCurrentUser(friend);
-                            handleFriendClick(friend.name, friend.email);
-                          }
-                        }}
+                        value={friend.email}
+                        className="px-3 py-2"
                       >
-                        <FiUser className="w-4 h-4 text-gray-400" aria-hidden="true" />
-                        <span className="text-sm text-gray-700">{friend.name}</span>
-                      </li>
+                        {friend.name}
+                      </option>
                     ))
                   ) : (
-                    <li role="alert" className="px-3 py-2 text-sm text-gray-500">No results found</li>
+                    <option disabled>No results found</option>
                   )}
-                </ul>
+                </select>
               )}
             </div>
           )}
