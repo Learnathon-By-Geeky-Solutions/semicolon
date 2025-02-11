@@ -25,6 +25,7 @@ const FriendDashboard: React.FC = () => {
         setIsAlreadyFriend(response.data.isFriend);
       } catch (error) {
         console.error('Error checking friendship status:', error);
+        toast.error('Unable to verify friendship status. Please try again later.');
       }
     };
 
