@@ -20,7 +20,7 @@ import AllocateDistrictResources from "./pages/allocateDistrictResources";
 import Settings from "./pages/settingsPage";
 import ResetPasswordPage from "./pages/resetPasswordPage";
 import FriendDashboard from "./pages/friendDashboard";
-
+import ShelterAnalyticsPage from "./pages/shelterAnalyticsPage";
 
 function App() {
   const location = useLocation();
@@ -75,6 +75,7 @@ function App() {
         <Route path="/manage-shelters" element={<ProtectedRoute> <ManageSheltersPage/> </ProtectedRoute>} />
         <Route path="/districts" element={<ProtectedRoute>  <DistrictPage /> </ProtectedRoute>} />
         <Route path="/resource-analyticts" element={ <ProtectedRoute>  <ResourceAnalytictsPage/>  </ProtectedRoute>} />
+        <Route path="/shelter-analytics" element={ <ProtectedRoute>  <ShelterAnalyticsPage/>  </ProtectedRoute>} />
         <Route path="/allocate-district-resources" element={ <ProtectedRoute>  <AllocateDistrictResources/> </ProtectedRoute>} />
         <Route path="/settings" element={ <ProtectedRoute>  <Settings/> </ProtectedRoute>} />
         
