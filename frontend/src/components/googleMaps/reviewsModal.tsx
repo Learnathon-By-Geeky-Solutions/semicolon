@@ -4,25 +4,9 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { MdStar, MdStarBorder, MdClose } from 'react-icons/md';
 import { SERVER_URL } from '../../constants/paths';
+import { ReviewsModalProps, Review } from '../../types/shelterReviewTypes';
 
 
-interface ReviewsModalProps {
-    shelterId: string;
-    shelterName: string;
-    onClose: () => void;
-  }
-  
-  interface Review {
-    _id: string;
-    user_id: string;
-    rating: number;
-    review: string;
-    createdAt: string;
-    updatedAt: string;
-    user?: {
-      name: string;
-    };
-  }
   
   export const ReviewsModal: React.FC<ReviewsModalProps> = ({ shelterId, shelterName, onClose }) => {
     const [reviews, setReviews] = useState<Review[]>([]);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getDistricts } from '../helpers/district';
 import { District } from '../types/districtTypes';
-import { Shelter } from '../types/shelterMapTypes';
+import { Shelter, ShelterWithStats } from '../types/shelterMapTypes';
 import LoadingSpinner from '../components/loadingSpinner';
 import { ResourceType, ResourceLabels } from '../types/resourceAnalyticsTypes';
 import PageLayout from '../components/layout/pageLayout';
@@ -43,7 +43,7 @@ const ShelterAnalyticsPage = () => {
           axios.get(`${SERVER_URL}/api/v1/shelters/allWithRatings`)
         ]);
 
-        const sheltersWithRatings = sheltersResponse.data.map((item: any) => ({
+        const sheltersWithRatings = sheltersResponse.data.map((item: ShelterWithStats) => ({
           ...item.shelter,
           averageRating: item.averageRating,
           reviewCount: item.reviewCount

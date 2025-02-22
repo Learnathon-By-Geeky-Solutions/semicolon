@@ -47,3 +47,9 @@ export interface ResourcePopupProps {
   onReview: () => void;
   onShowReviews: () => void;
 } 
+
+export interface ShelterWithStats {
+  averageRating: number;
+  reviewCount: number;
+  shelter: Shelter;
+}

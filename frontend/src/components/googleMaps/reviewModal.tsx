@@ -4,18 +4,8 @@ import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import { useAuthStore } from '../../store/authStore';
 import { SERVER_URL } from '../../constants/paths';
+import { ReviewModalProps, ExistingReview } from '../../types/shelterReviewTypes';
 
-interface ReviewModalProps {
-  shelterId: string;
-  onClose: () => void;
-}
-
-// Add interface for the review data
-interface ExistingReview {
-  _id: string;
-  rating: number;
-  review: string;
-}
 
 export const ReviewModal: React.FC<ReviewModalProps> = ({ shelterId, onClose }) => {
   const [rating, setRating] = useState(0);
