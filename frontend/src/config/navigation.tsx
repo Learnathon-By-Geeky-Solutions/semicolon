@@ -40,6 +40,12 @@ export const mainNavItems: NavItem[] = [
     roles: ['user', 'admin', 'authority'] // only admin and authority can view analytics
   },
   {
+    label: 'Shelter Analytics',
+    path: '/shelter-analytics',
+    icon: MdAnalytics,
+    roles: ['user', 'admin', 'authority'] // users can view shelter analytics
+  },
+  {
     label: 'Allocate Resources',
     path: '/allocate-district-resources',
     icon: MdManageHistory,
