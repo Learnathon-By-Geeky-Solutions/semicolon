@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { getDistricts } from '../helpers/district';
-import { getShelters } from '../helpers/shelter';
 import { District } from '../types/districtTypes';
 import { Shelter } from '../types/shelterMapTypes';
 import LoadingSpinner from '../components/loadingSpinner';
@@ -23,7 +22,7 @@ type SortOrder = 'asc' | 'desc';
 const ShelterAnalyticsPage = () => {
   const [districts, setDistricts] = useState<District[]>([]);
   const [shelters, setShelters] = useState<ShelterWithRating[]>([]);
-  const [selectedDistrictId, setSelectedDistrictId] = useState<string>("");
+  const [selectedDistrictId, setSelectedDistrictId] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -39,27 +38,16 @@ const ShelterAnalyticsPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [districtsData, sheltersData] = await Promise.all([
+        const [districtsData, sheltersResponse] = await Promise.all([
           getDistricts(),
-          getShelters()
+          axios.get(`${SERVER_URL}/api/v1/shelters/allWithRatings`)
         ]);
 
-        // Fetch ratings for all shelters
-        const ratingsPromises = sheltersData.map(shelter =>
-          axios.get(`${SERVER_URL}/api/v1/shelterReviews/averageRating/${shelter._id}`)
-            .then(response => ({
-              ...shelter,
-              averageRating: response.data.averageRating || 0,
-              reviewCount: response.data.reviewCount || 0
-            }))
-            .catch(() => ({
-              ...shelter,
-              averageRating: 0,
-              reviewCount: 0
-            }))
-        );
-
-        const sheltersWithRatings = await Promise.all(ratingsPromises);
+        const sheltersWithRatings = sheltersResponse.data.map((item: any) => ({
+          ...item.shelter,
+          averageRating: item.averageRating,
+          reviewCount: item.reviewCount
+        }));
         
         setDistricts(districtsData);
         setShelters(sheltersWithRatings);
@@ -104,7 +92,7 @@ const ShelterAnalyticsPage = () => {
   };
 
   const filteredAndSortedShelters = shelters
-    .filter(shelter => shelter.district_id === selectedDistrictId)
+    .filter(shelter => selectedDistrictId === "all" || shelter.district_id === selectedDistrictId)
     .sort((a, b) => {
       let comparison = 0;
       
@@ -132,6 +120,7 @@ const ShelterAnalyticsPage = () => {
           onChange={(e) => setSelectedDistrictId(e.target.value)}
           className="border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
         >
+          <option value="all">All Districts</option>
           {districts.map(district => (
             <option key={district._id} value={district._id}>
               {district.district_name}
