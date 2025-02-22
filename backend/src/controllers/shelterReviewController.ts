@@ -121,3 +121,25 @@ export const deleteReview = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get review by user ID and shelter ID
+export const getReviewByUserAndShelter = async (req: Request, res: Response) => {
+  try {
+    const { userId, shelterId } = req.params;
+
+    const review = await ShelterReview.findOne({
+      user_id: userId,
+      shelter_id: shelterId
+    });
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    res.json(review);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+

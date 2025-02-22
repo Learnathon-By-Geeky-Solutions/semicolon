@@ -10,6 +10,7 @@ import { MdMyLocation, MdSave, MdDirectionsCar, MdDirectionsWalk, MdClose, MdRou
 import { useAuthStore } from "../../store/authStore";
 import { getDistrictById } from "../../helpers/district";
 import { District } from "../../types/districtTypes";
+import { ReviewModal } from "./reviewModal";
 
 const loader = new Loader({
   apiKey: GOOGLE_MAPS_API_KEY,
@@ -49,6 +50,8 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [locationConsent, setLocationConsent] = useState<boolean | null>(null);
+
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const LocationConsentDialog = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -730,6 +733,15 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
               onResourceChange={handleResourceChange}
               permission={permission}
               onShowRoute={handleShowRouteFromPopup}
+              onReview={() => setIsReviewModalOpen(true)}
+            />
+          )}
+
+          {/* Review Modal */}
+          {isReviewModalOpen && selectedShelter && (
+            <ReviewModal
+              shelterId={selectedShelter._id}
+              onClose={() => setIsReviewModalOpen(false)}
             />
           )}
         </div>

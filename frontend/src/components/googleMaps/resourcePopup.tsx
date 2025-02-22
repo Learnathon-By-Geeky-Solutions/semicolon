@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdDelete, MdSave, MdClose, MdEdit, MdDirectionsCar, MdDirectionsWalk } from 'react-icons/md';
+import { MdDelete, MdSave, MdClose, MdEdit, MdDirectionsCar, MdDirectionsWalk, MdStar } from 'react-icons/md';
 import { ResourcePopupProps } from "../../types/shelterMapTypes";
 
 
@@ -12,7 +12,8 @@ export const ResourcePopup: React.FC<ResourcePopupProps> = ({
   onDelete,
   onResourceChange,
   permission,
-  onShowRoute
+  onShowRoute,
+  onReview
 }) => {
     
     const resources = {
@@ -92,7 +93,7 @@ export const ResourcePopup: React.FC<ResourcePopupProps> = ({
           </div>
 
           {/* Combined Action Buttons and Route Options */}
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             {permission === 'edit' && (
               <>
                 <button
@@ -131,6 +132,15 @@ export const ResourcePopup: React.FC<ResourcePopupProps> = ({
             >
               <MdDirectionsWalk className="w-5 h-5" />
               Walk
+            </button>
+
+            <button
+              className="flex-1 py-2 px-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 
+              transition-colors flex items-center justify-center gap-2"
+              onClick={onReview}
+            >
+              <MdStar className="w-5 h-5" />
+              Rate
             </button>
           </div>
         </div>
