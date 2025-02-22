@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { MdStar, MdStarBorder, MdClose } from 'react-icons/md';
+import { MdStar, MdStarBorder, MdClose, MdDelete } from 'react-icons/md';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 import { useAuthStore } from '../../store/authStore';
 import { SERVER_URL } from '../../constants/paths';
 
@@ -30,17 +31,14 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ shelterId, onClose }) 
       if (!user?._id) return;
       
       try {
-        const response = await fetch(
+        const { data } = await axios.get(
           `${SERVER_URL}/api/v1/shelterReviews/user/${user._id}/shelter/${shelterId}`
         );
         
-        if (response.ok) {
-          const data = await response.json();
-          if (data) {
-            setExistingReview(data);
-            setRating(data.rating);
-            setReview(data.review);
-          }
+        if (data) {
+          setExistingReview(data);
+          setRating(data.rating);
+          setReview(data.review);
         }
       } catch (error) {
         console.error('Error fetching existing review:', error);
@@ -51,6 +49,30 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ shelterId, onClose }) 
 
     fetchExistingReview();
   }, [shelterId, user?._id]);
+
+  const handleDelete = async () => {
+    if (!existingReview?._id || !window.confirm('Are you sure you want to delete this review?')) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await axios.post(`${SERVER_URL}/api/v1/shelterReviews/delete`, {
+        _id: existingReview._id,
+      });
+      toast.success('Review deleted successfully');
+      onClose();
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || 'Failed to delete review');
+      } else {
+        toast.error('Failed to delete review');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +95,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ shelterId, onClose }) 
 
       const payload = existingReview 
         ? {
-            _id: existingReview._id, // Include review ID for updates
+            _id: existingReview._id,
             shelter_id: shelterId,
             user_id: user._id,
             rating,
@@ -86,24 +108,21 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ shelterId, onClose }) 
             review: review.trim()
           };
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to submit review');
+      if (existingReview) {
+        await axios.post(endpoint, payload);
+      } else {
+        await axios.post(endpoint, payload);
       }
       
       toast.success(existingReview ? 'Review updated successfully' : 'Review submitted successfully');
       onClose();
     } catch (error) {
       console.error('Error submitting review:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to submit review');
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || 'Failed to submit review');
+      } else {
+        toast.error('Failed to submit review');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -162,6 +181,16 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ shelterId, onClose }) 
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-3 mt-4">
+          {existingReview && (
+            <button
+              onClick={handleDelete}
+              disabled={isSubmitting}
+              className="px-4 py-2 text-red-600 hover:text-red-800 font-medium flex items-center gap-1"
+            >
+              <MdDelete size={20} />
+              Delete
+            </button>
+          )}
           <button
             onClick={onClose}
             className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
