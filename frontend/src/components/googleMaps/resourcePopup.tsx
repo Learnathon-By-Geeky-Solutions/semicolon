@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdDelete, MdSave, MdClose, MdEdit, MdDirectionsCar, MdDirectionsWalk, MdStar } from 'react-icons/md';
+import { MdDelete, MdSave, MdClose, MdEdit, MdDirectionsCar, MdDirectionsWalk, MdStar, MdComment } from 'react-icons/md';
 import { ResourcePopupProps } from "../../types/shelterMapTypes";
 
 
@@ -13,7 +13,8 @@ export const ResourcePopup: React.FC<ResourcePopupProps> = ({
   onResourceChange,
   permission,
   onShowRoute,
-  onReview
+  onReview,
+  onShowReviews
 }) => {
     
     const resources = {
@@ -141,6 +142,15 @@ export const ResourcePopup: React.FC<ResourcePopupProps> = ({
             >
               <MdStar className="w-5 h-5" />
               Rate
+            </button>
+
+            <button
+              className="flex-1 py-2 px-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+              transition-colors flex items-center justify-center gap-2"
+              onClick={onShowReviews}
+            >
+              <MdComment className="w-5 h-5" />
+              Reviews
             </button>
           </div>
         </div>

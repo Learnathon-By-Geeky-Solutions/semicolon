@@ -6,11 +6,13 @@ import { ResourcePopup } from "./resourcePopup";
 import { Location, Shelter, NewShelter, MapWithSheltersProps, TravelMode } from "../../types/shelterMapTypes";
 import { getShelters, saveShelters } from "../../helpers/shelter";
 import LoadingSpinner from "../loadingSpinner";
-import { MdMyLocation, MdSave, MdDirectionsCar, MdDirectionsWalk, MdClose, MdRoute } from "react-icons/md";
+import { MdMyLocation, MdSave, MdDirectionsCar, MdDirectionsWalk, MdClose, MdRoute} from "react-icons/md";
 import { useAuthStore } from "../../store/authStore";
 import { getDistrictById } from "../../helpers/district";
 import { District } from "../../types/districtTypes";
 import { ReviewModal } from "./reviewModal";
+
+import { ReviewsModal } from "./reviewsModal";
 
 const loader = new Loader({
   apiKey: GOOGLE_MAPS_API_KEY,
@@ -52,6 +54,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   const [locationConsent, setLocationConsent] = useState<boolean | null>(null);
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
 
   const LocationConsentDialog = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -734,6 +737,7 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
               permission={permission}
               onShowRoute={handleShowRouteFromPopup}
               onReview={() => setIsReviewModalOpen(true)}
+              onShowReviews={() => setIsReviewsModalOpen(true)}
             />
           )}
 
@@ -744,10 +748,21 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
               onClose={() => setIsReviewModalOpen(false)}
             />
           )}
+
+          {/* Reviews List Modal */}
+          {isReviewsModalOpen && selectedShelter && (
+            <ReviewsModal
+              shelterId={selectedShelter._id}
+              shelterName={selectedShelter.name}
+              onClose={() => setIsReviewsModalOpen(false)}
+            />
+          )}
         </div>
       </div>
     </>
   );
 };
+
+
 
 export default MapWithShelters;
