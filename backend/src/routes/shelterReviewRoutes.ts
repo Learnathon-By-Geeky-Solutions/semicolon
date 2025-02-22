@@ -7,6 +7,7 @@ import {
   deleteReview,
   getReviewsByShelterId,
   getReviewByUserAndShelter,
+  getAverageRating
 } from "../controllers/shelterReviewController.js";
 
 const limiter = RateLimit({
@@ -24,4 +25,5 @@ shelterReviewRouter.post("/update", updateReview);
 shelterReviewRouter.post("/delete", deleteReview);
 shelterReviewRouter.post("/getReviewsByShelterId", getReviewsByShelterId);
 shelterReviewRouter.get("/user/:userId/shelter/:shelterId", getReviewByUserAndShelter);
+shelterReviewRouter.get("/averageRating/:shelterId", getAverageRating);
 export default shelterReviewRouter;

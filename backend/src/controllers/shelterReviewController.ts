@@ -143,3 +143,32 @@ export const getReviewByUserAndShelter = async (req: Request, res: Response) => 
 };
 
 
+// Get average rating for a shelter
+export const getAverageRating = async (req: Request, res: Response) => {
+  try {
+    const { shelterId } = req.params;
+
+    const reviews = await ShelterReview.find({ shelter_id: shelterId });
+
+    if (!reviews || reviews.length === 0) {
+      return res.json({
+        averageRating: 0,
+        reviewCount: 0
+      });
+    }
+
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = totalRating / reviews.length;
+
+    res.json({
+      averageRating,
+      reviewCount: reviews.length
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
