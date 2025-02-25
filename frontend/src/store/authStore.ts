@@ -47,6 +47,7 @@ interface AuthState {
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (token: string | undefined, password: string) => Promise<void>;
   addFriend: (userEmail: string, friendEmail: string) => Promise<void>;
+  deleteFriend: (userEmail: string, friendEmail: string) => Promise<void>;
   getUser: () => Promise<void>;
 }
 
@@ -247,6 +248,37 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (axios.isAxiosError(error)) {
         set({
           error: error.response?.data?.message || "Error fetching users",
+          isLoading: false,
+        });
+      } else {
+        set({ error: "Unexpected error occurred", isLoading: false });
+      }
+      throw error;
+    }
+  },
+  deleteFriend: async (userEmail: string, friendEmail: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const data = {
+        userEmail: userEmail,
+        friendEmail: friendEmail,
+      };
+
+      const response = await axios.post(
+        "http://localhost:5000/api/v1/user/deleteFriend",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Friend deleted successfully", response.data);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        set({
+          error: error.response?.data?.message || "Error deleting friend",
           isLoading: false,
         });
       } else {

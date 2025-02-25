@@ -10,7 +10,7 @@ import { SERVER_URL } from '../constants/paths';
 
 const FriendDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, user, users, addFriend } = useAuthStore();
+  const { currentUser, user, users, addFriend, deleteFriend } = useAuthStore();
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
   const friendEmail = currentUser?.email;
   const friend = users.find((u) => u.email === friendEmail);
@@ -33,17 +33,28 @@ const FriendDashboard: React.FC = () => {
     }
   }, [user?.email, friendEmail]);
 
-  const handleAddFriend = async () => {
-    if (isAlreadyFriend) return;
-    
-    try {
-      await addFriend(user?.email || " ", currentUser?.email || " ");
-      toast.success(`You have added ${friend?.name} as a friend!`);
-      setIsAlreadyFriend(true);
-    } catch (error) {
-      toast.error("Failed to add friend. Please try again.");
+  const handleAddFriend= async () => {
+    if (isAlreadyFriend) {
+     // If already a friend, delete the friend
+      try {
+        await deleteFriend(user?.email || " ", currentUser?.email || " ");
+        toast.success(`You have removed ${friend?.name} from your friends list.`);
+        setIsAlreadyFriend(false);
+      } catch (error) {
+       toast.error("Failed to remove friend. Please try again.");
+      }
+    } else {
+      // If not a friend, add them
+      try {
+        await addFriend(user?.email || " ", currentUser?.email || " ");
+        toast.success(`You have added ${friend?.name} as a friend!`);
+        setIsAlreadyFriend(true);
+      } catch (error) {
+        toast.error("Failed to add friend. Please try again.");
+      }
     }
   };
+  
 
   return (
     <PageLayout
@@ -53,7 +64,7 @@ const FriendDashboard: React.FC = () => {
         <button
           type="button"
           onClick={handleAddFriend}
-          disabled={isAlreadyFriend}
+          //disabled={isAlreadyFriend}
           aria-label={isAlreadyFriend ? "Already friends" : "Add friend"}
           className={`inline-flex items-center px-4 py-2 rounded-lg
           transition-all duration-200 shadow-sm hover:shadow
