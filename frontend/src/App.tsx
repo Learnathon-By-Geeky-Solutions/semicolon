@@ -21,6 +21,7 @@ import Settings from "./pages/settingsPage";
 import ResetPasswordPage from "./pages/resetPasswordPage";
 import FriendDashboard from "./pages/friendDashboard";
 import ShelterAnalyticsPage from "./pages/shelterAnalyticsPage";
+import FamilyStatus from "./pages/familyStatus";
 
 function App() {
   const location = useLocation();
@@ -78,7 +79,7 @@ function App() {
         <Route path="/shelter-analytics" element={ <ProtectedRoute>  <ShelterAnalyticsPage/>  </ProtectedRoute>} />
         <Route path="/allocate-district-resources" element={ <ProtectedRoute>  <AllocateDistrictResources/> </ProtectedRoute>} />
         <Route path="/settings" element={ <ProtectedRoute>  <Settings/> </ProtectedRoute>} />
-        
+        <Route path="/family-status" element={ <ProtectedRoute>  <FamilyStatus/> </ProtectedRoute>} />
         <Route path="/logout" element={"LOGOUT"} />
       </Routes>
       <Toaster />
