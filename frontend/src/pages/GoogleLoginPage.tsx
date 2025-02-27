@@ -1,15 +1,18 @@
 import { useGoogleLogin, CodeResponse } from '@react-oauth/google';
+import { useAuthStore } from '../store/authStore';
 
 type AuthResult = {
     code: string; // The authorization code returned by Google
 };
 
-const GoogleLoginPage = () => {
+const GoogleLoginPage = ({ page }: { page: string }) => {
     const responseGoogleLogin = async(authResult: AuthResult): Promise<void> => {
         try{
 
             if(authResult['code']){
-                console.log( 'Google auth result code',  authResult.code);
+                const { googleLogin } = useAuthStore.getState();
+                const response = await googleLogin(authResult['code']);
+                console.log(response);
             }
             else{
                 console.log('No code returned');
@@ -33,7 +36,7 @@ const GoogleLoginPage = () => {
 
   return (
         <button onClick={handleGoogleLogin} className="w-full py-2 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none transition duration-300 mt-4">
-            Login with Google
+            {page === 'login' ? 'Login with Google' : 'Sign Up with Google'}
         </button>
   )
 }

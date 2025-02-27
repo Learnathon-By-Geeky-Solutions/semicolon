@@ -4,9 +4,7 @@ import {
   signup,
   logout,
   checkAuth,
-  googleRedirect,
-  googleCallback,
-  googleCallbackHandler,
+  googleLogin,
   verifyEmail,
   forgotPassword,
   resetPassword,
@@ -43,11 +41,6 @@ authenticationRouter.post("/verify-email", verifyEmail);
 authenticationRouter.post("/forgot-password", forgotPassword);
 authenticationRouter.post("/reset-password/:token", resetPassword);
 
-authenticationRouter.get("/google", googleRedirect);
-authenticationRouter.get(
-  "/google/callback",
-  googleCallback,
-  googleCallbackHandler,
-);
+authenticationRouter.get("/google", googleLogin);
 
 export default authenticationRouter;

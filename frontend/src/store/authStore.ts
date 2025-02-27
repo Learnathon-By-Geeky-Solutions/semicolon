@@ -49,6 +49,7 @@ interface AuthState {
   addFriend: (userEmail: string, friendEmail: string) => Promise<void>;
   deleteFriend: (userEmail: string, friendEmail: string) => Promise<void>;
   getUser: () => Promise<void>;
+  googleLogin: (code: string) => Promise<void>;
 }
 
 axios.defaults.withCredentials = true;
@@ -167,6 +168,30 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error) {
       console.error("Error initiating Google authentication:", error);
       set({ error: "Failed to initiate Google authentication" });
+    }
+  },
+
+  googleLogin: async (code) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.get(`${API_URL}/google?code=${code}`);
+
+      set({
+        isAuthenticated: true,
+        user: response.data.user,
+        error: null,
+        isLoading: false,
+      });
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        set({
+          error: error.response?.data?.message || "Error logging in",
+          isLoading: false,
+        });
+      } else {
+        set({ error: "Unexpected error occurred", isLoading: false });
+      }
+      throw error;
     }
   },
 

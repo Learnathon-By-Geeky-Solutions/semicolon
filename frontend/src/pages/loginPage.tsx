@@ -75,7 +75,7 @@ const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        <GoogleAuthWrapper />
+        <GoogleAuthWrapper page="login" />
         
         <div className="mt-4 text-center text-gray-600">
           <p>
