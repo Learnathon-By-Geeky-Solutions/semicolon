@@ -8,14 +8,15 @@ const limiter = rateLimit({
 });
 
 const validateShelter = [
-  body("shelters").isArray(),
-  body("shelters.*.name").isString(),
-  body("shelters.*.lat").isNumeric(),
-  body("shelters.*.lng").isNumeric(),
-  body("shelters.*.district_id").isString(),
-  body("shelters.*.food").isNumeric(),
-  body("shelters.*.water").isNumeric(),
-  body("shelters.*.medicine").isNumeric(),
+  body("shelterName").notEmpty().withMessage("Shelter name is required"),
+  body("shelterAddress").notEmpty().withMessage("Shelter address is required"),
+  body("shelterCity").notEmpty().withMessage("Shelter city is required"),
+  body("shelterState").notEmpty().withMessage("Shelter state is required"),
+  body("shelterZip").notEmpty().withMessage("Shelter zip is required"),
+  body("shelterPhone").notEmpty().withMessage("Shelter phone is required"),
+  body("shelterEmail").notEmpty().withMessage("Shelter email is required"),
+  body("shelterWebsite").notEmpty().withMessage("Shelter website is required"),
+  body("shelterDescription").notEmpty().withMessage("Shelter description is required"),
 ];
 
 const shelterRouter = express.Router();

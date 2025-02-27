@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {getDistricts} from "../helpers/district";
 import { District } from "../types/districtTypes";
 import PasswordStrengthMeter from "../components/passwordStrengthMeter";
+import GoogleAuthWrapper from "../providers/GoogleAuthWrapper";
 
 const SignUpPage: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -197,6 +198,8 @@ const SignUpPage: React.FC = () => {
             {isLoading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
+
+        <GoogleAuthWrapper page="signup"/>
 
         {/* Login Link */}
         <div className="mt-4 text-center text-gray-600">

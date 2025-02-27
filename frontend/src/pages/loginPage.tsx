@@ -1,13 +1,13 @@
 import React, { useState, FormEvent } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { Link, useNavigate } from "react-router-dom";
-
+import GoogleAuthWrapper from '../providers/GoogleAuthWrapper';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { login , googleAuth, user} = useAuthStore();
+  const { login , user} = useAuthStore();
   const navigate = useNavigate();
   
   const handleSubmit = async (e: FormEvent) => {
@@ -23,15 +23,15 @@ const LoginPage: React.FC = () => {
     setIsLoading(false);
   };
 
-  const handleGoogleLogin = async () => {
+  /*const handleGoogleLogin = async () => {
     try {
-      googleAuth();
+      //googleAuth();
       console.log(user);
-      navigate("/");
+      navigate("/login-google");
     } catch (error) {
       console.error('Google login failed', error);
     }
-  };
+  };*/
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -74,9 +74,9 @@ const LoginPage: React.FC = () => {
            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        <button onClick={handleGoogleLogin} className="w-full py-2 bg-green-800 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none transition duration-300 mt-4">
-            Login with Google
-        </button>
+
+        <GoogleAuthWrapper page="login" />
+        
         <div className="mt-4 text-center text-gray-600">
           <p>
             Don't have an account?{' '}

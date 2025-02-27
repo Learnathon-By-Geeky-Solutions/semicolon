@@ -13,6 +13,9 @@ import {
   sendResetSuccessEmail,
 } from "../mailtrap/emails.js";
 import * as crypto from "crypto";
+import { oauth2client } from '../utils/googleConfig.js';
+import axios from 'axios';
+import jwt from 'jsonwebtoken';
 
 export const signup = async (
   req: Request,
@@ -151,60 +154,51 @@ export const checkAuth = async (
   }
 };
 
-export const googleRedirect = passport.authenticate("google", {
-  scope: ["profile", "email"],
-});
+export const googleLogin = async (req, res) => {
+  try{
+    const { code } = req.query;
+    const googleRes = await oauth2client.getToken(code);
+    oauth2client.setCredentials(googleRes.tokens);
 
-export const googleCallback = passport.authenticate("google", {
-  failureRedirect: "/login",
-});
+    const userRes = await axios.get(
+      'https://www.googleapis.com/oauth2/v3/userinfo?alt=json&access_token=' + googleRes.tokens.access_token,
+    );
 
-export const googleCallbackHandler = (req: Request, res: Response) => {
-  console.log("googleCallbackHandler done");
-  // Redirect to frontend dashboard or desired page
-  console.log(req);
-  res.redirect("https://5cf2-103-203-92-101.ngrok-free.app"); // e.g., https://your-frontend.com/
-};
-
-export const googleSignup = async (
-  accessToken,
-  refreshToken,
-  profile,
-  done,
-) => {
-  // At this point, user is authenticated
-
-  if (profile.emails[0].value) {
-    const user = await User.findOne({ email: profile.emails[0].value });
+    const {email, name, sub} = userRes.data;
+    const user = await User.findOne({ email: email });
     if (!user) {
-      const hashedPassword = await hash(profile.id, 10);
-
-      const verificationCode = Math.floor(
-        100000 + Math.random() * 900000,
-      ).toString();
+      const hashedPassword = await hash(sub, 10);
       const newUser = await User.create({
-        email: profile.emails[0].value,
-        name: profile.displayName,
+        email: email,
+        name: name,
         password: hashedPassword,
         role: Role.User,
         documents: null,
-        verificationToken: verificationCode,
-        verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
       });
+
+      await user.save();
 
       console.log(newUser);
       console.log("newUser created");
-      done(null, newUser);
-    } else {
-      console.log(user);
-      console.log("user found");
-      done(null, user);
     }
-  } else {
-    console.log("profile found");
-    done(null, profile);
+
+    generateTokenAndSetCookie(res, user._id, user.email, user.role);
+
+    res.status(200).json({
+      success: true,
+      message: "Logged in successfully",
+      user: {
+        ...user.toObject(),
+        password: undefined,
+      },
+    });
+
   }
-};
+  catch(error){
+    console.log("Error in googleLogin ", error);
+    res.status(400).json({ success: false, message: error.message });
+  }
+}
 
 export const verifyEmail = async (
   req: Request,
