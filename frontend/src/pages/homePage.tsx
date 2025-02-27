@@ -23,13 +23,16 @@ const HomePage: React.FC = () => {
   };
 
   const handleDashboardClick = () => {
+    if (!user) return;
+  
     const roleBasedRedirect: Record<string, string> = {
       admin: "/admin",
       authority: "/authority",
       volunteer: "/volunteer",
-      user: "/user",
+      user: `/user/${encodeURIComponent(user.email)}`, // Dynamic path for users based on email
     };
-    if (user && user.role in roleBasedRedirect) {
+  
+    if (user.role in roleBasedRedirect) {
       navigate(roleBasedRedirect[user.role]);
     }
   };

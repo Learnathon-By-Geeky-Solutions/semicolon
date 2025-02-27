@@ -1,7 +1,7 @@
 import express from "express";
-import { getShelters, saveShelters } from "../controllers/shelterController.js";
+import { body } from "express-validator";
+import { getShelters, getSheltersWithRatingsAndReviews, saveShelters } from "../controllers/shelterController.js";
 import rateLimit from "express-rate-limit";
-
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
@@ -10,6 +10,7 @@ const limiter = rateLimit({
 const shelterRouter = express.Router();
 
 shelterRouter.get("/all", limiter, getShelters);
-shelterRouter.post("/all", limiter, saveShelters);
+shelterRouter.post("/all", limiter, validateShelter, saveShelters);
+shelterRouter.get("/allWithRatings", limiter, getSheltersWithRatingsAndReviews);
 
 export default shelterRouter;
