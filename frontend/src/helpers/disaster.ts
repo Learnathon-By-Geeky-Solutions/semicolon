@@ -6,7 +6,8 @@ const API_URL = `${SERVER_URL}/api/v1/disasters/all`;
 
 export const getDisasters = async ( type?: string): Promise<Disaster[]> => {
   try {
-    const response = await axios.get(API_URL + (type ? `?type=${encodeURIComponent(type)}` : ''));
+    const response = await axios.get(API_URL + (type && type !== 'all' ? `?type=${encodeURIComponent(type)}` : ''));
+    console.log(response?.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching disasters:', error);

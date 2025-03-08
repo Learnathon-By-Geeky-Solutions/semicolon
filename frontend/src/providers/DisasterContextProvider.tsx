@@ -1,26 +1,21 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Disaster, DisasterContextType } from '../types/disasterTypes';
+import React, { createContext, useContext, useState, useEffect, ReactNode  } from 'react';
 import { getDisasters } from '../helpers/disaster';
+import { Disaster } from '../types/disasterTypes';
 
-// Default context values
-const defaultContextValue: DisasterContextType = {
-  disasters: [],
-  filterType: 'all',
-};
-
-// Create the context
-export const DisasterContext = createContext<DisasterContextType & {
+// Create context with default values
+const DisasterContext = createContext<{
+  disasters: Disaster[];
+  filterType: string;
   availableTypes: string[];
   loading: boolean;
-  setFilterType: (type: string) => void;
-}>(
-  {
-    ...defaultContextValue,
-    availableTypes: [],
-    loading: false,
-    setFilterType: () => {},
-  }
-);
+  setFilterType: React.Dispatch<React.SetStateAction<string>>;
+}>({
+  disasters: [],
+  filterType: 'all',
+  availableTypes: [],
+  loading: true,
+  setFilterType: () => {},
+});
 
 // Custom hook for using this context
 export const useDisasterContext = () => useContext(DisasterContext);
@@ -29,36 +24,58 @@ interface DisasterProviderProps {
   children: ReactNode;
 }
 
-export const DisasterProvider: React.FC<DisasterProviderProps> = ({ children }) => {
-  const [disasters, setDisasters] = useState<Disaster[]>([]);
-  const [filterType, setFilterType] = useState<string>('all');
-  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+export const DisasterProvider = ({ children }: DisasterProviderProps) => {
+  const [disasters, setDisasters] = useState([] as Disaster[]);
+  const [filterType, setFilterType] = useState('all');
+  const [availableTypes, setAvailableTypes] = useState([] as string[]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null as string | null);
+
+  
 
   // Fetch disasters when the component mounts or when the filter changes
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchDisasters = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
         const disastersData = await getDisasters(filterType);
-        setDisasters(disastersData);
-
-        // When viewing all disasters, compute available disaster types
-        if (filterType === 'all') {
-          const types = Array.from(new Set(disastersData.map((d: Disaster) => d.type)));
-          setAvailableTypes(types as string[]);
+        setDisasters(disastersData || []);
+        console.log(disastersData, disasters);
+        
+        // Only update state if component is still mounted
+        if (isMounted) {
+          // When viewing all disasters, compute available disaster types
+          if (filterType === 'all') {
+            const types = Array.from(new Set(disastersData?.map(d => d.type) || []));
+            setAvailableTypes(types);
+          }
         }
       } catch (error) {
         console.error('Error fetching disasters:', error);
+        if (isMounted) {
+          setError('Failed to load disaster data. Please try again.');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchDisasters();
+    
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
   }, [filterType]);
 
-  const value = {
+  // Create the context value object
+  const contextValue = {
     disasters,
     filterType,
     availableTypes,
@@ -67,8 +84,14 @@ export const DisasterProvider: React.FC<DisasterProviderProps> = ({ children }) 
   };
 
   return (
-    <DisasterContext.Provider value={value}>
-      {children}
+    <DisasterContext.Provider value={contextValue}>
+      {error ? (
+        <div className="error-message">{error}</div>
+      ) : (
+        children
+      )}
     </DisasterContext.Provider>
   );
 };
+
+export default DisasterContext;
