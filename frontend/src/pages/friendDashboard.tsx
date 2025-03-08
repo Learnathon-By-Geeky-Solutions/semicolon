@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuthStore } from '../store/authStore';
 import { Toaster, toast } from 'react-hot-toast';
 import PageLayout from "../components/layout/pageLayout";
@@ -16,14 +15,12 @@ import {
   Battery, 
   Signal, 
   Heart, 
-  UserCheck,
   Home
 } from 'lucide-react';
 import axios from 'axios';
 import { SERVER_URL } from '../constants/paths';
 
 const FriendDashboard: React.FC = () => {
-  const navigate = useNavigate();
   const { currentUser, user, users, addFriend, deleteFriend } = useAuthStore();
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
   const friendEmail = currentUser?.email;
@@ -55,6 +52,7 @@ const FriendDashboard: React.FC = () => {
         setIsAlreadyFriend(false);
       } catch (error) {
         toast.error("Failed to remove friend. Please try again.");
+        console.error("Error removing friend:", error);
       }
     } else {
       try {
@@ -63,6 +61,7 @@ const FriendDashboard: React.FC = () => {
         setIsAlreadyFriend(true);
       } catch (error) {
         toast.error("Failed to add friend. Please try again.");
+        console.error("Error adding friend:", error);
       }
     }
   };
