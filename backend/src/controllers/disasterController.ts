@@ -12,9 +12,9 @@ export const getDisasters = async (req: Request, res: Response) => {
         if (!disasters || disasters.length === 0) {
           return res.status(404).json({ message: "No disasters found" });
         }
-        
-        console.log(disasters[0]?.disasters);
-        res.json(disasters[0].disasters);
+
+        console.log(disasters);
+        res.json(disasters);
       } catch (err) {
         res.status(500).json({ error: err.message });
       }

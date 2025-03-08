@@ -2,6 +2,8 @@ import DisasterFilter from '../components/disaster/DisasterFilter';
 import DisasterMap from '../components/disaster/DisasterMap';
 import { useDisasterContext } from '../providers/DisasterContextProvider';
 import { ErrorBoundary } from 'react-error-boundary';
+import PageLayout from '../components/layout/pageLayout';
+import { mainNavItems } from '../config/navigation';
 
 const ErrorFallback: React.FC = () => (
   <div>Error loading disaster map. Please try again.</div>
@@ -11,7 +13,11 @@ const DisasterHeatmap = () => {
   const { loading } = useDisasterContext();
   
   return (
-    <div className="disaster-heatmap" style={{ width: '100%', height: '100vh' }}>
+    <PageLayout
+      title="Disaster Heatmap"
+      navItems={mainNavItems}
+    >
+    <div className="disaster-heatmap">
       <DisasterFilter />
       
       {loading ? (
@@ -24,6 +30,7 @@ const DisasterHeatmap = () => {
         </ErrorBoundary>
       )}
     </div>
+    </PageLayout>
   );
 };
 

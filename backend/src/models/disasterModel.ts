@@ -1,18 +1,13 @@
-import { Schema, model } from "mongoose";
+import mongoose from "mongoose";
 
-const DisasterSchema = new Schema({
+const disasterSchema = new mongoose.Schema({
   type: { type: String, required: true },
   location: {
-    lat: { type: Number, required: true },
-    lng: { type: Number, required: true }
+    lat: Number,
+    lng: Number,
   },
-  frequency: { type: Number, default: 1 },
-  date: { type: Date, default: Date.now }
+  frequency: Number,
+  date: Date,
 });
 
-const DisastersSchema = new Schema({
-  disasters: [DisasterSchema],
-});
-
-export const DisasterList = model("Disasters", DisastersSchema);
-
+export const DisasterList = mongoose.model("Disaster", disasterSchema);

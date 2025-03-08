@@ -9,12 +9,14 @@ async function seedDB() {
     await DisasterList.deleteMany({}); // Clear existing data
     console.log("Old Data Deleted!");
 
-    await DisasterList.create({
-      disasters: [
-        { type: "Flood", location: { lat: 23.81, lng: 90.41 }, frequency: 5 },
-        { type: "Cyclone", location: { lat: 22.35, lng: 91.78 }, frequency: 3 }
-      ]
-    });
+    const disasters = [
+      { type: "Flood", location: { lat: 23.81, lng: 90.41 }, frequency: 5 },
+      { type: "Cyclone", location: { lat: 22.35, lng: 91.78 }, frequency: 3 }
+    ];
+
+    for (const disaster of disasters) {
+      await DisasterList.create(disaster);
+    }
 
     console.log("Seeding Successful!");
   } catch (error) {
