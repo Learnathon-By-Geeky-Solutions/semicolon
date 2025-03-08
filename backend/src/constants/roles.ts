@@ -19,6 +19,7 @@ export enum Permission {
     ViewShelters = "view_shelters",
     NavigateShelters = "navigate_shelters",
     ViewResources = "view_resources",
+    ViewDisasterHeatmap = "view_disaster_heatmap",
 }
 
 export const RolePermissions: Record<Role, Permission[]> = {
@@ -32,6 +33,7 @@ export const RolePermissions: Record<Role, Permission[]> = {
         Permission.ViewShelters,
         Permission.NavigateShelters,
         Permission.ViewResources,
+        Permission.ViewDisasterHeatmap,
     ],
     [Role.Authority]: [
         Permission.ManageShelters,
@@ -41,15 +43,18 @@ export const RolePermissions: Record<Role, Permission[]> = {
         Permission.ViewShelters,
         Permission.NavigateShelters,
         Permission.ViewResources,
+        Permission.ViewDisasterHeatmap,
     ],
     [Role.Volunteer]: [
         Permission.ViewShelters,
         Permission.NavigateShelters,
         Permission.ViewResources, // can be asigned more permissions by the authorities
+        Permission.ViewDisasterHeatmap,
     ],
     [Role.User]: [
         Permission.ViewShelters,
         Permission.NavigateShelters,
         Permission.ViewResources,
+        Permission.ViewDisasterHeatmap,
     ]
 };
