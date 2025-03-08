@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useDisasterContext } from '../../providers/DisasterContextProvider';
-
+import { useDisasterContext } from '../../hooks/useDisasterContext';
 // Import Leaflet default marker icons
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -15,20 +14,6 @@ const DefaultIcon = L.icon({
   iconAnchor: [12, 41]
 });
 L.Marker.prototype.options.icon = DefaultIcon;
-
-// We'll properly ensure leaflet.heat is loaded
-declare global {
-  namespace L {
-    function heatLayer(latlngs: Array<[number, number, number?]>, options?: {
-      minOpacity?: number;
-      maxZoom?: number;
-      max?: number;
-      radius?: number;
-      blur?: number;
-      gradient?: {[key: string]: string};
-    }): L.Layer;
-  }
-}
 
 const DisasterMap = () => {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -123,7 +108,7 @@ const DisasterMap = () => {
         .map(d => [
           d.location.lat, 
           d.location.lng, 
-          d.frequency || 1 // Add intensity value
+          d.frequency ?? 1 // Add intensity value
         ]);
       
       console.log('Prepared points for heatmap:', points.length);

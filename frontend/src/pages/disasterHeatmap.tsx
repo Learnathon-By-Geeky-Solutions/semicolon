@@ -1,6 +1,6 @@
 import DisasterFilter from '../components/disaster/DisasterFilter';
 import DisasterMap from '../components/disaster/DisasterMap';
-import { useDisasterContext } from '../providers/DisasterContextProvider';
+import { useDisasterContext } from '../hooks/useDisasterContext';
 import { ErrorBoundary } from 'react-error-boundary';
 import PageLayout from '../components/layout/pageLayout';
 import { mainNavItems } from '../config/navigation';

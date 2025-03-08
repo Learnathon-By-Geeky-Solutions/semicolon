@@ -1,4 +1,4 @@
-import { useDisasterContext } from '../../providers/DisasterContextProvider';
+import { useDisasterContext } from '../../hooks/useDisasterContext';
 
 const DisasterFilter = () => {
   const { availableTypes, filterType, setFilterType } = useDisasterContext();

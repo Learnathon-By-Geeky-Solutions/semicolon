@@ -1,37 +1,19 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode  } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import { getDisasters } from '../helpers/disaster';
 import { Disaster } from '../types/disasterTypes';
-
-// Create context with default values
-const DisasterContext = createContext<{
-  disasters: Disaster[];
-  filterType: string;
-  availableTypes: string[];
-  loading: boolean;
-  setFilterType: React.Dispatch<React.SetStateAction<string>>;
-}>({
-  disasters: [],
-  filterType: 'all',
-  availableTypes: [],
-  loading: true,
-  setFilterType: () => {},
-});
-
-// Custom hook for using this context
-export const useDisasterContext = () => useContext(DisasterContext);
+import { DisasterContext } from '../hooks/useDisasterContext';
 
 interface DisasterProviderProps {
   children: ReactNode;
 }
 
-export const DisasterProvider = ({ children }: DisasterProviderProps) => {
-  const [disasters, setDisasters] = useState([] as Disaster[]);
+export const DisasterProvider: React.FC<DisasterProviderProps> = ({ children }) => {
+  const [disasters, setDisasters] = useState<Disaster[]>([]);
   const [filterType, setFilterType] = useState('all');
-  const [availableTypes, setAvailableTypes] = useState([] as string[]);
+  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null as string | null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch disasters when the component mounts or when the filter changes
   useEffect(() => {
     let isMounted = true;
     
@@ -42,20 +24,18 @@ export const DisasterProvider = ({ children }: DisasterProviderProps) => {
         
         const disastersData = await getDisasters(filterType);
         
-        // Only update state if component is still mounted
         if (isMounted) {
           setDisasters(disastersData || []);
 
-          // When viewing all disasters, compute available disaster types
           if (filterType === 'all') {
             const types = Array.from(new Set(disastersData?.map(d => d.type) || []));
             setAvailableTypes(types);
           }
         }
       } catch (error) {
-        console.error('Error fetching disasters:', error);
         if (isMounted) {
           setError('Failed to load disaster data. Please try again.');
+          console.error('Error fetching disasters:', error);
         }
       } finally {
         if (isMounted) {
@@ -65,33 +45,23 @@ export const DisasterProvider = ({ children }: DisasterProviderProps) => {
     };
 
     fetchDisasters();
-    console.log(disasters);
-
     
-    // Cleanup function
     return () => {
       isMounted = false;
     };
   }, [filterType]);
 
-  // Create the context value object
-  const contextValue = {
+  const contextValue = React.useMemo(() => ({
     disasters,
     filterType,
     availableTypes,
     loading,
     setFilterType,
-  };
+  }), [disasters, filterType, availableTypes, loading]);
 
   return (
     <DisasterContext.Provider value={contextValue}>
-      {error ? (
-        <div className="error-message">{error}</div>
-      ) : (
-        children
-      )}
+      {error ? <div className="error-message">{error}</div> : children}
     </DisasterContext.Provider>
   );
 };
-
-export default DisasterContext;
