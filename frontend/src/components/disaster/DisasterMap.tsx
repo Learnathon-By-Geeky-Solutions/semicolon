@@ -2,11 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useDisasterContext } from '../../hooks/useDisasterContext';
-// Import Leaflet default marker icons
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Fix Leaflet's default icon problem
 const DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
@@ -22,10 +20,9 @@ const DisasterMap = () => {
   const { disasters, loading } = useDisasterContext();
   const [heatmapLoaded, setHeatmapLoaded] = useState(false);
 
-  // First, ensure the heatmap library is loaded
+  
   useEffect(() => {
     if (typeof L.heatLayer !== 'function') {
-      // Load leaflet.heat dynamically if not already loaded
       const script = document.createElement('script');
       script.src = 'https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js';
       script.async = true;
@@ -71,7 +68,6 @@ const DisasterMap = () => {
   
   // Create and update heat layer
   useEffect(() => {
-    // Only proceed if everything is ready
     const map = mapInstanceRef.current;
     if (!map || loading || !disasters || disasters.length === 0 || !heatmapLoaded) {
       console.log('Not ready to create heatmap:', {

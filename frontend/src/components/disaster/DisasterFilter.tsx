@@ -15,8 +15,8 @@ const DisasterFilter = () => {
         className="filter-select"
       >
         <option value="all">All</option>
-        {availableTypes.map((type, index) => (
-          <option key={index} value={type}>{type}</option>
+        {availableTypes.map((type) => (
+          <option key={type} value={type}>{type}</option>
         ))}
       </select>
     </div>

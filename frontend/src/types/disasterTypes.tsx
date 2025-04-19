@@ -12,7 +12,10 @@ export interface Location {
     // Add any other properties your disaster objects have
   }
   
-  export interface DisasterContextType {
-    disasters: Disaster[];
-    filterType: string;
-  }
+export interface DisasterContextType {
+  disasters: Disaster[];
+  filterType: string;
+  availableTypes: string[];
+  loading: boolean;
+  setFilterType: React.Dispatch<React.SetStateAction<string>>;
+}
