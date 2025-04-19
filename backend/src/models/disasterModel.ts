@@ -6,8 +6,9 @@ const disasterSchema = new mongoose.Schema({
     lat: Number,
     lng: Number,
   },
-  frequency: Number,
   date: Date,
+  title: String,
+  description: String
 });
 
 export const DisasterList = mongoose.model("Disaster", disasterSchema);
