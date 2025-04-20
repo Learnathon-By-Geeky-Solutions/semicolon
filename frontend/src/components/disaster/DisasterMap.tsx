@@ -17,10 +17,10 @@ const DisasterMap = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const heatLayerRef = useRef<L.Layer | null>(null);
+  const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const { disasters, loading } = useDisasterContext();
   const [heatmapLoaded, setHeatmapLoaded] = useState(false);
 
-  
   useEffect(() => {
     if (typeof L.heatLayer !== 'function') {
       const script = document.createElement('script');
@@ -52,6 +52,9 @@ const DisasterMap = () => {
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
+      
+      // Create a layer group for markers
+      markersLayerRef.current = L.layerGroup().addTo(map);
       
       // Save map instance to ref
       mapInstanceRef.current = map;
@@ -93,6 +96,11 @@ const DisasterMap = () => {
       heatLayerRef.current = null;
     }
     
+    // Clear existing markers
+    if (markersLayerRef.current) {
+      markersLayerRef.current.clearLayers();
+    }
+    
     try {
       // Transform and filter valid points
       const points = disasters
@@ -124,6 +132,81 @@ const DisasterMap = () => {
         heatLayer.addTo(map);
         heatLayerRef.current = heatLayer;
         console.log('Heatmap layer added to map successfully');
+        
+        // Add invisible markers for each disaster with tooltips
+        disasters.forEach(disaster => {
+          if (disaster.location && typeof disaster.location.lat === 'number' && typeof disaster.location.lng === 'number') {
+            
+            const formattedDate = new Date(disaster.date ?? '').toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+            
+            const marker = L.circleMarker(
+              [disaster.location.lat, disaster.location.lng],
+              {
+                radius: 20,
+                fillColor: 'transparent',
+                fillOpacity: 0,
+                stroke: false
+              }
+            );
+            
+            //custom tooltip
+            const tooltipContent = `
+              <div class="disaster-tooltip">
+                <div class="disaster-type">${disaster.type}</div>
+                <div class="disaster-date">${formattedDate}</div>
+              </div>
+            `;
+            
+            marker.bindTooltip(tooltipContent, {
+              direction: 'top',
+              offset: L.point(0, -10),
+              opacity: 0.9,
+              className: 'disaster-tooltip-container'
+            });
+            
+            // Add to markers layer group
+            if (markersLayerRef.current) {
+              marker.addTo(markersLayerRef.current);
+            }
+          }
+        });
+        
+        const style = document.createElement('style');
+        style.textContent = `
+          .disaster-tooltip-container {
+            background-color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            padding: 0;
+          }
+          .disaster-tooltip-container .leaflet-tooltip-content {
+            padding: 0;
+          }
+          .disaster-tooltip {
+            padding: 10px 14px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+              Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+          }
+          .disaster-type {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+          }
+          .disaster-date {
+            font-size: 12px;
+            color: #666666;
+          }
+          .leaflet-tooltip-top:before {
+            border-top-color: #ffffff;
+          }
+        `;
+        document.head.appendChild(style);
         
         // Force the map to redraw
         setTimeout(() => {

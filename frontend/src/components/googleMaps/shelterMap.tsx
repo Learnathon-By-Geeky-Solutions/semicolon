@@ -247,8 +247,8 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
   const initializeMap = async () => {
     try {
-      const { Map } = await loader.importLibrary("maps");
-      const map = new Map(document.getElementById("map") as HTMLElement, {
+      const { Map: GoogleMap } = await loader.importLibrary("maps");
+      const map = new GoogleMap(document.getElementById("map") as HTMLElement, {
         center,
         zoom: 12,
         mapId: "shelter-map",
