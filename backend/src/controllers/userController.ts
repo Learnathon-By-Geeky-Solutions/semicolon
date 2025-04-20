@@ -91,7 +91,10 @@ export const deleteFriend = async (req: Request, res: Response, next: NextFuncti
     }
 
     // Find the user by userEmail
-    const user = await User.findOne({ email: userEmail });
+    if (typeof userEmail !== "string") {
+      return res.status(400).json({ success: false, message: "Invalid userEmail format" });
+    }
+    const user = await User.findOne({ email: { $eq: userEmail } });
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
