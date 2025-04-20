@@ -9,5 +9,5 @@ npm run dev
 
 to seed disaster data
 ```bash
-npm run seed
+node --loader ts-node/esm src/scripts/seedDB.ts
 ```

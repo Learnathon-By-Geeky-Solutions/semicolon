@@ -1,6 +1,7 @@
 import { connectToDatabase, disconnectFromDatabase } from "../db/connection.js";
 import { DisasterList } from "../models/disasterModel.js";
 import axios from "axios";
+import nlp from "compromise";
 
 interface Location {
   lat: number;
@@ -17,136 +18,151 @@ interface Disaster {
   description?: string;
 }
 
+// Cache to avoid duplicate geocoding calls
+const geocodeCache = new Map<string, Location>();
+
+// Extracts place names using NLP
+function extractLocationsFromText(text: string): string[] {
+  const doc = nlp(text);
+  const places = doc.places().out('array');
+  return [...new Set(places as string[])];
+}
+
+// Uses OpenCage to geocode place names
+async function geocodePlace(place: string): Promise<Location | null> {
+  if (geocodeCache.has(place)) return geocodeCache.get(place);
+
+  try {
+    const response = await axios.get(process.env.OPENCAGE_API_URL, {
+      params: {
+        q: `${place}, Bangladesh`,
+        key: process.env.OPENCAGE_API_KEY,
+        limit: 1,
+        countrycode: "bd"
+      }
+    });
+
+    const geometry = response.data.results[0]?.geometry;
+    if (geometry) {
+      const location = { lat: geometry.lat, lng: geometry.lng };
+      geocodeCache.set(place, location);
+      return location;
+    }
+  } catch (err) {
+    console.error(`Geocode failed for ${place}:`, err.message);
+  }
+
+  return null;
+}
+
 async function fetchReliefWebData(): Promise<Disaster[]> {
   try {
-    // Fetch the list of reports for Bangladesh
-    const listResponse = await axios.get(
-      "https://api.reliefweb.int/v1/reports",
-      {
-        params: {
-          appname: "apidoc",
-          "query[value]": "Bangladesh",
-          limit: 100 
-        }
-      }
-    );
-
-    const reports = listResponse.data.data;
+    const reports = await fetchReports();
     const disasters: Disaster[] = [];
 
-    // Process each report
     for (const report of reports) {
-      try {
-        // Fetch detailed report data
-        const detailResponse = await axios.get(
-          `https://api.reliefweb.int/v1/reports/${report.id}`,
-          { params: { appname: "apidoc" } }
-        );
-
-        const reportData = detailResponse.data.data[0].fields;
-        
-        // Extract disaster types if available
-        if (reportData.disaster_type && reportData.disaster_type.length > 0) {
-          // Get primary country location
-          let location: Location | null = null;
-          if (reportData.primary_country && reportData.primary_country.location) {
-            location = {
-              lat: reportData.primary_country.location.lat,
-              lng: reportData.primary_country.location.lon
-            };
-          }
-
-          // If we have a valid location, create disaster entries for each disaster type
-          if (location) {
-            for (const disasterType of reportData.disaster_type) {
-              const disaster: Disaster = {
-                type: disasterType.name,
-                location,
-                date: reportData.date ? new Date(reportData.date.created) : undefined,
-                title: reportData.title,
-                description: reportData.body?.substring(0, 500) // Truncate to avoid overly long descriptions
-              };
-              
-              // Try to extract affected people count from body text if available
-              /*if (reportData.body && reportData.body.includes("million people") || reportData.body.includes("people have been")) {
-                const bodyText = reportData.body;
-                const matches = bodyText.match(/(\d+(\.\d+)?\s*million people)|(\d+,\d+\s*people)|(\d+\s*people)/i);
-                if (matches) {
-                  let count = matches[0];
-                  if (count.includes("million")) {
-                    const num = parseFloat(count.split(" ")[0]);
-                    disaster.affectedPeople = Math.round(num * 1000000);
-                  } else {
-                    count = count.replace(/,/g, "").replace(/people/i, "").trim();
-                    disaster.affectedPeople = parseInt(count);
-                  }
-                }
-              }*/
-              
-              disasters.push(disaster);
-            }
-          }
-        }
-      } catch (error) {
-        console.error(`Error fetching details for report ${report.id}:`, error.message);
-        // Continue with the next report
-      }
+      const disasterData = await processReport(report);
+      if (disasterData) disasters.push(...disasterData);
     }
 
     return disasters;
   } catch (error) {
-    console.error("Error fetching data from ReliefWeb API:", error.message);
+    console.error("Error fetching data from ReliefWeb:", error.message);
     return [];
   }
+}
+
+async function fetchReports(): Promise<any[]> {
+  const response = await axios.get(process.env.RELIEF_WEB_API_URL, {
+    params: {
+      appname: "apidoc",
+      "query[value]": "Bangladesh",
+      "filter[field]": "primary_country.name",
+      "filter[value]": "Bangladesh",
+      limit: 100
+    }
+  });
+  return response.data.data;
+}
+
+async function processReport(report: any): Promise<Disaster[] | null> {
+  try {
+    const detailResponse = await axios.get(
+      `${process.env.RELIEF_WEB_API_URL}/${report.id}`,
+      { params: { appname: "apidoc" } }
+    );
+
+    const reportData = detailResponse.data.data[0]?.fields;
+    if (!reportData?.disaster_type?.length || reportData.primary_country?.name !== "Bangladesh") {
+      return null;
+    }
+
+    const description = reportData.body ?? "";
+    const location = await determineLocation(description, reportData);
+
+    if (!location) return null;
+
+    return reportData.disaster_type.map((disasterType: any) => ({
+      type: disasterType.name,
+      location,
+      date: reportData.date ? new Date(reportData.date.created) : undefined,
+      title: reportData.title ?? "No title provided",
+      description: description.substring(0, 500) ?? "No description provided"
+    }));
+  } catch (error) {
+    console.error(`Error processing report ${report.id}:`, error.message);
+    return null;
+  }
+}
+
+async function determineLocation(description: string, reportData: any): Promise<Location | null> {
+  const placeNames = extractLocationsFromText(description);
+
+  for (const place of placeNames) {
+    if (place !== "Bangladesh") {
+      const location = await geocodePlace(place);
+      if (location) return location;
+    }
+  }
+
+  if (reportData.primary_country?.location) {
+    return {
+      lat: reportData.primary_country.location.lat,
+      lng: reportData.primary_country.location.lon
+    };
+  }
+
+  return null;
 }
 
 async function seedDB() {
   try {
     console.log("Seeding Database with ReliefWeb data...");
-    await connectToDatabase(); // Ensure MongoDB is connected
-
-    await DisasterList.deleteMany({}); // Clear existing data
+    await connectToDatabase();
+    await DisasterList.deleteMany({});
     console.log("Old Data Deleted!");
 
-    // Fetch disaster data from ReliefWeb API
     const disasters = await fetchReliefWebData();
-    
+
     if (disasters.length === 0) {
-      console.log("No disaster data retrieved. Falling back to default data.");
-      // Fallback to default data if no data from API
-      const defaultDisasters = [
+      console.log("No valid disaster data found. Using fallback...");
+      const fallback = [
         { type: "Flood", location: { lat: 23.81, lng: 90.41 }, frequency: 5 },
         { type: "Cyclone", location: { lat: 22.35, lng: 91.78 }, frequency: 3 }
       ];
-      
-      for (const disaster of defaultDisasters) {
-        await DisasterList.create(disaster);
-      }
+      for (const d of fallback) await DisasterList.create(d);
     } else {
-      console.log(`Retrieved ${disasters.length} disasters from ReliefWeb API`);
-      
-      // Create frequency map to calculate frequency of each disaster type
-      /*const typeFrequency = disasters.reduce((acc, disaster) => {
-        acc[disaster.type] = (acc[disaster.type] || 0) + 1;
-        return acc;
-      }, {});
-      
-      // Add frequency to each disaster based on the map
-      disasters.forEach(disaster => {
-        disaster.frequency = typeFrequency[disaster.type];
-      });*/
-      
-      // Save all disasters to database
-      for (const disaster of disasters) {
-        await DisasterList.create(disaster);
+      console.log(`Inserting ${disasters.length} disasters into database...`);
+      for (const d of disasters) {
+        await DisasterList.create(d);
       }
     }
 
     console.log("Seeding Successful!");
   } catch (error) {
-    console.error("Error seeding database:", error);
+    console.error("Seeding failed:", error);
   } finally {
-    await disconnectFromDatabase(); // Close connection
+    await disconnectFromDatabase();
     console.log("Disconnected from MongoDB.");
   }
 }
