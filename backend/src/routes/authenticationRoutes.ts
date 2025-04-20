@@ -4,9 +4,8 @@ import {
   signup,
   logout,
   checkAuth,
-  googleRedirect,
-  googleCallback,
-  googleCallbackHandler,
+  googleLogin,
+  updateProfile,
   verifyEmail,
   forgotPassword,
   resetPassword,
@@ -40,14 +39,10 @@ authenticationRouter.post("/logout", logout);
 authenticationRouter.get("/check-auth", verifyTokenForCheckAuth, checkAuth);
 
 authenticationRouter.post("/verify-email", verifyEmail);
+authenticationRouter.post("/update-profile", updateProfile);
 authenticationRouter.post("/forgot-password", forgotPassword);
 authenticationRouter.post("/reset-password/:token", resetPassword);
 
-authenticationRouter.get("/google", googleRedirect);
-authenticationRouter.get(
-  "/google/callback",
-  googleCallback,
-  googleCallbackHandler,
-);
+authenticationRouter.get("/google", googleLogin);
 
 export default authenticationRouter;

@@ -6,7 +6,7 @@ const API_URL = `${SERVER_URL}/api/v1/auth`;
 interface User {
     name: string;
     email: string;
-    verificationCode: string;
+    verificationCode?: string;
 }
 
 export const verifyEmail = async (user: User): Promise<boolean> => {
@@ -20,5 +20,17 @@ export const verifyEmail = async (user: User): Promise<boolean> => {
         return false;
     }
 
+}
+
+export const updateProfile = async (user: User): Promise<boolean> => {
+    const url = `${API_URL}/update-profile`;
+    try {
+        const response = await axios.post(url, user);
+        console.log("Profile updated successfully", response);
+        return true;
+    } catch (error) {
+        console.error("Error updating profile", error);
+        return false;
+    }
 }
 

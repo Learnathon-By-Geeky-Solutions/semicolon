@@ -21,6 +21,9 @@ import Settings from "./pages/settingsPage";
 import ResetPasswordPage from "./pages/resetPasswordPage";
 import FriendDashboard from "./pages/friendDashboard";
 import ShelterAnalyticsPage from "./pages/shelterAnalyticsPage";
+import FamilyStatus from "./pages/familyStatus";
+import DisasterHeatmap from "./pages/disasterHeatmap";
+
 
 function App() {
   const location = useLocation();
@@ -54,7 +57,7 @@ function App() {
     window.scrollTo(0, 0);
   }, [location]);
 
-  return (
+  return ( 
     <div> 
       <Routes>
         
@@ -62,23 +65,24 @@ function App() {
         
         <Route path="/signup" element={<RedirectAuthenticatedUser> <SignUpPage/> </RedirectAuthenticatedUser>} />
         <Route path="/login" element={ <RedirectAuthenticatedUser> <LoginPage/></RedirectAuthenticatedUser> } />
-
+      
         <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
         <Route path="/reset-password/:token" element={<RedirectAuthenticatedUser> <ResetPasswordPage/> </RedirectAuthenticatedUser>} />
 
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard/></ProtectedRoute>} />
         <Route path="/authority" element={ <ProtectedRoute>  <AuthorityDashboard/> </ProtectedRoute>} />
         <Route path="/volunteer" element={<ProtectedRoute> <VolunteerDashboard/> </ProtectedRoute>} />
-        <Route path="/user/:email" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} /> {/* Dynamic user route */}
+        <Route path="/user/:email" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
         <Route path="/friend/:email" element={<ProtectedRoute><FriendDashboard /></ProtectedRoute>} /> 
         <Route path="/shelters" element={<ProtectedRoute> <SheltersPage/> </ProtectedRoute>} />
         <Route path="/manage-shelters" element={<ProtectedRoute> <ManageSheltersPage/> </ProtectedRoute>} />
         <Route path="/districts" element={<ProtectedRoute>  <DistrictPage /> </ProtectedRoute>} />
+        <Route path="/disaster-heatmap" element={ <ProtectedRoute>  <DisasterHeatmap/>  </ProtectedRoute>} />
         <Route path="/resource-analyticts" element={ <ProtectedRoute>  <ResourceAnalytictsPage/>  </ProtectedRoute>} />
         <Route path="/shelter-analytics" element={ <ProtectedRoute>  <ShelterAnalyticsPage/>  </ProtectedRoute>} />
         <Route path="/allocate-district-resources" element={ <ProtectedRoute>  <AllocateDistrictResources/> </ProtectedRoute>} />
         <Route path="/settings" element={ <ProtectedRoute>  <Settings/> </ProtectedRoute>} />
-        
+        <Route path="/family-status" element={ <ProtectedRoute>  <FamilyStatus/> </ProtectedRoute>} />
         <Route path="/logout" element={"LOGOUT"} />
       </Routes>
       <Toaster />

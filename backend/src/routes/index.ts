@@ -9,6 +9,7 @@ import { authorizeRole } from "../middlewares/roleMiddleware.js";
 import shelterRouter from "./shelterRoutes.js";
 import districtRouter from "./districtRoutes.js";
 import shelterReviewRouter from "./shelterReviewRoutes.js";
+import disasterRouter from "./disasterRoutes.js";
 
 const appRouter = Router();
 
@@ -33,6 +34,7 @@ appRouter.use("/user", userRouter);
 //appRouter.use("/user", verifyToken, authorizeRole("admin","authority", "volunteer", "user"), userRouter);
 appRouter.use("/shelters", shelterRouter);
 appRouter.use("/district", districtRouter);
+appRouter.use("/disasters", disasterRouter);
 //>>>>>>> origin/dev
 
 appRouter.use("/shelterReviews", shelterReviewRouter);

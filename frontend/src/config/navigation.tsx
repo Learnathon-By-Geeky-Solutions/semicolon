@@ -5,7 +5,7 @@ import {
   MdAnalytics,
   MdSettings,
   MdMap,
-  MdManageHistory
+  MdManageHistory,
 } from 'react-icons/md';
 
 export const mainNavItems: NavItem[] = [
@@ -52,9 +52,15 @@ export const mainNavItems: NavItem[] = [
     roles: ['authority'] // only admin and authority can allocate resources
   },
   {
+    label: 'Disaster Heatmap',
+    path: '/disaster-heatmap',
+    icon: MdMap,
+    roles: ['user', 'admin', 'authority', 'volunteer'] // everyone can access disaster heatmap
+  },
+  {
     label: 'Settings',
     path: '/settings',
     icon: MdSettings,
     roles: ['user', 'admin', 'authority', 'volunteer'] // everyone can access settings
-  }
+  },
 ];

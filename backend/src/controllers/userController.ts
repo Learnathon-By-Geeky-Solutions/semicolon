@@ -56,9 +56,6 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
       // Save the updated user document
       await user.save();
   
-      // Optionally, you could also add the user's ID to the friend's family (if mutual friendship is desired)
-      //friend.family.push(user.email);
-      //await friend.save();
   
       // Send the response back with success message
       res.status(200).json({ success: true, message: "Friend added successfully" });
@@ -84,4 +81,52 @@ export const checkFriendship = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
+export const deleteFriend = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userEmail, friendEmail } = req.body; // Get userEmail and friendEmail from the request body
+
+    // Check if both userEmail and friendEmail are provided
+    if (!userEmail || !friendEmail) {
+      return res.status(400).json({ success: false, message: "userEmail and friendEmail are required" });
+    }
+
+    // Find the user by userEmail
+    if (typeof userEmail !== "string") {
+      return res.status(400).json({ success: false, message: "Invalid userEmail format" });
+    }
+    const user = await User.findOne({ email: { $eq: userEmail } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Find the friend by friendEmail
+    const friend = await User.findOne({ email: friendEmail });
+    if (!friend) {
+      return res.status(404).json({ success: false, message: "Friend not found" });
+    }
+
+    // Check if the friend is actually in the user's family list
+    if (!user.family.includes(friend.email)) {
+      return res.status(400).json({ success: false, message: "This user is not in your friend list" });
+    }
+
+    // Remove the friend from the user's family list
+    user.family = user.family.filter(email => email !== friend.email);
+
+    // Save the updated user document
+    await user.save();
+
+    // Optionally, if mutual friendship should be removed, remove the user from the friend's family list as well
+    // friend.family = friend.family.filter(email => email !== user.email);
+    // await friend.save();
+
+    // Send the response back with success message
+    res.status(200).json({ success: true, message: "Friend removed successfully" });
+  } catch (error) {
+    // Handle any errors
+    console.error("Error removing friend:", error);
+    res.status(500).json({ success: false, message: "An error occurred while removing friend" });
+  }
+};
+
   

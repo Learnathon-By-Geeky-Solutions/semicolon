@@ -3,12 +3,12 @@ import { Mail, User, Shield, X } from 'lucide-react';
 import PageLayout from '../components/layout/pageLayout';
 import { mainNavItems } from '../config/navigation';
 import { useAuthStore } from '../store/authStore';
-import { verifyEmail } from '../helpers/settings';
+import { verifyEmail, updateProfile } from '../helpers/settings';
 
 const SettingsPage = () => {
-  const { user } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   const [name, setName] = useState(user?.name ?? '');
-  const [email, setEmail] = useState(user?.email ?? '');
+  const [email] = useState(user?.email ?? '');
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(user?.isVerified || false);
   const [verificationCode, setVerificationCode] = useState('');
@@ -17,9 +17,19 @@ const SettingsPage = () => {
 
   const handleSave = async () => {
     setIsSaving(true);
-    // TODO: Implement API call to update user profile
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSaving(false);
+    try {
+      const success = await updateProfile({ name : name, email: email });
+      if (success) {
+        // Update the user in the auth store to reflect changes
+        updateUser({ ...user, name });
+        // Hide success message after 3 seconds
+        setTimeout(() => 3000);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleVerificationSubmit = async (e: React.FormEvent) => {
@@ -83,11 +93,11 @@ const SettingsPage = () => {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter your email"
+                    readOnly
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
                   />
                 </div>
+                <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
               </div>
 
               {/* Email Verification */}

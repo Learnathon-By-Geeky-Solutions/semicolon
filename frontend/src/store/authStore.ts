@@ -44,10 +44,13 @@ interface AuthState {
   googleAuth: () => void;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => void;
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (token: string | undefined, password: string) => Promise<void>;
   addFriend: (userEmail: string, friendEmail: string) => Promise<void>;
+  deleteFriend: (userEmail: string, friendEmail: string) => Promise<void>;
   getUser: () => Promise<void>;
+  googleLogin: (code: string) => Promise<void>;
 }
 
 axios.defaults.withCredentials = true;
@@ -160,12 +163,42 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
+  updateUser: (userData) => {
+    set((state) => ({
+      user: state.user ? { ...state.user, ...userData } : null
+    }));
+  },
+
   googleAuth: () => {
     try {
       window.location.href = `${API_URL}/google`;
     } catch (error) {
       console.error("Error initiating Google authentication:", error);
       set({ error: "Failed to initiate Google authentication" });
+    }
+  },
+
+  googleLogin: async (code) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.get(`${API_URL}/google?code=${code}`);
+
+      set({
+        isAuthenticated: true,
+        user: response.data.user,
+        error: null,
+        isLoading: false,
+      });
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        set({
+          error: error.response?.data?.message || "Error logging in",
+          isLoading: false,
+        });
+      } else {
+        set({ error: "Unexpected error occurred", isLoading: false });
+      }
+      throw error;
     }
   },
 
@@ -247,6 +280,37 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (axios.isAxiosError(error)) {
         set({
           error: error.response?.data?.message || "Error fetching users",
+          isLoading: false,
+        });
+      } else {
+        set({ error: "Unexpected error occurred", isLoading: false });
+      }
+      throw error;
+    }
+  },
+  deleteFriend: async (userEmail: string, friendEmail: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const data = {
+        userEmail: userEmail,
+        friendEmail: friendEmail,
+      };
+
+      const response = await axios.post(
+        "http://localhost:5000/api/v1/user/deleteFriend",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Friend deleted successfully", response.data);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        set({
+          error: error.response?.data?.message || "Error deleting friend",
           isLoading: false,
         });
       } else {
