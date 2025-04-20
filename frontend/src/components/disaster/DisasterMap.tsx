@@ -137,12 +137,13 @@ const DisasterMap = () => {
         disasters.forEach(disaster => {
           if (disaster.location && typeof disaster.location.lat === 'number' && typeof disaster.location.lng === 'number') {
             
-            const formattedDate = new Date(disaster.date ?? '').toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric'
-            });
-            
+            const formattedDate = disaster.date
+              ? new Date(disaster.date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                })
+              : 'Unknown';
             const marker = L.circleMarker(
               [disaster.location.lat, disaster.location.lng],
               {
