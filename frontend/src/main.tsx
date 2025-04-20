@@ -5,7 +5,12 @@ import './index.css'
 import App from './App.tsx'
 import { DisasterProvider } from './providers/DisasterContextProvider';
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  console.error('Root element not found');
+  throw new Error('Root element not found');
+}
+createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
       <DisasterProvider>
