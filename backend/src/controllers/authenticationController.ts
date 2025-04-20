@@ -3,7 +3,6 @@ import { hash, compare } from "bcrypt";
 import { User } from "../models/userModel.js";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 import { AuthenticatedRequest } from "../types/types.js";
-import passport from "passport";
 import { Role } from "../constants/roles.js";
 import { generateVerificationCode } from "../utils/generateVerficationCode.js";
 import {
@@ -15,7 +14,6 @@ import {
 import * as crypto from "crypto";
 import { oauth2client } from '../utils/googleConfig.js';
 import axios from 'axios';
-import jwt from 'jsonwebtoken';
 
 export const signup = async (
   req: Request,
@@ -56,7 +54,7 @@ export const signup = async (
       documents: documentFile ? documentFile.buffer : null,
       verificationToken: verificationCode,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours validity
-      district_id: district_id || null,
+      district_id: district_id ?? null,
     });
     await user.save();
 

@@ -56,9 +56,6 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
       // Save the updated user document
       await user.save();
   
-      // Optionally, you could also add the user's ID to the friend's family (if mutual friendship is desired)
-      //friend.family.push(user.email);
-      //await friend.save();
   
       // Send the response back with success message
       res.status(200).json({ success: true, message: "Friend added successfully" });
