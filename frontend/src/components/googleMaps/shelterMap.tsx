@@ -564,20 +564,6 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
         {/* Loading Overlay */}
         {isLoading && (
           <div>
-      {showLocationDialog && (
-        <LocationConsentDialog
-          onDeny={() => {
-            setLocationConsent(false);
-            setShowLocationDialog(false);
-            toast.error("Location access denied. Some features will be limited.");
-          }}
-          onAllow={() => {
-            setLocationConsent(true);
-            setShowLocationDialog(false);
-            requestLocation();
-          }}
-        />
-      )}
           </div>
         )}
         
