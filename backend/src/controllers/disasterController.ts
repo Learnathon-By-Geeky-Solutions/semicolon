@@ -3,9 +3,9 @@ import { DisasterList } from "../models/disasterModel.js";
 
 export const getDisasters = async (req: Request, res: Response) => {
     try {
-        const filter: { type?: string } = {};
-        if (req.query.type && req.query.type !== 'all') {
-          filter.type = req.query.type as string;
+        const filter: { type?: { $eq: string } } = {};
+        if (typeof req.query.type === 'string' && req.query.type !== 'all') {
+          filter.type = { $eq: req.query.type };
         }
         const disasters = await DisasterList.find(filter);
 
