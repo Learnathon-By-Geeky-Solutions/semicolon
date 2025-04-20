@@ -111,6 +111,46 @@ export const login = async (
   }
 };
 
+export const updateProfile = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    const { email, name } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Name is required" 
+      });
+    }
+
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
+
+    user.name = name;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        ...user.toObject(),
+        password: undefined,
+      },
+    });
+  } catch (error) {
+    console.log("Error updating profile", error);
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 export const logout = async (
   req: Request,
   res: Response,
