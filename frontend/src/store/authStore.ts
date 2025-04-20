@@ -44,6 +44,7 @@ interface AuthState {
   googleAuth: () => void;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => void;
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (token: string | undefined, password: string) => Promise<void>;
   addFriend: (userEmail: string, friendEmail: string) => Promise<void>;
@@ -160,6 +161,12 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
       throw error;
     }
+  },
+
+  updateUser: (userData) => {
+    set((state) => ({
+      user: state.user ? { ...state.user, ...userData } : null
+    }));
   },
 
   googleAuth: () => {

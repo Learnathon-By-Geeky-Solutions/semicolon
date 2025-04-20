@@ -5,6 +5,7 @@ import {
   logout,
   checkAuth,
   googleLogin,
+  updateProfile,
   verifyEmail,
   forgotPassword,
   resetPassword,
@@ -38,6 +39,7 @@ authenticationRouter.post("/logout", logout);
 authenticationRouter.get("/check-auth", verifyTokenForCheckAuth, checkAuth);
 
 authenticationRouter.post("/verify-email", verifyEmail);
+authenticationRouter.post("/update-profile", updateProfile);
 authenticationRouter.post("/forgot-password", forgotPassword);
 authenticationRouter.post("/reset-password/:token", resetPassword);
 

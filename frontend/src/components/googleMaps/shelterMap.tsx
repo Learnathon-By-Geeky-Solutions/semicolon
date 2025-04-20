@@ -5,7 +5,6 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { ResourcePopup } from "./resourcePopup";
 import { Location, Shelter, NewShelter, MapWithSheltersProps, TravelMode } from "../../types/shelterMapTypes";
 import { getShelters, saveShelters } from "../../helpers/shelter";
-import LoadingSpinner from "../loadingSpinner";
 import { MdMyLocation, MdSave, MdDirectionsCar, MdDirectionsWalk, MdClose, MdRoute} from "react-icons/md";
 import { useAuthStore } from "../../store/authStore";
 import { getDistrictById } from "../../helpers/district";
@@ -56,7 +55,10 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
 
-  const LocationConsentDialog = () => (
+  const LocationConsentDialog: React.FC<{
+    onDeny: () => void;
+    onAllow: () => void;
+  }> = ({ onDeny, onAllow }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
         <h2 className="text-xl font-semibold mb-4">Location Access Required</h2>
@@ -71,22 +73,14 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
         </p>
         <div className="flex justify-end gap-3">
           <button
-            onClick={() => {
-              setLocationConsent(false);
-              setShowLocationDialog(false);
-              toast.error("Location access denied. Some features will be limited.");
-            }}
+            onClick={onDeny}
             className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 
             transition-colors duration-200"
           >
             Deny
           </button>
           <button
-            onClick={() => {
-              setLocationConsent(true);
-              setShowLocationDialog(false);
-              requestLocation();
-            }}
+            onClick={onAllow}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 
             transition-colors duration-200"
           >
@@ -247,8 +241,8 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
   const initializeMap = async () => {
     try {
-      const { Map } = await loader.importLibrary("maps");
-      const map = new Map(document.getElementById("map") as HTMLElement, {
+      const { Map: GoogleMap } = await loader.importLibrary("maps");
+      const map = new GoogleMap(document.getElementById("map") as HTMLElement, {
         center,
         zoom: 12,
         mapId: "shelter-map",
@@ -552,12 +546,24 @@ const MapWithShelters: React.FC<MapWithSheltersProps> = ({ permission }) => {
 
   return (
     <>
-      {showLocationDialog && <LocationConsentDialog />}
+      {showLocationDialog && (
+        <LocationConsentDialog
+          onDeny={() => {
+            setLocationConsent(false);
+            setShowLocationDialog(false);
+            toast.error("Location access denied. Some features will be limited.");
+          }}
+          onAllow={() => {
+            setLocationConsent(true);
+            setShowLocationDialog(false);
+            requestLocation();
+          }}
+        />
+      )}
       <div className="flex-1 flex flex-col bg-gray-50">
         {/* Loading Overlay */}
         {isLoading && (
           <div>
-            <LoadingSpinner />
           </div>
         )}
         

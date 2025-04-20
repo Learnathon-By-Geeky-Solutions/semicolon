@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { ShelterList } from "../models/shelterModel.js";
-import mongoose from "mongoose";
 
 export const getShelters = async (req: Request, res: Response) => {
   try {

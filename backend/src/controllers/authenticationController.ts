@@ -3,7 +3,6 @@ import { hash, compare } from "bcrypt";
 import { User } from "../models/userModel.js";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 import { AuthenticatedRequest } from "../types/types.js";
-import passport from "passport";
 import { Role } from "../constants/roles.js";
 import { generateVerificationCode } from "../utils/generateVerficationCode.js";
 import {
@@ -15,7 +14,6 @@ import {
 import * as crypto from "crypto";
 import { oauth2client } from '../utils/googleConfig.js';
 import axios from 'axios';
-import jwt from 'jsonwebtoken';
 
 export const signup = async (
   req: Request,
@@ -56,7 +54,7 @@ export const signup = async (
       documents: documentFile ? documentFile.buffer : null,
       verificationToken: verificationCode,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours validity
-      district_id: district_id || null,
+      district_id: district_id ?? null,
     });
     await user.save();
 
@@ -109,6 +107,46 @@ export const login = async (
     });
   } catch (error) {
     console.log("Error in login ", error);
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProfile = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    const { email, name } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Name is required" 
+      });
+    }
+
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
+
+    user.name = name;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        ...user.toObject(),
+        password: undefined,
+      },
+    });
+  } catch (error) {
+    console.log("Error updating profile", error);
     res.status(400).json({ success: false, message: error.message });
   }
 };
